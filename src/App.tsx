@@ -1,5 +1,7 @@
 import { Box } from '@mui/material';
 
+import Profile from './components/profile/Profile';
+
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -7,6 +9,7 @@ import './App.css'
 function App() {
   return (
     <Box component='div' className='App'>
+      <Profile />
       <Box component='header' className='App-header'>
         <Box component='a' href="https://vitejs.dev" target="_blank">
           <Box component='img' src={viteLogo} className="logo" alt="Vite logo" />
