@@ -1,4 +1,5 @@
 #root {
+  width: 100vw;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -54,18 +55,34 @@
   }
 }
 
-.carousel {
-  width: 100vw;
-  height: 500px;
-  margin: 0;
-  display: grid;
-  grid-template-rows: 400px 100px;
-  grid-template-columns: 1fr 30px 30px 30px 30px 30px 1fr;
+.gallery {
+  height: 400px;
+  margin: 20px 0px;
   align-items: center;
   justify-items: center;
 }
 
-.carousel .box {
+.gallery .navigation {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery .display {
+  height: 24em;
+  margin-bottom: -3em;
+  grid-row: 1 / 2;
+  grid-column: 1 / 8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  perspective: 36em;
+}
+
+.gallery .box {
   position: relative;
   width: auto;
   height: 16em;
@@ -78,26 +95,18 @@
   margin-top: 30px;
 }
 
-.carousel:hover .box {
-  transform: rotateY(calc(15deg * var(--r))) translateX(calc(-100px * var(--r)));
+.gallery div.item {
+  position: absolute;
+  width: 50%;
+  max-width: 32em;
+  transition: all 0.5s linear;
 }
 
-.carousel .box:hover ~ .box {
-  transform: rotateY(calc(-35deg * var(--r)))
-    translateX(calc(-100px * var(--r)));
-}
-
-.carousel div.item:hover .box {
-  transform: rotateY(0deg) scale(1.25);
-  z-index: 1;
-  box-shadow: 0 25px 40px rgba(0, 0, 0, 0.5);
-}
-
-.carousel div.item:hover {
+.gallery div.item:hover {
   z-index: 31;
 }
 
-.carousel div.item .box .imgBx {
+.gallery div.item .box .imgBx {
   position: absolute;
   top: 0;
   left: 0;
@@ -105,7 +114,7 @@
   height: 100%;
 }
 
-.carousel div.item .box .imgBx:before {
+.gallery div.item .box .imgBx:before {
   content: "";
   position: absolute;
   top: 0;
@@ -119,11 +128,11 @@
   mix-blend-mode: multiply;
 }
 
-.carousel div.item:hover .box .imgBx:before {
+.gallery div.item:hover .box .imgBx:before {
   opacity: 1;
 }
 
-.carousel div.item .box .imgBx img {
+.gallery div.item .box .imgBx img {
   position: absolute;
   top: 0;
   left: 0;
@@ -132,7 +141,7 @@
   object-fit: cover;
 }
 
-.carousel div.item .box .content {
+.gallery div.item .box .content {
   position: absolute;
   top: 0;
   left: 0;
@@ -145,7 +154,7 @@
   box-sizing: border-box;
 }
 
-.carousel div.item .box .content .title {
+.gallery div.item .box .content .title {
   color: #fff;
   transition: 0.5s;
   text-transform: capitalize;
@@ -155,11 +164,11 @@
   transition-delay: 0.3s;
 }
 
-.carousel div.item:hover .box .content .title {
+.gallery div.item:hover .box .content .title {
   transform: translateY(0px);
 }
 
-.carousel div.item .box .content p {
+.gallery div.item .box .content p {
   color: #fff;
   transition: 0.5s;
   font-size: 14px;
@@ -167,62 +176,27 @@
   transition-delay: 0.4s;
 }
 
-.carousel div.item:hover .box .content p {
+.gallery div.item:hover .box .content p {
   transform: translateY(0px);
 }
 
-.carousel div#gallery {
-  width: 100%;
-  height: 100%;
-  margin-bottom: -100px;
-  grid-row: 1 / 2;
-  grid-column: 1 / 8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  transform-style: preserve-3d;
-  perspective: 36em;
-  --items: 5;
-  --middle: 3;
-  --focused-position: 1;
+.gallery:hover .box {
+  transform: rotateY(calc(15deg * var(--r))) translateX(calc(-100px * var(--r)));
 }
 
-.carousel div.item {
-  position: absolute;
-  width: 50%;
-  max-width: 32em;
-  height: 100%;
-  --r: calc(var(--focused-position) - var(--offset));
-  --abs: max(calc(var(--r) * -1), var(--r));
-  transition: all 0.25s linear;
-  transform: rotateY(calc(-10deg * var(--r)))
-    translateX(calc(-300px * var(--r)));
-  z-index: calc((var(--focused-position) - var(--abs)));
+.gallery .box:hover ~ .box {
+  transform: rotateY(calc(-35deg * var(--r)))
+    translateX(calc(-100px * var(--r)));
 }
 
-.carousel input {
+.gallery div.item:hover .box {
+  transform: rotateY(0deg) scale(1.25);
   z-index: 1;
+  box-shadow: 0 25px 40px rgba(0, 0, 0, 0.5);
 }
 
-.carousel input:nth-of-type(1):checked ~ div#gallery {
-  --focused-position: 1;
-}
-
-.carousel input:nth-of-type(2):checked ~ div#gallery {
-  --focused-position: 2;
-}
-
-.carousel input:nth-of-type(3):checked ~ div#gallery {
-  --focused-position: 3;
-}
-
-.carousel input:nth-of-type(4):checked ~ div#gallery {
-  --focused-position: 4;
-}
-
-.carousel input:nth-of-type(5):checked ~ div#gallery {
-  --focused-position: 5;
+.gallery input {
+  z-index: 1;
 }
 
 .card {
