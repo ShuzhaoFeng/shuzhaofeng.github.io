@@ -1,54 +1,19 @@
 import { Box, Grid, Typography } from "@mui/material";
-import profilePicture from "../../assets/profile_picture.jpg";
 import { useEffect, useState } from "react";
-
-const items = [
-  {
-    title: "Item 1",
-    desc: "This is a placeholder description for Item 1",
-    image: profilePicture,
-    color: "#f00",
-  },
-  {
-    title: "Item 2",
-    desc: "This is a placeholder description for Item 2",
-    image: profilePicture,
-    color: "#0f0",
-  },
-  {
-    title: "Item 3",
-    desc: "This is a placeholder description for Item 3",
-    image: profilePicture,
-    color: "#00f",
-  },
-  {
-    title: "Item 4",
-    desc: "This is a placeholder description for Item 4",
-    image: profilePicture,
-    color: "#ff0",
-  },
-  {
-    title: "Item 5",
-    desc: "This is a placeholder description for Item 5",
-    image: profilePicture,
-    color: "#0ff",
-  },
-  {
-    title: "Item 6",
-    desc: "This is a placeholder description for Item 6",
-    image: profilePicture,
-    color: "#f0f",
-  },
-];
+import galleryItems from "./GalleryItems";
 
 const Gallery = () => {
   const [timer, setTimer] = useState(0);
   const [focusedPosition, setFocusedPosition] = useState(0);
 
   const autoScroll = () => {
-    setTimer(setInterval(() => {
-      setFocusedPosition(focusedPosition => (focusedPosition + 1) % items.length);
-    }, 4000));
+    setTimer(
+      setInterval(() => {
+        setFocusedPosition(
+          (focusedPosition) => (focusedPosition + 1) % galleryItems.length
+        );
+      }, 4000)
+    );
   };
 
   useEffect(() => {
@@ -60,19 +25,24 @@ const Gallery = () => {
   }, []);
 
   return (
-    <Grid container className="gallery" onMouseLeave={() => {
+    <Grid
+      container
+      className="gallery"
+      onMouseLeave={() => {
         console.log("Mouse left gallery");
         console.log("Putting timer on");
-        autoScroll()
+        autoScroll();
         console.log("Timer: " + timer);
-      }} onMouseEnter={() => {
+      }}
+      onMouseEnter={() => {
         console.log("Mouse entered gallery");
         console.log("Clearing" + timer);
-        clearInterval(timer)
+        clearInterval(timer);
         console.log("Timer: " + timer);
-        }}>
+      }}
+    >
       <Grid item xs={12} className="display">
-        {items.map((item, index) => (
+        {galleryItems.map((galleryItem, index) => (
           <Box
             component="div"
             className="item"
@@ -85,8 +55,11 @@ const Gallery = () => {
                 Math.max(focusedPosition - index, -focusedPosition + index),
             }}
             onClick={() => {
-              console.log("Clicked. Index: " + index);
-              setFocusedPosition(index);
+              if (index === focusedPosition) {
+                window.open(galleryItem.url, "_blank");
+              } else {
+                setFocusedPosition(index);
+              }
             }}
           >
             <Box key={index} className="box" p={2}>
@@ -94,11 +67,11 @@ const Gallery = () => {
                 className="imgBx"
                 display="flex"
                 alignItems="center"
-                sx={{ "--gradient-color": item.color }}
+                sx={{ "--gradient-color": galleryItem.color }}
               >
                 <Box
                   component="img"
-                  src={item.image}
+                  src={galleryItem.image}
                   alt={`Image ${index + 1}`}
                 />
               </Box>
@@ -110,13 +83,14 @@ const Gallery = () => {
                       variant="h5"
                       component="div"
                       textAlign="start"
+                      sx={{ color: galleryItem.color }}
                     >
-                      {item.title}
+                      {galleryItem.title}
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
                     <Typography variant="body2" textAlign="start">
-                      {item.desc}
+                      {galleryItem.desc}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -130,10 +104,10 @@ const Gallery = () => {
         xs={12}
         className="navigation"
         sx={{
-          gridTemplateColumns: `1fr repeat(${items.length}, 30px) 1fr`,
+          gridTemplateColumns: `1fr repeat(${galleryItems.length}, 30px) 1fr`,
         }}
       >
-        {items.map((_item, index) => (
+        {galleryItems.map((_item, index) => (
           <Box
             id={`carousel_radio_${index + 1}`}
             component="input"

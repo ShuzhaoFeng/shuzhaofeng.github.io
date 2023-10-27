@@ -5,6 +5,10 @@
   text-align: center;
 }
 
+section {
+  padding: 2rem 0;
+}
+
 .profile {
   width: 19em;
   height: auto;
@@ -82,20 +86,8 @@
   perspective: 36em;
 }
 
-.gallery .box {
-  position: relative;
-  width: auto;
-  height: 16em;
-  background: #000;
-  transition: 0.5s;
-  transform-style: preserve-3d;
-  overflow: hidden;
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-top: 30px;
-}
-
 .gallery div.item {
+  cursor:pointer;
   position: absolute;
   width: 50%;
   max-width: 32em;
@@ -104,6 +96,19 @@
 
 .gallery div.item:hover {
   z-index: 31;
+}
+
+.gallery div.item .box {
+  position: relative;
+  width: auto;
+  height: 16em;
+  transition: 0.5s;
+  transform-style: preserve-3d;
+  overflow: hidden;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 .gallery div.item .box .imgBx {
@@ -155,10 +160,9 @@
 }
 
 .gallery div.item .box .content .title {
-  color: #fff;
   transition: 0.5s;
-  text-transform: capitalize;
   margin-bottom: 5px;
+  font-weight: bold; 
   font-size: 20px;
   transform: translateY(200px);
   transition-delay: 0.3s;
