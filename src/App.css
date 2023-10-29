@@ -73,6 +73,10 @@ section {
   justify-content: center;
 }
 
+.gallery .navigation input {
+  z-index: 1;
+}
+
 .gallery .display {
   height: 24em;
   margin-bottom: -3em;
@@ -86,7 +90,7 @@ section {
   perspective: 36em;
 }
 
-.gallery div.item {
+.gallery .display .item {
   cursor:pointer;
   position: absolute;
   width: 50%;
@@ -94,11 +98,7 @@ section {
   transition: all 0.5s linear;
 }
 
-.gallery div.item:hover {
-  z-index: 31;
-}
-
-.gallery div.item .box {
+.gallery .display .item .box {
   position: relative;
   width: auto;
   height: 16em;
@@ -111,15 +111,7 @@ section {
   margin-bottom: 1em;
 }
 
-.gallery div.item .box .imgBx {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.gallery div.item .box .imgBx:before {
+.gallery .display .item .box .imgBx:before {
   content: "";
   position: absolute;
   top: 0;
@@ -133,11 +125,15 @@ section {
   mix-blend-mode: multiply;
 }
 
-.gallery div.item:hover .box .imgBx:before {
-  opacity: 1;
+.gallery .display .item .box .imgBx {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.gallery div.item .box .imgBx img {
+.gallery .display .item .box .imgBx img {
   position: absolute;
   top: 0;
   left: 0;
@@ -146,7 +142,7 @@ section {
   object-fit: cover;
 }
 
-.gallery div.item .box .content {
+.gallery .display .item .box .content {
   position: absolute;
   top: 0;
   left: 0;
@@ -159,7 +155,7 @@ section {
   box-sizing: border-box;
 }
 
-.gallery div.item .box .content .title {
+.gallery .display .item .box .content .title {
   transition: 0.5s;
   margin-bottom: 5px;
   font-weight: bold; 
@@ -168,11 +164,7 @@ section {
   transition-delay: 0.3s;
 }
 
-.gallery div.item:hover .box .content .title {
-  transform: translateY(0px);
-}
-
-.gallery div.item .box .content p {
+.gallery .display .item .box .content p {
   color: #fff;
   transition: 0.5s;
   font-size: 14px;
@@ -180,27 +172,26 @@ section {
   transition-delay: 0.4s;
 }
 
-.gallery div.item:hover .box .content p {
-  transform: translateY(0px);
+.gallery .display .item:hover {
+  z-index: 31;
 }
 
-.gallery:hover .box {
-  transform: rotateY(calc(15deg * var(--r))) translateX(calc(-100px * var(--r)));
-}
-
-.gallery .box:hover ~ .box {
-  transform: rotateY(calc(-35deg * var(--r)))
-    translateX(calc(-100px * var(--r)));
-}
-
-.gallery div.item:hover .box {
-  transform: rotateY(0deg) scale(1.25);
+.gallery .display .item:hover .box {
+  transform: scale(1.25);
   z-index: 1;
   box-shadow: 0 25px 40px rgba(0, 0, 0, 0.5);
 }
 
-.gallery input {
-  z-index: 1;
+.gallery .display .item:hover .box .imgBx:before {
+  opacity: 1;
+}
+
+.gallery .display .item:hover .box .content .title {
+  transform: translateY(0px);
+}
+
+.gallery .display .item:hover .box .content p {
+  transform: translateY(0px);
 }
 
 .card {
