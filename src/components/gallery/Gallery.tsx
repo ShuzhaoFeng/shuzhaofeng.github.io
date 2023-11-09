@@ -22,24 +22,16 @@ const Gallery = () => {
     return () => {
       clearInterval(timer);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <Grid
       container
       className="gallery"
-      onMouseLeave={() => {
-        console.log("Mouse left gallery");
-        console.log("Putting timer on");
-        autoScroll();
-        console.log("Timer: " + timer);
-      }}
+      onMouseLeave={autoScroll}
       onMouseEnter={() => {
-        console.log("Mouse entered gallery");
-        console.log("Clearing" + timer);
         clearInterval(timer);
-        console.log("Timer: " + timer);
       }}
     >
       <Grid item xs={12} className="display">
