@@ -1,19 +1,29 @@
 import { Box, Grid, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import galleryItems from './GalleryItems'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '../../redux/store'
+import { setFocusedPosition, setTimer } from '../../redux/slices/gallerySlice'
 
 const Gallery = () => {
-    const [timer, setTimer] = useState(0)
-    const [focusedPosition, setFocusedPosition] = useState(0)
+    const timer = useSelector((state: RootState) => state.gallery.timer)
+    const focusedPosition = useSelector(
+        (state: RootState) => state.gallery.focusedPosition
+    )
+
+    const dispatch = useDispatch()
 
     const autoScroll = () => {
-        setTimer(
-            setInterval(() => {
-                setFocusedPosition(
-                    (focusedPosition) =>
-                        (focusedPosition + 1) % galleryItems.length
-                )
-            }, 4000)
+        dispatch(
+            setTimer(
+                setInterval(() => {
+                    dispatch(
+                        setFocusedPosition(
+                            (focusedPosition + 1) % galleryItems.length
+                        )
+                    )
+                }, 4000)
+            )
         )
     }
 
@@ -57,7 +67,7 @@ const Gallery = () => {
                             if (index === focusedPosition) {
                                 window.open(galleryItem.url, '_blank')
                             } else {
-                                setFocusedPosition(index)
+                                dispatch(setFocusedPosition(index))
                             }
                         }}
                     >
@@ -117,10 +127,10 @@ const Gallery = () => {
                         name='position'
                         sx={{
                             gridColumn: `${index + 2} / ${index + 3}`,
-                            gridRow: `2 / 3`,
+                            gridRow: '2 / 3',
                         }}
                         onChange={() => {
-                            setFocusedPosition(index)
+                            dispatch(setFocusedPosition(index))
                         }}
                         checked={index === focusedPosition}
                     />
