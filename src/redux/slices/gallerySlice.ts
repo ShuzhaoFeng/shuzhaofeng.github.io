@@ -16,9 +16,13 @@ const gallerySlice = createSlice({
         setFocusedPosition: (state, action) => {
             state.focusedPosition = action.payload
         },
+        incrementFocusedPosition: (state, action) => {
+            state.focusedPosition = (state.focusedPosition + 1) % action.payload
+        },
     },
 })
 
-export const { setTimer, setFocusedPosition } = gallerySlice.actions
+export const { setTimer, setFocusedPosition, incrementFocusedPosition } =
+    gallerySlice.actions
 
 export default gallerySlice.reducer

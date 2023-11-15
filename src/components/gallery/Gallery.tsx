@@ -3,7 +3,11 @@ import { useEffect } from 'react'
 import galleryItems from './GalleryItems'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../redux/store'
-import { setFocusedPosition, setTimer } from '../../redux/slices/gallerySlice'
+import {
+    setTimer,
+    setFocusedPosition,
+    incrementFocusedPosition,
+} from '../../redux/slices/gallerySlice'
 
 const Gallery = () => {
     const timer = useSelector((state: RootState) => state.gallery.timer)
@@ -17,11 +21,7 @@ const Gallery = () => {
         dispatch(
             setTimer(
                 setInterval(() => {
-                    dispatch(
-                        setFocusedPosition(
-                            (focusedPosition + 1) % galleryItems.length
-                        )
-                    )
+                    dispatch(incrementFocusedPosition(galleryItems.length))
                 }, 4000)
             )
         )
