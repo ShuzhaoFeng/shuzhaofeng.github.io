@@ -23,15 +23,6 @@ function App() {
                 <Typography variant='h4'>My Projects</Typography>
                 <Gallery />
             </Box>
-            <Box
-                component='a'
-                className='App-link'
-                href='https://reactjs.org'
-                target='_blank'
-                rel='noopener noreferrer'
-            >
-                Learn React
-            </Box>
         </Box>
     )
 }
