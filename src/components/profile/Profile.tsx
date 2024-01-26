@@ -8,6 +8,16 @@ const Profile = () => (
             component='img'
             src={profilePicture}
             className='image'
+            alt='Placeholder Picture'
+            style={{
+                position: 'inherit',
+                visibility: 'hidden',
+            }}
+        />
+        <Box
+            component='img'
+            src={profilePicture}
+            className='image'
             alt='Profile Picture'
         />
     </Box>

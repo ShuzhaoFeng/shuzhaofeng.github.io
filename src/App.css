@@ -1,34 +1,52 @@
 #root {
   width: 100vw;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
-section {
-  padding: 2rem 0;
+.App {
+  display: flex;
+  place-items: center;
+  width: 100vw;
+  min-height: 100vh;
+  background: radial-gradient(rgb(255, 255, 255), rgb(0, 198, 255));
+  background-attachment: scroll;
+}
+
+.page {
+  padding: 2rem;
+  width: inherit;
 }
 
 .profile {
-  width: 19em;
+  position: relative;
+  width: 100%;
   height: auto;
   display: inline-flex;
 }
 
 .profile .image {
+  z-index: 2;
   width: 100%;
   overflow: hidden;
   border-radius: 0.5em;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
 
 .profile .shadow {
-  z-index: -1;
-  margin-right: -19em;
-  width: inherit;
-  height: inherit;
+  z-index: 1;
   background: linear-gradient(rgba(38, 37, 42, 0) 0%, rgba(38, 37, 42, 1) 100%);
   filter: blur(1em);
-  transform: translateY(0.25em);
+  transform: translateY(0.5em);
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
 
 .gallery {
