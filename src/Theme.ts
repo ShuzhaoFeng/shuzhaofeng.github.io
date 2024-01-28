@@ -7,7 +7,7 @@ declare module '@mui/material/styles' {
             | TypographyOptions
             | ((palette: Palette) => TypographyOptions)
     }
-    // allow configuration using `createTheme`
+
     interface ThemeOptions {
         typography?:
             | TypographyOptions
@@ -19,6 +19,11 @@ const theme = createTheme({
     typography: {
         h3: {
             fontWeight: 600,
+        },
+        subtitle1: {
+            fontSize: 18,
+            fontWeight: 400,
+            color: '#5e5e5e',
         },
     },
 })

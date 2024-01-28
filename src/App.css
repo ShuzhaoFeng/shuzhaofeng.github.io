@@ -18,6 +18,20 @@
   width: inherit;
 }
 
+.intro {
+  padding: 2rem;
+  text-align: left;
+}
+
+.intro .intro-title {
+  text-wrap: nowrap;
+}
+
+.intro .intro-body {
+  height: fit-content;
+  gap: 1rem;
+}
+
 .profile {
   position: relative;
   width: 100%;

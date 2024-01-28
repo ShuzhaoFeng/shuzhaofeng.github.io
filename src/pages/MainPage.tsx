@@ -6,23 +6,27 @@ const MainPage = () => {
     return (
         <Box component='div' className='page' display='flex'>
             <Profile />
-            <Grid container>
+            <Grid container className='intro'>
                 <Grid item xs={12}>
-                    <Typography variant='h3'>
+                    <Typography variant='h3' className='intro-title'>
                         Hello, I'm Shuzhao Feng
                     </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                    <Typography>
-                        Hello, I'm Shuzhao Feng, and this will be my personal
-                        website.
-                    </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                    <Typography>
-                        I'm actively developing this website in my free time, so
-                        please check back later!
-                    </Typography>
+                    <Grid container className='intro-body'>
+                        <Grid item xs={12}>
+                            <Typography variant='subtitle1'>
+                                Hello, I'm Shuzhao Feng, and this will be my
+                                personal website.
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography variant='subtitle1'>
+                                I'm actively developing this website in my free
+                                time, so please check back later!
+                            </Typography>
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
         </Box>
