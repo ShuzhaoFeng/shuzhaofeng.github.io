@@ -5,17 +5,36 @@
 }
 
 .App {
-  display: flex;
-  place-items: center;
   width: 100vw;
   min-height: 100vh;
   background: radial-gradient(rgb(255, 255, 255), rgb(0, 198, 255));
   background-attachment: scroll;
+  overflow: hidden;
+}
+
+.topbar {
+
+}
+
+.topbar .home {
+  display: flex;
+  color: inherit;
+  margin-right: 2rem !important;
+  letter-spacing: .2rem !important;
+  text-transform: uppercase;
+}
+
+.topbar .navigation {
+  display: block !important;
+  margin: .5rem .5rem !important;
+  color: inherit !important;
 }
 
 .page {
+  width: calc(100% - 4rem);
+  height: calc(100% - 4rem);
   padding: 2rem;
-  width: inherit;
+  place-items: center;
 }
 
 .intro {
