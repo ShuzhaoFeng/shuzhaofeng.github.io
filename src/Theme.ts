@@ -19,6 +19,7 @@ const theme = createTheme({
     typography: {
         h3: {
             fontWeight: 600,
+            paddingBottom: 20,
         },
         subtitle1: {
             fontSize: 18,

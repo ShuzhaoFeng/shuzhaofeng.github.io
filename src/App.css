@@ -5,7 +5,7 @@
 }
 
 .App {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   background: radial-gradient(rgb(255, 255, 255), rgb(0, 198, 255));
   background-attachment: scroll;
@@ -31,8 +31,8 @@
 }
 
 .page {
-  width: calc(100% - 4rem);
-  height: calc(100% - 4rem);
+  width: 100% !important;
+  min-height: 100% !important;
   padding: 2rem;
   place-items: center;
 }
