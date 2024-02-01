@@ -1,6 +1,5 @@
 import { Box, Grid, Typography } from '@mui/material'
 import { useEffect } from 'react'
-import galleryItems from './GalleryItems'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../redux/store'
 import {
@@ -8,8 +7,11 @@ import {
     setFocusedPosition,
     incrementFocusedPosition,
 } from '../../redux/slices/gallerySlice'
+import { GalleryProps } from './galleryTypes'
 
-const Gallery = () => {
+const Gallery = (props: GalleryProps) => {
+    const { items } = props
+
     const timer = useSelector((state: RootState) => state.gallery.timer)
     const focusedPosition = useSelector(
         (state: RootState) => state.gallery.focusedPosition
@@ -21,7 +23,7 @@ const Gallery = () => {
         dispatch(
             setTimer(
                 setInterval(() => {
-                    dispatch(incrementFocusedPosition(galleryItems.length))
+                    dispatch(incrementFocusedPosition(items.length))
                 }, 4000)
             )
         )
@@ -44,10 +46,12 @@ const Gallery = () => {
             onMouseEnter={() => {
                 clearInterval(timer)
             }}
+            {...props}
         >
             <Grid item xs={12} className='display'>
-                {galleryItems.map((galleryItem, index) => (
+                {items.map((_item, index) => (
                     <Box
+                        key={_item.title}
                         component='div'
                         className='item'
                         sx={{
@@ -65,23 +69,23 @@ const Gallery = () => {
                         }}
                         onClick={() => {
                             if (index === focusedPosition) {
-                                window.open(galleryItem.url, '_blank')
+                                window.open(_item.url, '_blank')
                             } else {
                                 dispatch(setFocusedPosition(index))
                             }
                         }}
                     >
-                        <Box key={index} className='box' p={2}>
+                        <Box key={_item.title} className='box' p={2}>
                             <Box
                                 className='imgBx'
                                 display='flex'
                                 alignItems='center'
-                                sx={{ '--gradient-color': galleryItem.color }}
+                                sx={{ '--gradient-color': _item.color }}
                             >
                                 <Box
                                     component='img'
-                                    src={galleryItem.image}
-                                    alt={`Image ${index + 1}`}
+                                    src={_item.image}
+                                    alt={`Image ${_item.title}`}
                                 />
                             </Box>
                             <Box className='content'>
@@ -92,9 +96,9 @@ const Gallery = () => {
                                             variant='h5'
                                             component='div'
                                             textAlign='start'
-                                            sx={{ color: galleryItem.color }}
+                                            sx={{ color: _item.color }}
                                         >
-                                            {galleryItem.title}
+                                            {_item.title}
                                         </Typography>
                                     </Grid>
                                     <Grid item xs={12}>
@@ -102,7 +106,7 @@ const Gallery = () => {
                                             variant='body2'
                                             textAlign='start'
                                         >
-                                            {galleryItem.desc}
+                                            {_item.desc}
                                         </Typography>
                                     </Grid>
                                 </Grid>
@@ -116,12 +120,13 @@ const Gallery = () => {
                 xs={12}
                 className='navigation'
                 sx={{
-                    gridTemplateColumns: `1fr repeat(${galleryItems.length}, 30px) 1fr`,
+                    gridTemplateColumns: `1fr repeat(${items.length}, 30px) 1fr`,
                 }}
             >
-                {galleryItems.map((_item, index) => (
+                {items.map((_item, index) => (
                     <Box
-                        id={`carousel_radio_${index + 1}`}
+                        id={`carousel_radio_${_item.title}`}
+                        key={`carousel_radio_${_item.title}`}
                         component='input'
                         type='radio'
                         name='position'

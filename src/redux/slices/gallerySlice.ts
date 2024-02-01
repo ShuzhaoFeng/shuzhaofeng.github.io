@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { GalleryState } from '../states/GalleryState'
+import { GalleryState } from '../states/galleryState'
 
 const initialState: GalleryState = {
     timer: 0,

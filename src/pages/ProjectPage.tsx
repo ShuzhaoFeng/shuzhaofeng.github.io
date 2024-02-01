@@ -1,6 +1,8 @@
 import { Grid, Typography } from '@mui/material'
 
 import Gallery from '../components/gallery/Gallery'
+import personal from '../components/gallery/items/personal'
+import school from '../components/gallery/items/school'
 
 const MainPage = () => {
     return (
@@ -21,7 +23,7 @@ const MainPage = () => {
                 </Typography>
             </Grid>
             <Grid item xs={12}>
-                <Gallery />
+                <Gallery items={personal} />
             </Grid>
         </Grid>
     )

@@ -1,15 +1,8 @@
-import JsonPathSerializerIcon from '../../assets/JsonPathSerializerIcon.png'
-import ReactViteTypescript from '../../assets/ReactViteTypescript.png'
+import JsonPathSerializerIcon from '../../../assets/JsonPathSerializerIcon.png'
+import ReactViteTypescript from '../../../assets/ReactViteTypescript.png'
+import { GalleryItem } from '../galleryTypes'
 
-type GalleryItem = {
-    title: string
-    desc: string
-    image: string
-    color: string
-    url: string
-}
-
-const galleryItems: GalleryItem[] = [
+const personal: GalleryItem[] = [
     {
         title: 'JsonPathSerializer',
         color: '#90e090',
@@ -28,4 +21,4 @@ const galleryItems: GalleryItem[] = [
     },
 ]
 
-export default galleryItems
+export default personal
