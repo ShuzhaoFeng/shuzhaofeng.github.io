@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../redux/store'
 import {
+    createGallery,
     setTimer,
     setFocusedPosition,
     incrementFocusedPosition,
@@ -10,30 +11,34 @@ import {
 import { GalleryProps } from './galleryTypes'
 
 const Gallery = (props: GalleryProps) => {
-    const { items } = props
+    const { name, items } = props
 
-    const timer = useSelector((state: RootState) => state.gallery.timer)
-    const focusedPosition = useSelector(
-        (state: RootState) => state.gallery.focusedPosition
-    )
+    const gallery = useSelector((state: RootState) => state.gallery[name])
 
     const dispatch = useDispatch()
 
     const autoScroll = () => {
         dispatch(
-            setTimer(
-                setInterval(() => {
-                    dispatch(incrementFocusedPosition(items.length))
-                }, 4000)
-            )
+            setTimer({
+                gallery: name,
+                timer: setInterval(() => {
+                    dispatch(
+                        incrementFocusedPosition({
+                            gallery: name,
+                            length: items.length,
+                        })
+                    )
+                }, 4000),
+            })
         )
     }
 
     useEffect(() => {
+        dispatch(createGallery(name))
         autoScroll()
 
         return () => {
-            clearInterval(timer)
+            clearInterval(gallery?.timer)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -44,7 +49,7 @@ const Gallery = (props: GalleryProps) => {
             className='gallery'
             onMouseLeave={autoScroll}
             onMouseEnter={() => {
-                clearInterval(timer)
+                clearInterval(gallery?.timer)
             }}
             {...props}
         >
@@ -56,22 +61,27 @@ const Gallery = (props: GalleryProps) => {
                         className='item'
                         sx={{
                             transform: `rotateY(${
-                                -10 * (focusedPosition - index)
+                                -10 * (gallery?.focusedPosition - index)
                             }deg) translateX(${
-                                -300 * (focusedPosition - index)
+                                -300 * (gallery?.focusedPosition - index)
                             }px)`,
                             zIndex:
-                                focusedPosition -
+                                gallery?.focusedPosition -
                                 Math.max(
-                                    focusedPosition - index,
-                                    -focusedPosition + index
+                                    gallery?.focusedPosition - index,
+                                    -gallery?.focusedPosition + index
                                 ),
                         }}
                         onClick={() => {
-                            if (index === focusedPosition) {
+                            if (index === gallery?.focusedPosition) {
                                 window.open(_item.url, '_blank')
                             } else {
-                                dispatch(setFocusedPosition(index))
+                                dispatch(
+                                    setFocusedPosition({
+                                        gallery: name,
+                                        focusedPosition: index,
+                                    })
+                                )
                             }
                         }}
                     >
@@ -129,15 +139,20 @@ const Gallery = (props: GalleryProps) => {
                         key={`carousel_radio_${_item.title}`}
                         component='input'
                         type='radio'
-                        name='position'
+                        name={`position_${name}`}
                         sx={{
                             gridColumn: `${index + 2} / ${index + 3}`,
                             gridRow: '2 / 3',
                         }}
                         onChange={() => {
-                            dispatch(setFocusedPosition(index))
+                            dispatch(
+                                setFocusedPosition({
+                                    gallery: name,
+                                    focusedPosition: index,
+                                })
+                            )
                         }}
-                        checked={index === focusedPosition}
+                        checked={gallery && index === gallery.focusedPosition}
                     />
                 ))}
             </Grid>

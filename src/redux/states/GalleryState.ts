@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export type GalleryState = {
-    timer: number
-    focusedPosition: number
+    [key: string]: {
+        timer: number
+        focusedPosition: number
+    }
 }

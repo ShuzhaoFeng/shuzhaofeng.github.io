@@ -23,7 +23,7 @@ const MainPage = () => {
                 </Typography>
             </Grid>
             <Grid item xs={12}>
-                <Gallery items={personal} />
+                <Gallery name='personal' items={personal} />
             </Grid>
         </Grid>
     )

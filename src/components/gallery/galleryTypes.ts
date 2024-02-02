@@ -9,5 +9,6 @@ export type GalleryItem = {
 }
 
 export type GalleryProps = GridProps & {
+    name: string
     items: GalleryItem[]
 }
