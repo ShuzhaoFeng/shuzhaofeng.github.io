@@ -1,13 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { GitHubProfileType } from '../../components/github-profile/gitHubProfileType'
 
-const initialState = {}
+const initialState: { [key: string]: GitHubProfileType } = {}
 
 export const fetchGitHubUser = createAsyncThunk(
     'gitHubProfile/fetchUser',
-    async (userId: number) =>
-        fetch(`https://api.github.com/users/${userId}`).then((response) =>
-            response.json()
-        )
+    async (username: string) =>
+        fetch(`https://api.github.com/users/${username}`).then((response) => {
+            console.log(response)
+            return response.json()
+        })
 )
 
 const gitHubProfileSlice = createSlice({
