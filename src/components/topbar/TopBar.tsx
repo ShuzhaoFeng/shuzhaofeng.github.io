@@ -34,11 +34,14 @@ const TopBar = () => {
                             display: { xs: 'none', md: 'flex' },
                         }}
                     >
-                        <Button className='navigation' href='/'>
-                            PlaceHolder1
+                        <Button className='navigation' href='/journey'>
+                            Journey
                         </Button>
-                        <Button className='navigation' href='/'>
-                            PlaceHolder2
+                        <Button className='navigation' href='/projects'>
+                            Projects
+                        </Button>
+                        <Button className='navigation' href='/awards'>
+                            Awards
                         </Button>
                     </Box>
                 </Toolbar>

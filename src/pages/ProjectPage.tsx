@@ -24,6 +24,20 @@ const MainPage = () => {
                 </Typography>
             </Grid>
             <Grid item xs={12}>
+                <Typography variant='h4'>Personal Projects</Typography>
+            </Grid>
+            <Grid item xs={12}>
+                <Typography variant='subtitle1'>
+                    You can find my personal GitHub account as follows:
+                </Typography>
+            </Grid>
+            <Grid item xs={12}>
+                <GitHubProfile username='ShuzhaoFeng' />
+            </Grid>
+            <Grid item xs={12}>
+                <Gallery name='personal' items={personal} />
+            </Grid>
+            <Grid item xs={12}>
                 <Typography variant='h4'>School Projects</Typography>
             </Grid>
             <Grid item xs={12}>
@@ -35,7 +49,7 @@ const MainPage = () => {
                 <GitHubProfile username='mcgill-sfeng' />
             </Grid>
             <Grid item xs={12}>
-                <Gallery name='personal' items={personal} />
+                <Gallery name='school' items={school} />
             </Grid>
         </Grid>
     )
