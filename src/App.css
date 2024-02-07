@@ -82,6 +82,38 @@
   right: 0;
 }
 
+.project-title {
+  padding: 1rem;
+}
+
+.github-profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.github-profile .container {
+  border: 1px solid #e1e4e8;
+  width: 50%;
+  max-width: 20rem;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.github-profile .container .avatar {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5%;
+  overflow: hidden;
+}
+
+.github-profile .container .user-info:link {
+  text-decoration: none;
+}
+
 .gallery {
   height: 400px;
   margin: 20px 0px;

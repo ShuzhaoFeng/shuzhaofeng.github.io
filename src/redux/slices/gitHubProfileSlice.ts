@@ -7,7 +7,6 @@ export const fetchGitHubUser = createAsyncThunk(
     'gitHubProfile/fetchUser',
     async (username: string) =>
         fetch(`https://api.github.com/users/${username}`).then((response) => {
-            console.log(response)
             return response.json()
         })
 )
