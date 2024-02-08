@@ -34,13 +34,13 @@ const TopBar = () => {
                             display: { xs: 'none', md: 'flex' },
                         }}
                     >
-                        <Button className='navigation' href='/journey'>
+                        <Button className='navigation' href='/#/journey'>
                             Journey
                         </Button>
-                        <Button className='navigation' href='/projects'>
+                        <Button className='navigation' href='/#/projects'>
                             Projects
                         </Button>
-                        <Button className='navigation' href='/awards'>
+                        <Button className='navigation' href='/#/awards'>
                             Awards
                         </Button>
                     </Box>
