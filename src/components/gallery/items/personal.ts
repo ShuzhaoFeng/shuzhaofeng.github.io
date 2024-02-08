@@ -1,5 +1,6 @@
 import JsonPathSerializerIcon from '../../../assets/JsonPathSerializerIcon.png'
 import ReactViteTypescript from '../../../assets/ReactViteTypescript.png'
+import Unity from '../../../assets/Unity.png'
 import { GalleryItem } from '../galleryTypes'
 
 const personal: GalleryItem[] = [
@@ -18,6 +19,15 @@ const personal: GalleryItem[] = [
         desc: 'Yes, I make this website',
         image: ReactViteTypescript,
         url: 'https://github.com/ShuzhaoFeng/shuzhaofeng.github.io',
+    },
+    {
+        title: '魇 · Chimera',
+        color: '#e37e02',
+        desc:
+            "A strategy game developed in Unity, with player's experience and freedom enhanced with powers of AI." +
+            'This is my little secret...for now 🤫.',
+        image: Unity,
+        url: '/#/projects',
     },
 ]
 
