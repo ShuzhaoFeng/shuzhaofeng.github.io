@@ -5,7 +5,7 @@ export type GalleryItem = {
     desc: string
     image: string
     color: string
-    url: string
+    url?: string
 }
 
 export type GalleryProps = GridProps & {

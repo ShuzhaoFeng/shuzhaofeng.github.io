@@ -27,7 +27,6 @@ const personal: GalleryItem[] = [
             "A strategy game developed in Unity, with player's experience and freedom enhanced with powers of AI." +
             'This is my little secret...for now 🤫.',
         image: Unity,
-        url: '/#/projects',
     },
 ]
 

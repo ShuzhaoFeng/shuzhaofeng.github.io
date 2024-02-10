@@ -73,7 +73,10 @@ const Gallery = (props: GalleryProps) => {
                                 ),
                         }}
                         onClick={() => {
-                            if (index === gallery?.focusedPosition) {
+                            if (
+                                _item.url &&
+                                index === gallery?.focusedPosition
+                            ) {
                                 window.open(_item.url, '_blank')
                             } else {
                                 dispatch(
