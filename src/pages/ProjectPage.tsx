@@ -53,12 +53,6 @@ const MainPage = () => {
                 <GitHubProfile username='mcgill-sfeng' />
             </Grid>
             <Grid item xs={12}>
-                <Typography variant='subtitle1'>
-                    WIP: I'm figuring this section out. Please check back a few
-                    days later.
-                </Typography>
-            </Grid>
-            <Grid item xs={12}>
                 <Gallery name='school' items={school} />
             </Grid>
         </Grid>

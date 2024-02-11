@@ -1,5 +1,5 @@
-import JsonPathSerializerIcon from '../../../assets/JsonPathSerializerIcon.png'
-import ReactViteTypescript from '../../../assets/ReactViteTypescript.png'
+import JsonPathSerializerIcon from '../../../assets/jsonpathserializer.png'
+import ReactViteTypescript from '../../../assets/react-vite-typescript.png'
 import Unity from '../../../assets/Unity.png'
 import { GalleryItem } from '../galleryTypes'
 
