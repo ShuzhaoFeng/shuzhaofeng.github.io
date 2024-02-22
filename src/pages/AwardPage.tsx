@@ -1,18 +1,15 @@
 import { Grid, Typography } from '@mui/material'
-
-import Journey from '../components/journey/Journey'
-
-const JourneyPage = () => {
+const AwardPage = () => {
     return (
         <Grid container className='page'>
             <Grid item xs={12}>
-                <Typography variant='h3'>My Journey</Typography>
+                <Typography variant='h3'>My Awards</Typography>
             </Grid>
             <Grid item xs={12}>
-                <Journey />
+                {/* placeholder */}
             </Grid>
         </Grid>
     )
 }
 
-export default JourneyPage
+export default AwardPage
