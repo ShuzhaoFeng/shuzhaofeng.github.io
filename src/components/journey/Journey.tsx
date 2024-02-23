@@ -6,30 +6,30 @@ import {
     TimelineContent,
     TimelineDot,
 } from '@mui/lab'
+import { useSelector } from 'react-redux'
+import { RootState } from '../../redux/store'
+import { JourneyProps } from './journeyTypes'
 
-const Journey = () => {
+const Journey = (props: JourneyProps) => {
+    const { items } = props
+
+    const focusedPosition = useSelector(
+        (state: RootState) => state.journey.focusedPosition
+    )
+
+    console.log(focusedPosition)
+
     return (
-        <Timeline>
-            <TimelineItem>
-                <TimelineSeparator>
-                    <TimelineDot />
-                    <TimelineConnector />
-                </TimelineSeparator>
-                <TimelineContent>Event1</TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-                <TimelineSeparator>
-                    <TimelineDot />
-                    <TimelineConnector />
-                </TimelineSeparator>
-                <TimelineContent>Event2</TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-                <TimelineSeparator>
-                    <TimelineDot />
-                </TimelineSeparator>
-                <TimelineContent>Event3</TimelineContent>
-            </TimelineItem>
+        <Timeline {...props}>
+            {items.map((_item, index) => (
+                <TimelineItem>
+                    <TimelineSeparator>
+                        <TimelineDot />
+                        {index !== items.length - 1 && <TimelineConnector />}
+                    </TimelineSeparator>
+                    <TimelineContent>{_item.title}</TimelineContent>
+                </TimelineItem>
+            ))}
         </Timeline>
     )
 }

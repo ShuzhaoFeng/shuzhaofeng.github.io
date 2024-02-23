@@ -1,6 +1,7 @@
 import { Grid, Typography } from '@mui/material'
 
 import Journey from '../components/journey/Journey'
+import journey from '../components/journey/items/journey'
 
 const JourneyPage = () => {
     return (
@@ -9,7 +10,7 @@ const JourneyPage = () => {
                 <Typography variant='h3'>My Journey</Typography>
             </Grid>
             <Grid item xs={12}>
-                <Journey />
+                <Journey items={journey} />
             </Grid>
         </Grid>
     )
