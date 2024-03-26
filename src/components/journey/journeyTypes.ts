@@ -1,7 +1,7 @@
 export type JourneyItem = {
     title: string
-    date: string
-    description: string
+    cardTitle: string
+    cardDetailedText: string
 }
 
 export type JourneyProps = {
