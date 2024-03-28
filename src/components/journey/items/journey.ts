@@ -41,6 +41,30 @@ const journey = [
         cardDetailedText:
             'In 2019, I began CÉGEP at Marianopolis College. During those years, my interest in social activities and leadership played an important role. I threw myself into student clubs and unions, leading initiatives, founding my own club, and even running for the student union election. Despite not winning, the experience was rich with lessons and personal growth.',
     },
+    {
+        title: '2021',
+        cardTitle: 'A New Chapter at McGill University',
+        cardDetailedText:
+            'Despite the pandemic, I celebrated my graduation from Marianopolis College in 2021 and embarked on a new adventure at McGill University, studying in software engineering.',
+    },
+    {
+        title: 'June - December 2022',
+        cardTitle: 'First Internship at Genetec',
+        cardDetailedText:
+            'In the middle of 2022, I started my first internship at Genetec, a company specializing in security systems. I deeply enjoyed my time joining the SpartaCats Team as a software developer intern, gaining invaluable experience and insights that shaped my career path.',
+    },
+    {
+        title: 'May - August 2023',
+        cardTitle: 'Exploring New Frontiers with X2O Media',
+        cardDetailedText:
+            'My journey continued in the summer of 2023, where I joined X2O Media, a company specializing in  digital signage and videocommunication, as a software developer intern.  worked as a software developer intern with the R&D Team, specializing in Typescript, Node.js and React.',
+    },
+    {
+        title: 'January 2024',
+        cardTitle: 'Capstone, and a Glimpse into my Secret',
+        cardDetailedText:
+            'The dawn of 2024 brought with it not only the commencement of my capstone project, Cybersight, but also the inception of a secret project with close friends. Stay tuned for the revelations that lie ahead...',
+    },
 ]
 
 export default journey
