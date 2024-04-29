@@ -1,3 +1,7 @@
+import HighSchoolPhoto from '../../../assets/high-school-photo.jpg'
+import CegepGradPhoto from '../../../assets/cegep-grad-photo.jpg'
+import GenetecYearEndPhoto from '../../../assets/genetec-year-end-photo.jpg'
+
 const journey = [
     {
         title: '2001',
@@ -28,6 +32,13 @@ const journey = [
         cardTitle: 'High School at Collège Jean-de-Brébeuf',
         cardDetailedText:
             'In 2014, I started my high school at Collège Jean-de-Brébeuf. The same year, I started participating in mathematic competitions.',
+        media: {
+            name: 'Photo of me with my friends at Collège Jean-de-Brébeuf',
+            source: {
+                url: HighSchoolPhoto,
+            },
+            type: 'IMAGE',
+        },
     },
     {
         title: '2019',
@@ -40,6 +51,13 @@ const journey = [
         cardTitle: 'CÉGEP at Marianopolis College',
         cardDetailedText:
             'In 2019, I began CÉGEP at Marianopolis College. During those years, my interest in social activities and leadership played an important role. I threw myself into student clubs and unions, leading initiatives, founding my own club, and even running for the student union election. Despite not winning, the experience was rich with lessons and personal growth.',
+        media: {
+            name: "Photo of me (standing, second from the right) with my friends, taken at my CÉGEP's graduation ceremony",
+            source: {
+                url: CegepGradPhoto,
+            },
+            type: 'IMAGE',
+        },
     },
     {
         title: '2021',
@@ -52,6 +70,13 @@ const journey = [
         cardTitle: 'First Internship at Genetec',
         cardDetailedText:
             'In the middle of 2022, I started my first internship at Genetec, a company specializing in security systems. I deeply enjoyed my time joining the SpartaCats Team as a software developer intern, gaining invaluable experience and insights that shaped my career path.',
+        media: {
+            name: "Photo of me at Genetec's year-end party",
+            source: {
+                url: GenetecYearEndPhoto,
+            },
+            type: 'IMAGE',
+        },
     },
     {
         title: 'May - August 2023',
