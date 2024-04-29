@@ -7,6 +7,7 @@ import {
     Toolbar,
     Typography,
 } from '@mui/material'
+import Icon from '../../assets/icon.jpg'
 
 const TopBar = () => {
     return (
@@ -16,8 +17,12 @@ const TopBar = () => {
                     <Link href='/'>
                         <Box
                             component='img'
-                            src='placeholder'
-                            sx={{ display: { xs: 'none', md: 'flex' } }}
+                            src={Icon}
+                            sx={{
+                                width: 30,
+                                display: { xs: 'none', md: 'flex' },
+                                paddingRight: 1,
+                            }}
                         />
                     </Link>
                     <Typography
