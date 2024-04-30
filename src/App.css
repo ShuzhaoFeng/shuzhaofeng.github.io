@@ -249,6 +249,36 @@
   transform: translateY(0px);
 }
 
+.award {
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding: 10px;
+}
+
+.award .grid-row {
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding: 10px;
+  margin: 10px;
+}
+
+.award .grid-row .row-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.award .grid-row .row-item .item-box {
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding: 10px;
+}
+
+.award .grid-row .row-item .item-content {
+  padding: 10px;
+  background-color: antiquewhite;
+}
+
 .card {
   padding: 2em;
 }

@@ -1,4 +1,6 @@
 import { Grid, Typography } from '@mui/material'
+import Award from '../components/award/Award'
+import awards from '../components/award/items/award'
 const AwardPage = () => {
     return (
         <Grid container className='page'>
@@ -6,7 +8,7 @@ const AwardPage = () => {
                 <Typography variant='h3'>My Awards</Typography>
             </Grid>
             <Grid item xs={12}>
-                {/* placeholder */}
+                <Award items={awards} />
             </Grid>
         </Grid>
     )
