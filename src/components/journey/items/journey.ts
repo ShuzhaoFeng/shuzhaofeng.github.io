@@ -1,4 +1,5 @@
 import HighSchoolPhoto from '../../../assets/high-school-photo.jpg'
+import AQJMParisPhoto from '../../../assets/aqjm-paris-photo.jpg'
 import CegepGradPhoto from '../../../assets/cegep-grad-photo.jpg'
 import GenetecYearEndPhoto from '../../../assets/genetec-year-end-photo.jpg'
 
@@ -45,6 +46,13 @@ const journey = [
         cardTitle: 'A Good End Note',
         cardDetailedText:
             "I graduated from Collège Jean-de-Brébeuf in 2019. Before I left, I clinched 1st place in Quebec's AQJM mathematics competition. This honor gave me a chance to visit Paris that summer for the international final, where I earned 21st position globally.",
+        media: {
+            name: 'Photo of me in Paris, before the AQJM mathematics competition final',
+            source: {
+                url: AQJMParisPhoto,
+            },
+            type: 'IMAGE',
+        },
     },
     {
         title: '2019-2021',
