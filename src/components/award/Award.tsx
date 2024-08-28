@@ -21,6 +21,8 @@ const Award = (props: AwardProps) => {
             container
             sx={{
                 backgroundImage: `url(${woodenPatternDark})`,
+                boxShadow:
+                    '0 0 16px 0 rgba(0, 0, 0, 0.9),0 10px 24px 0 rgba(0, 0, 0, 0.81)',
             }}
         >
             {itemRows.map((row, index) => (
