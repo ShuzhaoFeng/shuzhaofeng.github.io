@@ -11,17 +11,9 @@ const AwardItem = (props: AwardItemProps) => {
             className='item-box'
             sx={{
                 backgroundImage: `url(${goldPattern})`,
-                boxShadow:
-                    '0 0 4px 0 rgba(0, 0, 0, 0.9),0 4px 8px 0 rgba(0, 0, 0, 0.81)',
             }}
         >
-            <Grid
-                className='item-content'
-                container
-                sx={{
-                    boxShadow: 'inset 0 0 10px rgba(250, 160, 0, 0.9)',
-                }}
-            >
+            <Grid className='item-content' container>
                 <Grid item xs={12}>
                     <Typography variant='h6'>{item.title}</Typography>
                 </Grid>
