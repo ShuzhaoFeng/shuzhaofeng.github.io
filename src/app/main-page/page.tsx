@@ -37,18 +37,18 @@ export default function MainPage() {
           </p>
           <p className="text-center text-lg sm:text-xl">
             Visit the{" "}
+            <a href="/research" className="text-cyan-400 hover:underline">
+              Research
+            </a>{" "}
+            page to see my academic research work and publications.
+          </p>
+          <p className="text-center text-lg sm:text-xl">
+            Visit the{" "}
             <a href="/projects" className="text-cyan-400 hover:underline">
               Projects
             </a>{" "}
             page to see what I am or have been working on with my software
             engineering skills.
-          </p>
-          <p className="text-center text-lg sm:text-xl">
-            Visit the{" "}
-            <a href="/awards" className="text-cyan-400 hover:underline">
-              Awards
-            </a>{" "}
-            page to see some of the awards I have received.
           </p>
         </div>
         <p className="mt-12 text-center text-xs text-gray-400">

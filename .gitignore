@@ -2,6 +2,7 @@
 
 # Project documentation and session notes
 PROJECT_SUMMARY.md
+.github/copilot-instructions.md
 
 # dependencies
 /node_modules

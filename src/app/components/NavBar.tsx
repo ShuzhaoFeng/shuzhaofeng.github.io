@@ -3,12 +3,17 @@ import { usePathname } from "next/navigation";
 
 export default function NavBar() {
   const pathname = usePathname();
+  // Normalize pathname by removing trailing slash (except for root)
+  const normalizedPathname =
+    pathname === "/" ? "/" : pathname.replace(/\/$/, "");
+
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/journey", label: "Journey" },
+    { href: "/research", label: "Research" },
     { href: "/projects", label: "Projects" },
-    { href: "/awards", label: "Awards" },
   ];
+
   return (
     <nav className="w-full sticky top-0 z-50 shadow-md">
       <div className="bg-gradient-to-t from-[#1e293b]/80 via-[#111827] to-black w-full">
@@ -20,7 +25,7 @@ export default function NavBar() {
             <ul className="flex gap-4 md:gap-8 text-base font-medium flex-1">
               {navLinks.map(({ href, label }) => (
                 <li key={href}>
-                  {pathname === href ? (
+                  {normalizedPathname === href ? (
                     <span className="text-cyan-400 font-bold cursor-default">
                       {label}
                     </span>
@@ -36,6 +41,36 @@ export default function NavBar() {
               ))}
             </ul>
             <div className="flex items-center justify-end min-w-max">
+              <a
+                href="mailto:shuzhao.feng@mail.mcgill.ca"
+                className="ml-2 p-1 rounded-full hover:bg-gray-700 transition-colors"
+                aria-label="Email"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  className="w-8 h-8 text-white"
+                >
+                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                </svg>
+              </a>
+              <a
+                href="https://www.linkedin.com/in/shuzhao-feng/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-2 p-1 rounded-full hover:bg-gray-700 transition-colors"
+                aria-label="LinkedIn Profile"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  className="w-8 h-8 text-white"
+                >
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                </svg>
+              </a>
               <a
                 href="https://github.com/ShuzhaoFeng"
                 target="_blank"
