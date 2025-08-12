@@ -54,8 +54,8 @@ export default function ActivityWidget() {
     <>
       {/* Dialog */}
       {isOpen && (
-        <div className="fixed bottom-20 right-4 md:bottom-24 md:right-6 z-30 w-80 max-w-[calc(100vw-2rem)]">
-          <div className="bg-gray-800 border border-gray-600 rounded-lg shadow-xl p-4">
+        <div className="fixed bottom-16 left-2 right-2 sm:bottom-20 sm:left-auto sm:right-4 md:bottom-24 md:right-6 z-30 sm:w-80 sm:max-w-[calc(100vw-2rem)]">
+          <div className="bg-gray-800 border border-gray-600 rounded-lg shadow-xl p-3 sm:p-4">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
                 {getActivityIcon(currentActivity.type)}
@@ -125,23 +125,25 @@ export default function ActivityWidget() {
       )}
 
       {/* Floating Button with Label */}
-      <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-20 flex items-center gap-3">
+      <div className="fixed bottom-4 right-2 sm:right-4 md:bottom-6 md:right-6 z-20 flex items-center gap-2 sm:gap-3">
         {/* Always visible label */}
-        <div className="bg-gray-800 border border-gray-600 px-3 py-2 rounded-lg shadow-lg">
-          <div className="text-white text-xs font-medium">
+        <div className="bg-gray-800 border border-gray-600 px-2 sm:px-3 py-1 sm:py-2 rounded-lg shadow-lg max-w-[200px] sm:max-w-none">
+          <div className="text-white text-xs font-medium truncate">
             My Upcoming Event
           </div>
-          <div className="text-gray-300 text-xs">{currentActivity.title}</div>
+          <div className="text-gray-300 text-xs truncate">
+            {currentActivity.title}
+          </div>
         </div>
 
         <button
           onClick={handleButtonClick}
-          className="bg-cyan-500 hover:bg-cyan-600 text-white p-3 rounded-full shadow-lg transition-colors flex-shrink-0"
+          className="bg-cyan-500 hover:bg-cyan-600 text-white p-2 sm:p-3 rounded-full shadow-lg transition-colors flex-shrink-0"
           aria-label="View next activity"
         >
           <div className="relative">
             <svg
-              className="w-5 h-5"
+              className="w-4 h-4 sm:w-5 sm:h-5"
               style={{
                 transform: isSpinning ? "rotate(360deg)" : "rotate(0deg)",
                 transition: isSpinning ? "transform 0.6s ease-in-out" : "none",
