@@ -1,11 +1,12 @@
 "use client";
 import { TimelineEntry } from "../components";
 import { timelineEntries } from "../data/timelineData";
+import { useTranslation } from "react-i18next";
 
 export default function JourneyPage() {
+  const { t } = useTranslation();
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
-      {/* Timeline only, no main title */}
       <section className="w-full max-w-2xl mx-auto mt-4">
         <ol className="relative border-l border-cyan-500">
           {timelineEntries.map((entry, index) => (
@@ -29,7 +30,7 @@ export default function JourneyPage() {
               </svg>
             </span>
             <p className="mb-4 text-base font-normal text-gray-500 italic">
-              To be continued...
+              {t("journey.toBeContinued")}
             </p>
           </li>
         </ol>

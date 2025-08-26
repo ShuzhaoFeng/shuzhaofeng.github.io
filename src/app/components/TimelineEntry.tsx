@@ -2,7 +2,7 @@ import React from "react";
 
 interface TimelineEntryProps {
   icon: React.ReactNode;
-  description: React.ReactNode;
+  description: React.ReactNode | (() => React.ReactNode);
 }
 
 export default function TimelineEntry({
@@ -15,7 +15,7 @@ export default function TimelineEntry({
         {icon}
       </span>
       <div className="mb-4 text-base font-normal text-gray-300">
-        {description}
+        {typeof description === "function" ? description() : description}
       </div>
     </li>
   );

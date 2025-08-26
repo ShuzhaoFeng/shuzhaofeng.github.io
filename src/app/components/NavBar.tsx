@@ -1,6 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function NavBar() {
   const pathname = usePathname();
@@ -10,11 +11,13 @@ export default function NavBar() {
   const normalizedPathname =
     pathname === "/" ? "/" : pathname.replace(/\/$/, "");
 
+  const { t } = useTranslation();
+
   const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/journey", label: "Journey" },
-    { href: "/research", label: "Research" },
-    { href: "/projects", label: "Projects" },
+    { href: "/", label: t("nav.home") },
+    { href: "/journey", label: t("nav.journey") },
+    { href: "/research", label: t("nav.research") },
+    { href: "/projects", label: t("nav.projects") },
   ];
 
   return (
@@ -23,7 +26,7 @@ export default function NavBar() {
         <div className="max-w-6xl mx-auto px-2 sm:px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-4 md:gap-8 w-full">
             <div className="text-base sm:text-xl font-bold tracking-tight text-white drop-shadow-lg mr-2 sm:mr-6 min-w-max">
-              Shuzhao Feng
+              {t("nav.name")}
             </div>
 
             {/* Desktop Navigation */}

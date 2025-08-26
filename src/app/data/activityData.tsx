@@ -1,10 +1,13 @@
+import React from "react";
+import { Trans } from "react-i18next";
 import Link from "next/link";
-import { ReactNode } from "react";
+import i18n from "../../i18n";
 
 export interface Activity {
   id: string;
   title: string;
-  description: ReactNode;
+  // description is a render function so the Trans node is created during render (inside providers)
+  description: () => React.ReactNode;
   date: string;
   location: string;
   type: "conference" | "travel" | "presentation" | "meeting" | "other";
@@ -12,22 +15,21 @@ export interface Activity {
 
 export const currentActivity: Activity = {
   id: "1",
-  title: "RE '25 Conference",
-  description: (
-    <>
-      I will be in Valencia, Spain to attend the RE &apos;25 conference and
-      present{" "}
-      <Link
-        href="/research"
-        className="text-blue-400 hover:text-blue-300 underline"
-      >
-        our paper
-      </Link>
-      .
-    </>
+  title: i18n.t("activity.current.title"),
+  description: () => (
+    <Trans
+      i18nKey="activity.current.description"
+      components={[
+        <Link
+          key="paper"
+          href="/research"
+          className="text-blue-400 hover:text-blue-300 underline"
+        />,
+      ]}
+    />
   ),
-  date: "September 1-5, 2025",
-  location: "Valencia, Spain",
+  date: i18n.t("activity.current.date"),
+  location: i18n.t("activity.current.location"),
   type: "conference",
 };
 
@@ -36,10 +38,10 @@ export const upcomingActivities: Activity[] = [
   // Add more activities as needed
   // {
   //   id: "2",
-  //   title: "Research Presentation",
-  //   description: "Presenting my latest research findings at the university symposium",
-  //   date: "October 2025",
-  //   location: "McGill University",
+  //   title: i18n.t("activity.upcoming.title"),
+  //   description: i18n.t("activity.upcoming.description"),
+  //   date: i18n.t("activity.upcoming.date"),
+  //   location: i18n.t("activity.upcoming.location"),
   //   type: "presentation",
   // }
 ];

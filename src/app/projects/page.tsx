@@ -1,7 +1,9 @@
 "use client";
 import { ProjectCard } from "../components";
+import { useTranslation } from "react-i18next";
 
 export default function ProjectsPage() {
+  const { t } = useTranslation();
   // JsonPathSerializer project data
   const jsonPathSerializerIcon = (
     <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -21,8 +23,7 @@ export default function ProjectsPage() {
       {/* Small descriptive message */}
       <div className="w-full max-w-4xl mx-auto mt-4 mb-8">
         <p className="text-center text-lg text-gray-300">
-          These are my non-research related software engineering projects and
-          applications.
+          {t("projects.intro")}
         </p>
       </div>
 
@@ -86,19 +87,17 @@ export default function ProjectsPage() {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-gray-400">
-                More Projects Coming Soon
+                {t("projects.comingSoonTitle")}
               </h3>
             </div>
             <p className="text-gray-400 mb-4">
-              Additional projects will be showcased here...
+              {t("projects.comingSoonDescription")}
             </p>
           </div>
         </div>
 
         <div className="text-center mt-12">
-          <p className="text-gray-400 italic">
-            More projects will be added soon!
-          </p>
+          <p className="text-gray-400 italic">{t("projects.footnote")}</p>
         </div>
       </div>
     </main>

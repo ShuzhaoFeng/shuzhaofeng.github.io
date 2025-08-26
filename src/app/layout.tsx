@@ -1,8 +1,10 @@
-import type { Metadata } from "next";
+"use client";
+import { useTranslation } from "react-i18next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "./components/NavBar";
 import { ActivityWidget } from "./components";
+import I18nProvider from "./i18n-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,25 +16,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Hi, I'm Shuzhao Feng",
-  description:
-    "Personal website of Shuzhao Feng, master's student in Electrical and Computer Engineering at McGill University.",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { t } = useTranslation();
   return (
     <html lang="en">
+      <head>
+        <title>{t("layout.title")}</title>
+        <meta name="description" content={t("layout.description")} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NavBar />
-        {children}
-        <ActivityWidget />
+        <I18nProvider>
+          <NavBar />
+          {children}
+          <ActivityWidget />
+        </I18nProvider>
       </body>
     </html>
   );

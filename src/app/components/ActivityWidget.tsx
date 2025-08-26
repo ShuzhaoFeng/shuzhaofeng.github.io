@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { currentActivity } from "../data/activityData";
+import { useTranslation } from "react-i18next";
 
 export default function ActivityWidget() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false); // Controls width
   const [showContent, setShowContent] = useState(false); // Controls content visibility
   const [isSpinning, setIsSpinning] = useState(false);
@@ -38,7 +40,7 @@ export default function ActivityWidget() {
               <div className="flex items-center gap-2 min-w-0 flex-1">
                 <div className="min-w-0 flex-1">
                   <div className="text-white text-sm font-semibold truncate">
-                    My Upcoming Event
+                    {t("activity.headerTitle")}
                   </div>
                   <div className="text-gray-300 text-sm font-medium truncate">
                     {currentActivity.title}
@@ -83,7 +85,9 @@ export default function ActivityWidget() {
             >
               <div className="space-y-2">
                 <p className="text-gray-300 text-xs leading-relaxed">
-                  {currentActivity.description}
+                  {typeof currentActivity.description === "function"
+                    ? currentActivity.description()
+                    : currentActivity.description}
                 </p>
 
                 <div className="flex items-center gap-4 pt-2 text-xs">
@@ -125,7 +129,7 @@ export default function ActivityWidget() {
         <button
           onClick={handleButtonClick}
           className="bg-cyan-500 hover:bg-cyan-600 text-white p-2 sm:p-3 rounded-full shadow-lg transition-colors flex-shrink-0"
-          aria-label="View next activity"
+          aria-label={t("activity.buttonAriaLabel")}
         >
           <div className="relative">
             <svg

@@ -121,7 +121,7 @@ export default function ResearchPaper({
           {isExpanded ? <p>{abstract}</p> : <p>{shortAbstract}</p>}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-2 text-cyan-400 hover:text-cyan-300 text-sm font-medium transition-colors"
+            className="mt-2 text-cyan-400 hover:text-cyan-300 text-sm font-medium transition-colors cursor-pointer"
           >
             {isExpanded ? "Show Less" : "Read More"}
           </button>
