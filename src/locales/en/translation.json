@@ -30,11 +30,11 @@
   "research.authors": "Authors:",
   "research.venue": "Venue:",
   "research.year": "Year:",
-  "research.footnote": "For the most up-to-date list of publications, please visit my <0>Google Scholar profile</0>",
+  "research.footnote": "For the most up-to-date list of publications, please visit my <0>Google Scholar profile</0>.",
   "projects.intro": "These are my non-research related software engineering projects and applications.",
   "projects.comingSoonTitle": "Coming Soon",
   "projects.comingSoonDescription": "More projects will be added in the future...",
-  "projects.footnote": "For a full list of my work, please visit my GitHub profile."
+  "projects.footnote": "For a full list of my work, please visit my <0>GitHub profile</0>."
   ,"activity.headerTitle": "My Upcoming Event",
   "activity.buttonAriaLabel": "View next activity",
   "activity.current.title": "RE '25 Conference",

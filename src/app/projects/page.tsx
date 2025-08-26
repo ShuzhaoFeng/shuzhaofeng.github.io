@@ -1,6 +1,6 @@
 "use client";
 import { ProjectCard } from "../components";
-import { useTranslation } from "react-i18next";
+import { useTranslation, Trans } from "react-i18next";
 
 export default function ProjectsPage() {
   const { t } = useTranslation();
@@ -97,7 +97,20 @@ export default function ProjectsPage() {
         </div>
 
         <div className="text-center mt-12">
-          <p className="text-gray-400 italic">{t("projects.footnote")}</p>
+          <p className="text-gray-400 italic">
+            <Trans
+              i18nKey="projects.footnote"
+              components={[
+                <a
+                  key="github"
+                  href="https://github.com/ShuzhaoFeng"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                />,
+              ]}
+            />
+          </p>
         </div>
       </div>
     </main>

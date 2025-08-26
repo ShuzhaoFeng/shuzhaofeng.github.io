@@ -58,9 +58,9 @@ export default function MainPage() {
             />
           </p>
         </div>
-        <p className="mt-12 text-center text-xs text-gray-400">
-          {t("main.footnote")}
-        </p>
+        <div className="text-center mt-12">
+          <p className="text-gray-400 italic">{t("main.footnote")}</p>
+        </div>
         <style jsx>{`
           .shiny-text {
             background: linear-gradient(90deg, #fff 0%, #b3b3b3 50%, #fff 100%);
