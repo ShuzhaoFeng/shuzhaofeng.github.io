@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function NavBar() {
@@ -11,7 +11,28 @@ export default function NavBar() {
   const normalizedPathname =
     pathname === "/" ? "/" : pathname.replace(/\/$/, "");
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [isLangOpen, setIsLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement | null>(null);
+
+  const locales = [{ code: "en", label: "English" }];
+
+  const currentLocaleLabel =
+    locales.find((l) => l.code === i18n.language)?.label ?? locales[0].label;
+
+  useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      if (
+        isLangOpen &&
+        langRef.current &&
+        !langRef.current.contains(e.target as Node)
+      ) {
+        setIsLangOpen(false);
+      }
+    };
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
+  }, [isLangOpen]);
 
   const navLinks = [
     { href: "/", label: t("nav.home") },
@@ -129,6 +150,71 @@ export default function NavBar() {
                   <path d="M12 2C6.477 2 2 6.484 2 12.021c0 4.428 2.865 8.184 6.839 9.504.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.004.07 1.532 1.032 1.532 1.032.892 1.53 2.341 1.088 2.91.832.091-.647.35-1.088.636-1.339-2.221-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.987 1.029-2.686-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.025A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.295 2.748-1.025 2.748-1.025.546 1.378.202 2.397.1 2.65.64.699 1.028 1.593 1.028 2.686 0 3.847-2.337 4.695-4.566 4.944.359.309.678.919.678 1.852 0 1.336-.012 2.417-.012 2.747 0 .267.18.577.688.479C19.138 20.2 22 16.447 22 12.021 22 6.484 17.523 2 12 2z" />
                 </svg>
               </a>
+            </div>
+
+            {/* Language dropdown - far right with spacing */}
+            <div ref={langRef} className="ml-4 relative">
+              <button
+                onClick={() => setIsLangOpen(!isLangOpen)}
+                aria-haspopup="true"
+                aria-expanded={isLangOpen}
+                className="w-32 px-3 py-1 rounded-full bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium transition-colors flex items-center justify-between gap-2 border border-gray-700 shadow-sm"
+                aria-label={t("nav.languageAria", "Change language")}
+              >
+                <span className="flex-1 text-left truncate">
+                  {currentLocaleLabel}
+                </span>
+                <svg
+                  className="w-3 h-3 text-white ml-2"
+                  style={{
+                    transform: isLangOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.15s ease-in-out",
+                  }}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+
+              <div
+                className={`absolute right-0 mt-2 w-44 rounded-md shadow-lg overflow-hidden z-50 transform transition-all duration-200 ease-in-out ${
+                  isLangOpen
+                    ? "opacity-100 scale-100 max-h-40 bg-gray-800 border border-gray-700"
+                    : "opacity-0 scale-95 max-h-0 bg-gray-800 border border-gray-700 pointer-events-none"
+                }`}
+                aria-hidden={!isLangOpen}
+              >
+                <div className="flex flex-col">
+                  {locales.map((loc) => (
+                    <button
+                      key={loc.code}
+                      onClick={() => {
+                        i18n.changeLanguage(loc.code);
+                        setIsLangOpen(false);
+                      }}
+                      className="flex items-center justify-between w-full text-left px-3 py-2 hover:bg-gray-700 text-white text-sm"
+                    >
+                      <span>{loc.label}</span>
+                      {i18n.language === loc.code && (
+                        <svg
+                          className="w-4 h-4 text-cyan-400"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M20.285 6.709a1 1 0 00-1.414-1.418l-9.193 9.227-3.536-3.536A1 1 0 005.427 12.98l4.243 4.243a1 1 0 001.414 0l9.201-9.201z" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { currentActivity } from "../data/activityData";
 import { useTranslation } from "react-i18next";
 
@@ -8,6 +8,8 @@ export default function ActivityWidget() {
   const [isOpen, setIsOpen] = useState(false); // Controls width
   const [showContent, setShowContent] = useState(false); // Controls content visibility
   const [isSpinning, setIsSpinning] = useState(false);
+  const mainButtonRef = useRef<HTMLButtonElement | null>(null);
+  const panelId = "activity-panel";
 
   const handleButtonClick = () => {
     setIsSpinning(true);
@@ -21,12 +23,28 @@ export default function ActivityWidget() {
     setTimeout(() => setIsSpinning(false), 600);
   };
 
+  // Close on Escape and return focus to main button
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        setShowContent(false);
+        setIsOpen(false);
+        // return focus to main button after next tick
+        setTimeout(() => mainButtonRef.current?.focus(), 0);
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isOpen]);
+
   return (
     <>
       {/* Single expandable widget container */}
       <div className="fixed bottom-4 right-2 sm:right-4 md:bottom-6 md:right-6 z-20 flex items-end gap-2 sm:gap-3">
         {/* Expandable activity panel */}
         <div
+          id={panelId}
           className="bg-gray-800 border border-gray-600 rounded-lg shadow-lg overflow-hidden transition-all duration-500 ease-in-out"
           style={{
             width: isOpen ? "min(calc(100vw - 6rem), 320px)" : "200px",
@@ -55,7 +73,11 @@ export default function ActivityWidget() {
                 }`}
               >
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    // Collapse content first, then close the panel to keep animations consistent
+                    setShowContent(false);
+                    setIsOpen(false);
+                  }}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   <svg
@@ -127,9 +149,12 @@ export default function ActivityWidget() {
 
         {/* Calendar button */}
         <button
+          ref={mainButtonRef}
           onClick={handleButtonClick}
           className="bg-cyan-500 hover:bg-cyan-600 text-white p-2 sm:p-3 rounded-full shadow-lg transition-colors flex-shrink-0"
           aria-label={t("activity.buttonAriaLabel")}
+          aria-controls={panelId}
+          aria-expanded={isOpen}
         >
           <div className="relative">
             <svg
