@@ -1,7 +1,4 @@
 import React from "react";
-import { Trans } from "react-i18next";
-import Link from "next/link";
-import i18n from "../../i18n";
 
 export interface Activity {
   id: string;
@@ -13,25 +10,8 @@ export interface Activity {
   type: "conference" | "travel" | "presentation" | "meeting" | "other";
 }
 
-export const currentActivity: Activity = {
-  id: "1",
-  title: i18n.t("activity.current.title"),
-  description: () => (
-    <Trans
-      i18nKey="activity.current.description"
-      components={[
-        <Link
-          key="paper"
-          href="/research"
-          className="text-blue-400 hover:text-blue-300 underline"
-        />,
-      ]}
-    />
-  ),
-  date: i18n.t("activity.current.date"),
-  location: i18n.t("activity.current.location"),
-  type: "conference",
-};
+// Current activity cleared (expired). Set to null to indicate no active item.
+export const currentActivity: Activity | null = null;
 
 // You can add future activities here as well
 export const upcomingActivities: Activity[] = [

@@ -1,6 +1,7 @@
 "use client";
 import { ResearchPaper } from "../components";
 import { useTranslation, Trans } from "react-i18next";
+import { researchPapers } from "../data/researchData";
 
 export default function ResearchPage() {
   const { t } = useTranslation();
@@ -15,33 +16,24 @@ export default function ResearchPage() {
 
       {/* Research Papers */}
       <div className="w-full max-w-6xl mx-auto space-y-8">
-        {/* Real Paper 1 - LLM-based Satisfiability Checking */}
-        <ResearchPaper
-          title={t(
-            "research.paper1.title",
-            "LLM-based Satisfiability Checking of String Requirements by Consistent Data and Checker Generation"
-          )}
-          image="/research/llm-satisfiability-checking/image.png"
-          imageAlt={t(
-            "research.paper1.imageAlt",
-            "String requirements satisfiability checking with LLMs"
-          )}
-          authors={t(
-            "research.paper1.authors",
-            "Boqi Chen, Aren A. Babikian, Shuzhao Feng, Dániel Varró, Gunter Mussbacher"
-          )}
-          venue={t(
-            "research.paper1.venue",
-            "33rd IEEE International Requirements Engineering Conference (RE '25)"
-          )}
-          year={2025}
-          abstract={t(
-            "research.paper1.abstract",
-            "Requirements over strings, commonly represented using natural language (NL), are particularly relevant for software systems due to their heavy reliance on string data manipulation. While individual requirements can usually be analyzed manually, verifying properties (e.g., satisfiability) over sets of NL requirements is particularly challenging. Formal approaches (e.g., SMT solvers) may efficiently verify such properties, but are known to have theoretical limitations. Additionally, the translation of NL requirements into formal constraints typically requires significant manual effort. Recently, large language models (LLMs) have emerged as an alternative approach for formal reasoning tasks, but their effectiveness in verifying requirements over strings is less studied. In this paper, we introduce a hybrid approach that verifies the satisfiability of NL requirements over strings by using LLMs (1) to derive a satisfiability outcome (and a consistent string, if possible), and (2) to generate declarative (i.e., SMT) and imperative (i.e., Python) checkers, used to validate the correctness of (1). In our experiments, we assess the performance of four LLMs. Results show that LLMs effectively translate natural language into checkers, even achieving perfect testing accuracy for Python-based checkers. These checkers substantially help LLMs in generating a consistent string and accurately identifying unsatisfiable requirements, leading to more than doubled generation success rate and F1-score in certain cases compared to baselines without generated checkers."
-          )}
-          paperUrl="https://arxiv.org/abs/2506.16639"
-          pdfFile="/research/llm-satisfiability-checking/paper.pdf"
-        />
+        {researchPapers.map((p) => (
+          <ResearchPaper
+            key={p.id}
+            title={p.title}
+            image={p.image}
+            imageAlt={p.imageAlt}
+            authors={p.authors}
+            venue={p.venue}
+            year={p.year}
+            abstract={p.abstract}
+            paperUrl={p.paperUrl}
+            pdfFile={p.pdfFile}
+            pdfUrl={p.pdfUrl}
+            slidesFile={p.slidesFile}
+            slidesUrl={p.slidesUrl}
+            recordingUrl={p.recordingUrl}
+          />
+        ))}
 
         {/* Coming Soon Card */}
         <div className="bg-gray-800/30 rounded-lg p-6 border border-gray-600 opacity-60">

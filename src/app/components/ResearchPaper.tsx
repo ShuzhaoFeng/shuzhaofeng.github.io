@@ -7,7 +7,7 @@ interface ResearchPaperProps {
   image: StaticImageData | string;
   imageAlt: string;
   abstract: string;
-  paperUrl: string;
+  paperUrl?: string;
   pdfFile?: string; // For imported PDF files
   pdfUrl?: string; // For external PDF URLs (fallback)
   slidesFile?: string; // For imported slides files
@@ -130,19 +130,21 @@ export default function ResearchPaper({
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-3">
-        {/* Paper Link */}
-        <a
-          href={paperUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
-        >
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-            <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-          </svg>
-          View Paper
-        </a>
+        {/* Paper Link (optional) */}
+        {paperUrl && (
+          <a
+            href={paperUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+              <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+            </svg>
+            View Paper
+          </a>
+        )}
 
         {/* Download PDF */}
         {(pdfFile || pdfUrl) && (
@@ -165,13 +167,32 @@ export default function ResearchPaper({
         {(slidesFile || slidesUrl) && (
           <button
             onClick={handleSlidesDownload}
+            aria-label="Download slides"
             className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
           >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <svg
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <rect
+                x="2"
+                y="4"
+                width="20"
+                height="12"
+                rx="1.5"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                fill="none"
+              />
+              <path d="M10 9.5v5l4-2.5-4-2.5z" fill="currentColor" />
               <path
-                fillRule="evenodd"
-                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                clipRule="evenodd"
+                d="M12 18v2"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                strokeLinecap="round"
               />
             </svg>
             Download Slides
