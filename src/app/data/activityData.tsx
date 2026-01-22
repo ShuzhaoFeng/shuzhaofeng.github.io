@@ -1,4 +1,5 @@
 import React from "react";
+import { Trans } from "react-i18next";
 
 export interface Activity {
   id: string;
@@ -10,8 +11,28 @@ export interface Activity {
   type: "conference" | "travel" | "presentation" | "meeting" | "other";
 }
 
-// Current activity cleared (expired). Set to null to indicate no active item.
-export const currentActivity: Activity | null = null;
+// Current activity
+export const currentActivity: Activity | null = {
+  id: "hec-forecast-2026",
+  title: "activity.current.title",
+  description: () => (
+    <Trans
+      i18nKey="activity.current.description"
+      components={[
+        <a
+          key="forecast"
+          href="https://www.csdhec.ca/forecast"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-cyan-400 hover:underline"
+        />,
+      ]}
+    />
+  ),
+  date: "activity.current.date",
+  location: "activity.current.location",
+  type: "conference",
+};
 
 // You can add future activities here as well
 export const upcomingActivities: Activity[] = [

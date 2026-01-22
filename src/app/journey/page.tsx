@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 export default function JourneyPage() {
   const { t } = useTranslation();
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
+    <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
       <section className="w-full max-w-2xl mx-auto mt-4">
         <ol className="relative border-l border-cyan-500">
           {timelineEntries.map((entry, index) => (

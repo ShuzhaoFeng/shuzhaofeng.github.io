@@ -1,24 +1,33 @@
 "use client";
-import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-export default function NavBar() {
-  const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+type PageType = "home" | "journey" | "research" | "projects";
 
-  // Normalize pathname by removing trailing slash (except for root)
-  const normalizedPathname =
-    pathname === "/" ? "/" : pathname.replace(/\/$/, "");
+export default function NavBar() {
+  const [currentPage, setCurrentPage] = useState<PageType>("home");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const { t, i18n } = useTranslation();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const langRef = useRef<HTMLDivElement | null>(null);
 
-  const locales = [{ code: "en", label: "English" }];
+  const locales = [
+    { code: "en", label: "English" },
+    { code: "fr", label: "Français" },
+    { code: "zh", label: "简体中文" },
+  ];
 
   const currentLocaleLabel =
     locales.find((l) => l.code === i18n.language)?.label ?? locales[0].label;
+
+  // Load current page from localStorage on mount
+  useEffect(() => {
+    const savedPage = localStorage.getItem("currentPage") as PageType;
+    if (savedPage) {
+      setCurrentPage(savedPage);
+    }
+  }, []);
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
@@ -34,11 +43,19 @@ export default function NavBar() {
     return () => document.removeEventListener("click", onDocClick);
   }, [isLangOpen]);
 
+  const handleNavigate = (page: PageType) => {
+    setCurrentPage(page);
+    setIsMobileMenuOpen(false);
+    if (window.navigateToPage) {
+      window.navigateToPage(page);
+    }
+  };
+
   const navLinks = [
-    { href: "/", label: t("nav.home") },
-    { href: "/journey", label: t("nav.journey") },
-    { href: "/research", label: t("nav.research") },
-    { href: "/projects", label: t("nav.projects") },
+    { page: "home" as PageType, label: t("nav.home") },
+    { page: "journey" as PageType, label: t("nav.journey") },
+    { page: "research" as PageType, label: t("nav.research") },
+    { page: "projects" as PageType, label: t("nav.projects") },
   ];
 
   return (
@@ -52,19 +69,19 @@ export default function NavBar() {
 
             {/* Desktop Navigation */}
             <ul className="hidden md:flex gap-4 md:gap-8 text-base font-medium flex-1">
-              {navLinks.map(({ href, label }) => (
-                <li key={href} className="min-w-max">
-                  {normalizedPathname === href ? (
+              {navLinks.map(({ page, label }) => (
+                <li key={page} className="min-w-max">
+                  {currentPage === page ? (
                     <span className="text-cyan-400 font-bold cursor-default">
                       {label}
                     </span>
                   ) : (
-                    <a
-                      href={href}
-                      className="hover:text-cyan-400 transition-colors text-white whitespace-nowrap"
+                    <button
+                      onClick={() => handleNavigate(page)}
+                      className="hover:text-cyan-400 transition-colors text-white whitespace-nowrap bg-transparent border-none cursor-pointer font-base"
                     >
                       {label}
-                    </a>
+                    </button>
                   )}
                 </li>
               ))}
@@ -223,20 +240,19 @@ export default function NavBar() {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-600">
             <div className="px-4 py-3 space-y-3">
-              {navLinks.map(({ href, label }) => (
-                <div key={href}>
-                  {normalizedPathname === href ? (
+              {navLinks.map(({ page, label }) => (
+                <div key={page}>
+                  {currentPage === page ? (
                     <span className="block text-cyan-400 font-bold py-2 text-base">
                       {label}
                     </span>
                   ) : (
-                    <a
-                      href={href}
-                      className="block text-white hover:text-cyan-400 transition-colors py-2 text-base"
-                      onClick={() => setIsMobileMenuOpen(false)}
+                    <button
+                      onClick={() => handleNavigate(page)}
+                      className="block text-white hover:text-cyan-400 transition-colors py-2 text-base w-full text-left bg-transparent border-none cursor-pointer"
                     >
                       {label}
-                    </a>
+                    </button>
                   )}
                 </div>
               ))}

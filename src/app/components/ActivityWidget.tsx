@@ -65,7 +65,7 @@ export default function ActivityWidget() {
                   </div>
                   {currentActivity ? (
                     <div className="text-gray-300 text-sm font-medium truncate">
-                      {currentActivity.title}
+                      {t(currentActivity.title)}
                     </div>
                   ) : null}
                 </div>
@@ -132,7 +132,7 @@ export default function ActivityWidget() {
                             clipRule="evenodd"
                           />
                         </svg>
-                        <span>{currentActivity.date}</span>
+                        <span>{t(currentActivity.date)}</span>
                       </div>
                       <div className="flex items-center gap-1 text-gray-400">
                         <svg
@@ -146,7 +146,7 @@ export default function ActivityWidget() {
                             clipRule="evenodd"
                           />
                         </svg>
-                        <span>{currentActivity.location}</span>
+                        <span>{t(currentActivity.location)}</span>
                       </div>
                     </div>
                   </>

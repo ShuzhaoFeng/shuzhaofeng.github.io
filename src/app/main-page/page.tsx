@@ -6,7 +6,7 @@ export default function MainPage() {
   const { t } = useTranslation();
   return (
     <>
-      <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
+      <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-6xl gap-8 py-8">
           <div className="flex items-center justify-center order-1 lg:order-1">
             <Profile />

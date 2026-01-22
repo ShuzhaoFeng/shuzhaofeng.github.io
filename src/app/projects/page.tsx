@@ -7,7 +7,7 @@ export default function ProjectsPage() {
   const { t } = useTranslation();
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
+    <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
       {/* Small descriptive message */}
       <div className="w-full max-w-4xl mx-auto mt-4 mb-8">
         <p className="text-center text-lg text-gray-300">

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface ProjectCardProps {
   title: string;
@@ -22,6 +23,7 @@ export default function ProjectCard({
   iconColor,
   techStack,
 }: ProjectCardProps) {
+  const { t } = useTranslation();
   return (
     <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700 hover:border-cyan-500 transition-colors">
       <div className="flex items-center gap-3 mb-4">
@@ -55,7 +57,7 @@ export default function ProjectCard({
       <p className="text-gray-300 mb-4">{description}</p>
       {features && (
         <div className="mb-4 text-sm text-gray-400">
-          <strong>Features:</strong> {features}
+          <strong>{t("projects.features")}</strong> {features}
         </div>
       )}
       <div className="flex flex-wrap gap-2">

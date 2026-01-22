@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image, { StaticImageData } from "next/image";
+import { useTranslation } from "react-i18next";
 
 interface ResearchPaperProps {
   title: string;
@@ -33,6 +34,7 @@ export default function ResearchPaper({
   venue,
   year,
 }: ResearchPaperProps) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Handle PDF download
@@ -98,17 +100,18 @@ export default function ResearchPaper({
           </h3>
           {authors && (
             <p className="text-gray-300 text-sm mb-1">
-              <span className="font-medium">Authors:</span> {authors}
+              <span className="font-medium">{t("research.authors")}</span>{" "}
+              {authors}
             </p>
           )}
           {venue && (
             <p className="text-gray-300 text-sm mb-1">
-              <span className="font-medium">Venue:</span> {venue}
+              <span className="font-medium">{t("research.venue")}</span> {venue}
             </p>
           )}
           {year && (
             <p className="text-gray-300 text-sm mb-1">
-              <span className="font-medium">Year:</span> {year}
+              <span className="font-medium">{t("research.year")}</span> {year}
             </p>
           )}
         </div>
@@ -116,14 +119,16 @@ export default function ResearchPaper({
 
       {/* Abstract */}
       <div className="mb-4">
-        <h4 className="text-lg font-medium text-gray-200 mb-2">Abstract</h4>
+        <h4 className="text-lg font-medium text-gray-200 mb-2">
+          {t("research.abstractHeading")}
+        </h4>
         <div className="text-gray-300 leading-relaxed">
           {isExpanded ? <p>{abstract}</p> : <p>{shortAbstract}</p>}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="mt-2 text-cyan-400 hover:text-cyan-300 text-sm font-medium transition-colors cursor-pointer"
           >
-            {isExpanded ? "Show Less" : "Read More"}
+            {isExpanded ? t("research.showLess") : t("research.readMore")}
           </button>
         </div>
       </div>
@@ -142,7 +147,7 @@ export default function ResearchPaper({
               <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
               <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
             </svg>
-            View Paper
+            {t("research.viewPaper")}
           </a>
         )}
 
@@ -159,7 +164,7 @@ export default function ResearchPaper({
                 clipRule="evenodd"
               />
             </svg>
-            Download PDF
+            {t("research.downloadPdf")}
           </button>
         )}
 
@@ -195,7 +200,7 @@ export default function ResearchPaper({
                 strokeLinecap="round"
               />
             </svg>
-            Download Slides
+            {t("research.downloadSlides")}
           </button>
         )}
 
@@ -214,7 +219,7 @@ export default function ResearchPaper({
                 clipRule="evenodd"
               />
             </svg>
-            View Recording
+            {t("research.viewRecording")}
           </a>
         )}
       </div>
