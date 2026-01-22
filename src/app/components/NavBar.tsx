@@ -170,19 +170,35 @@ export default function NavBar() {
             </div>
 
             {/* Language dropdown - far right with spacing */}
-            <div ref={langRef} className="ml-4 relative">
+            <div ref={langRef} className="ml-2 sm:ml-4 relative">
               <button
                 onClick={() => setIsLangOpen(!isLangOpen)}
                 aria-haspopup="true"
                 aria-expanded={isLangOpen}
-                className="w-32 px-3 py-1 rounded-full bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium transition-colors flex items-center justify-between gap-2 border border-gray-700 shadow-sm"
+                className="md:w-32 px-2 md:px-3 py-1 rounded-full bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium transition-colors flex items-center justify-between gap-2 border border-gray-700 shadow-sm"
                 aria-label={t("nav.languageAria", "Change language")}
               >
-                <span className="flex-1 text-left truncate">
+                {/* Mobile: Globe Icon */}
+                <svg
+                  className="w-5 h-5 md:hidden text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                {/* Desktop: Text Label */}
+                <span className="hidden md:flex md:flex-1 text-left truncate">
                   {currentLocaleLabel}
                 </span>
                 <svg
-                  className="w-3 h-3 text-white ml-2"
+                  className="w-3 h-3 text-white ml-1 md:ml-2 hidden md:block"
                   style={{
                     transform: isLangOpen ? "rotate(180deg)" : "rotate(0deg)",
                     transition: "transform 0.15s ease-in-out",
