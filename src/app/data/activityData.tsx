@@ -12,27 +12,7 @@ export interface Activity {
 }
 
 // Current activity
-export const currentActivity: Activity | null = {
-  id: "hec-forecast-2026",
-  title: "activity.current.title",
-  description: () => (
-    <Trans
-      i18nKey="activity.current.description"
-      components={[
-        <a
-          key="forecast"
-          href="https://www.csdhec.ca/forecast"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-cyan-400 hover:underline"
-        />,
-      ]}
-    />
-  ),
-  date: "activity.current.date",
-  location: "activity.current.location",
-  type: "conference",
-};
+export const currentActivity: Activity | null = null;
 
 // You can add future activities here as well
 export const upcomingActivities: Activity[] = [

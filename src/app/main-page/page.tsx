@@ -58,7 +58,7 @@ export default function MainPage() {
             />
           </p>
         </div>
-        <div className="text-center mt-12">
+        <div className="text-center mt-12 pb-20">
           <p className="text-gray-400 italic">{t("main.footnote")}</p>
         </div>
         <style jsx>{`
