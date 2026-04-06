@@ -12,7 +12,27 @@ export interface Activity {
 }
 
 // Current activity
-export const currentActivity: Activity | null = null;
+export const currentActivity: Activity | null = {
+  id: "fse-2026",
+  title: "activity.current.title",
+  description: () => (
+    <Trans
+      i18nKey="activity.current.description"
+      components={[
+        <a
+          key="fse-2026-link"
+          href="https://conf.researchr.org/home/fse-2026"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-cyan-300 underline hover:text-cyan-200"
+        />,
+      ]}
+    />
+  ),
+  date: "activity.current.date",
+  location: "activity.current.location",
+  type: "conference",
+};
 
 // You can add future activities here as well
 export const upcomingActivities: Activity[] = [

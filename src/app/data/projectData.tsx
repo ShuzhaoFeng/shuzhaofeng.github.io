@@ -13,6 +13,32 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    id: "discord-botc",
+    title: "discord-botc",
+    description:
+      "An admin server for Blood on the Clocktower operations, with Discord bot integration to coordinate game management and player interactions.",
+    features:
+      "Automatic game logic resolution, player message coordination, role and game-state management, and multilingual support.",
+    githubUrl: "https://github.com/ShuzhaoFeng/discord-botc",
+    icon: (
+      <svg
+        className="w-6 h-6 text-white"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path d="M20.32 4.37A19.79 19.79 0 0 0 15.49 3a13.85 13.85 0 0 0-.61 1.25 18.27 18.27 0 0 0-5.76 0A13.84 13.84 0 0 0 8.51 3a19.7 19.7 0 0 0-4.84 1.37C.64 8.87-.18 13.26.23 17.57a19.95 19.95 0 0 0 5.95 3 14.61 14.61 0 0 0 1.27-2.05 12.76 12.76 0 0 1-2-.95c.17-.12.33-.25.48-.38a14.3 14.3 0 0 0 12.17 0c.15.13.31.26.48.38a12.66 12.66 0 0 1-2 .95 14.5 14.5 0 0 0 1.27 2.05 19.86 19.86 0 0 0 5.95-3c.49-5-.83-9.34-3.68-13.2zM8.03 14.96c-1.18 0-2.14-1.08-2.14-2.4 0-1.33.95-2.41 2.14-2.41 1.19 0 2.15 1.08 2.14 2.41 0 1.32-.95 2.4-2.14 2.4zm7.94 0c-1.18 0-2.14-1.08-2.14-2.4 0-1.33.95-2.41 2.14-2.41 1.19 0 2.15 1.08 2.14 2.41 0 1.32-.95 2.4-2.14 2.4z" />
+      </svg>
+    ),
+    iconColor: "bg-indigo-500",
+    techStack: [
+      { name: "Next.js", color: "bg-gray-600/20 text-gray-300" },
+      { name: "TypeScript", color: "bg-blue-600/20 text-blue-300" },
+      { name: "Tailwind CSS", color: "bg-cyan-600/20 text-cyan-300" },
+      { name: "discord.js", color: "bg-indigo-600/20 text-indigo-300" },
+      { name: "Express", color: "bg-gray-600/20 text-gray-300" },
+    ],
+  },
+  {
     id: "jsonpathserializer",
     title: "JsonPathSerializer",
     description:

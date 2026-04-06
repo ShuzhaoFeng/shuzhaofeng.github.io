@@ -38,8 +38,8 @@
   "projects.footnote": "For a full list of my work, please visit my <0>GitHub profile</0>."
   ,"activity.headerTitle": "My Upcoming Event",
   "activity.buttonAriaLabel": "View next activity",
-  "activity.current.title": "HEC Forecast",
-  "activity.current.date": "January 27, 2026",
-  "activity.current.location": "Montreal, Quebec, Canada",
-  "activity.current.description": "I will be attending the <0>HEC Forecast</0> event."
+  "activity.current.title": "FSE 2026",
+  "activity.current.date": "July 5-9, 2026",
+  "activity.current.location": "Montreal, Canada",
+  "activity.current.description": "I will be attending <0>FSE 2026 (co-located with AIware 2026)</0> to present our work."
 }
