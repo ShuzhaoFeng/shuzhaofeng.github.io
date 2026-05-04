@@ -18,6 +18,21 @@ export interface Research {
 
 export const researchPapers: Research[] = [
   {
+    id: "paper2",
+    title:
+      "LLM-Assisted Repository-Level Generation with Structured Spec-Driven Engineering",
+    image: "/research/llm-assisted-repository-level-generation/image.png",
+    imageAlt:
+      "Repository-level generation with structured spec-driven engineering",
+    authors: "Shuzhao Feng, Boqi Chen, Brett H Meyer, Gunter Mussbacher",
+    venue:
+      "34th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (FSE Companion '26)",
+    year: 2026,
+    abstract:
+      "State-of-the-art Large Language Models (LLMs) excel in code generation at the function level. However, the output quality significantly declines when scaling to repository-level systems. Current workflows relying only on natural language prompts suffer from inherent ambiguity and a lack of verifiability. To address this, we propose structured spec-driven engineering (SSDE), a paradigm that leverages structured artifacts to guide LLM generation. We argue that structured specifications as LLM inputs make high-quality, repository-level code generation a tangible goal, while at the same time offering superior verifiability, leading to significant potential for improvement. We first investigate the feasibility of this vision through a pilot study generating Model-View-Controller (MVC) business logic for three software systems using five LLMs, and then highlight the potential, challenges, and future roadmap for SSDE.",
+    pdfFile: "/research/llm-assisted-repository-level-generation/paper.pdf",
+  },
+  {
     id: "paper1",
     title:
       "LLM-based Satisfiability Checking of String Requirements by Consistent Data and Checker Generation",

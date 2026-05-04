@@ -2,6 +2,7 @@
 import { ResearchPaper } from "../components";
 import { useTranslation, Trans } from "react-i18next";
 import { researchPapers } from "../data/researchData";
+import { Plus } from "lucide-react";
 
 export default function ResearchPage() {
   const { t } = useTranslation();
@@ -39,17 +40,7 @@ export default function ResearchPage() {
         <div className="bg-gray-800/30 rounded-lg p-6 border border-gray-600 opacity-60">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-gray-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <Plus className="w-6 h-6 text-gray-400" aria-hidden="true" />
             </div>
             <h3 className="text-xl font-semibold text-gray-400">
               {t("research.comingSoonTitle")}

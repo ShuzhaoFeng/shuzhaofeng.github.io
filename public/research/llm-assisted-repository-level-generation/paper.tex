@@ -1,0 +1,129 @@
+\documentclass[sigconf,screen]{acmart}
+\settopmatter{authorsperrow=4}
+\usepackage[nameinlink]{cleveref}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage[table]{xcolor}
+\usepackage{hhline}
+\usepackage{tcolorbox}
+\usepackage{makecell}
+\usepackage{booktabs}
+\usepackage{todonotes}
+
+\setlength\parindent{0pt}
+
+\title[LLM-Assisted Repository-Level Generation with Structured Spec-Driven Engineering]{LLM-Assisted Repository-Level Generation \\ with Structured Spec-Driven Engineering}
+
+\author{Shuzhao Feng}
+\orcid{0009-0001-0743-7219}
+\affiliation{%
+  \institution{McGill University}
+  \city{Montreal}
+  \state{Quebec}
+  \country{Canada}
+}
+\email{shuzhao.feng@mail.mcgill.ca}
+
+\author{Boqi Chen}
+\orcid{0000-0002-1451-3603}
+\affiliation{%
+  \institution{University of Ottawa}
+  \city{Ottawa}
+  \state{Ontario}
+  \country{Canada}
+}
+\email{boqi.chen@uottawa.ca}
+
+\author{Brett H Meyer}
+\orcid{0000-0002-6650-3298}
+\affiliation{%
+  \institution{McGill University}
+  \city{Montreal}
+  \state{Quebec}
+  \country{Canada}
+}
+\email{brett.meyer@mcgill.ca}
+
+\author{Gunter Mussbacher}
+\orcid{0009-0006-8070-9184}
+\affiliation{%
+  \institution{McGill University}
+  \city{Montreal}
+  \state{Quebec}
+  \country{Canada}
+}
+\email{gunter.mussbacher@mcgill.ca}
+
+\copyrightyear{2026}
+\acmYear{2026}
+\setcopyright{cc}
+\setcctype{by}
+\acmConference[FSE Companion '26]{34th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering}{July 05--09, 2026}{Montreal, QC, Canada}
+\acmBooktitle{34th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (FSE Companion '26), July 05--09, 2026, Montreal, QC, Canada}
+\acmDOI{10.1145/3803437.3805567}
+\acmISBN{979-8-4007-2636-1/2026/07}
+
+\date{January 2026}
+
+\begin{CCSXML}
+<ccs2012>
+   <concept>
+       <concept_id>10011007.10011006.10011060.10011061</concept_id>
+       <concept_desc>Software and its engineering~Unified Modeling Language (UML)</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10011007.10011074.10011092.10011782</concept_id>
+       <concept_desc>Software and its engineering~Automatic programming</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10011007.10010940.10010971.10011682</concept_id>
+       <concept_desc>Software and its engineering~Abstraction, modeling and modularity</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10010147.10010257</concept_id>
+       <concept_desc>Computing methodologies~Machine learning</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10010147.10010178.10010199.10010203</concept_id>
+       <concept_desc>Computing methodologies~Planning with abstraction and generalization</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+ </ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Software and its engineering~Automatic programming}
+\ccsdesc[300]{Software and its engineering~Unified Modeling Language (UML)}
+\ccsdesc[300]{Software and its engineering~Abstraction, modeling and modularity}
+\ccsdesc[500]{Computing methodologies~Machine learning}
+\ccsdesc[300]{Computing methodologies~Planning with abstraction and generalization}
+
+\keywords{Large Language Models (LLMs), Code Generation, Spec-Driven Development, Artificial Intelligence, Model-Driven Engineering, Software Requirements, Domain Models, Gherkin Specifications}
+
+\begin{document}
+
+\begin{abstract}
+State-of-the-art Large Language Models (LLMs) excel in code generation at the function level. However, the output quality significantly declines when scaling to repository-level systems. Current workflows relying only on natural language prompts suffer from inherent ambiguity and a lack of verifiability. To address this, we propose \textit{structured spec-driven engineering} (SSDE), a paradigm that leverages structured artifacts to guide LLM generation. We argue that structured specifications as LLM inputs make high-quality, repository-level code generation a tangible goal, while at the same time offering superior verifiability, leading to significant potential for improvement.  We first investigate the feasibility of this vision through a pilot study generating Model-View-Controller (MVC) business logic for three software systems using five LLMs, and then highlight the potential, challenges, and future roadmap for SSDE.
+\end{abstract}
+
+\maketitle
+
+\input{introduction}
+
+\input{experiment}
+
+\input{results}
+
+\input{roadmap}
+
+\input{conclusion}
+
+\input{acknowledgement}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{reference}
+
+\end{document}

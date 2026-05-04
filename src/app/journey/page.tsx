@@ -2,6 +2,7 @@
 import { TimelineEntry } from "../components";
 import { timelineEntries } from "../data/timelineData";
 import { useTranslation } from "react-i18next";
+import { MoreHorizontal } from "lucide-react";
 
 export default function JourneyPage() {
   const { t } = useTranslation();
@@ -19,15 +20,10 @@ export default function JourneyPage() {
           {/* "To be continued..." entry */}
           <li className="ml-6">
             <span className="absolute flex items-center justify-center w-8 h-8 bg-gray-700 rounded-full -left-4 ring-4 ring-gray-900">
-              <svg
+              <MoreHorizontal
                 className="w-5 h-5 text-white"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <circle cx="4" cy="10" r="2" />
-                <circle cx="10" cy="10" r="2" />
-                <circle cx="16" cy="10" r="2" />
-              </svg>
+                aria-hidden="true"
+              />
             </span>
             <p className="mb-4 text-base font-normal text-gray-500 italic">
               {t("journey.toBeContinued")}

@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { currentActivity } from "../data/activityData";
 import { useTranslation } from "react-i18next";
+import { CalendarDays, MapPin, X } from "lucide-react";
 
 export default function ActivityWidget() {
   const { t } = useTranslation();
@@ -85,17 +86,7 @@ export default function ActivityWidget() {
                   }}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <X className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -121,31 +112,11 @@ export default function ActivityWidget() {
 
                     <div className="flex items-center gap-4 pt-2 text-xs">
                       <div className="flex items-center gap-1 text-gray-400">
-                        <svg
-                          className="w-3 h-3"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+                        <CalendarDays className="w-3 h-3" aria-hidden="true" />
                         <span>{t(currentActivity.date)}</span>
                       </div>
                       <div className="flex items-center gap-1 text-gray-400">
-                        <svg
-                          className="w-3 h-3"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+                        <MapPin className="w-3 h-3" aria-hidden="true" />
                         <span>{t(currentActivity.location)}</span>
                       </div>
                     </div>
@@ -166,21 +137,14 @@ export default function ActivityWidget() {
           aria-expanded={isOpen}
         >
           <div className="relative">
-            <svg
+            <CalendarDays
               className="w-4 h-4 sm:w-5 sm:h-5"
               style={{
                 transform: isSpinning ? "rotate(360deg)" : "rotate(0deg)",
                 transition: isSpinning ? "transform 0.6s ease-in-out" : "none",
               }}
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                clipRule="evenodd"
-              />
-            </svg>
+              aria-hidden="true"
+            />
 
             {/* Notification dot - only show when there's an active activity */}
             {currentActivity ? (

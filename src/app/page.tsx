@@ -6,6 +6,7 @@ import { TimelineEntry, ResearchPaper, ProjectCard } from "./components";
 import { timelineEntries } from "./data/timelineData";
 import { researchPapers } from "./data/researchData";
 import { projects } from "./data/projectData";
+import { MoreHorizontal, Plus } from "lucide-react";
 
 type PageType = "home" | "journey" | "research" | "projects";
 
@@ -119,15 +120,10 @@ export default function RootPage() {
             ))}
             <li className="ml-6">
               <span className="absolute flex items-center justify-center w-8 h-8 bg-gray-700 rounded-full -left-4 ring-4 ring-gray-900">
-                <svg
+                <MoreHorizontal
                   className="w-5 h-5 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <circle cx="4" cy="10" r="2" />
-                  <circle cx="10" cy="10" r="2" />
-                  <circle cx="16" cy="10" r="2" />
-                </svg>
+                  aria-hidden="true"
+                />
               </span>
               <p className="mb-4 text-base font-normal text-gray-500 italic">
                 {t("journey.toBeContinued")}
@@ -166,17 +162,7 @@ export default function RootPage() {
             <div className="bg-gray-800/30 rounded-lg p-6 border border-gray-600 opacity-60">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center">
-                  <svg
-                    className="w-6 h-6 text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <Plus className="w-6 h-6 text-gray-400" aria-hidden="true" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-400">
                   {t("research.comingSoonTitle")}
@@ -230,15 +216,10 @@ export default function RootPage() {
               <div className="bg-gray-800/30 rounded-lg p-6 border border-gray-600 opacity-60">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center">
-                    <svg
+                    <MoreHorizontal
                       className="w-6 h-6 text-gray-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <circle cx="4" cy="10" r="2" />
-                      <circle cx="10" cy="10" r="2" />
-                      <circle cx="16" cy="10" r="2" />
-                    </svg>
+                      aria-hidden="true"
+                    />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-400">
                     {t("projects.comingSoonTitle")}

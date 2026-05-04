@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { Check, ChevronDown, Globe, Mail, Menu, X } from "lucide-react";
 
 type PageType = "home" | "journey" | "research" | "projects";
 
@@ -94,28 +95,11 @@ export default function NavBar() {
                 className="p-2 rounded-md text-white hover:bg-gray-700 transition-colors"
                 aria-label="Toggle mobile menu"
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  {isMobileMenuOpen ? (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  ) : (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  )}
-                </svg>
+                {isMobileMenuOpen ? (
+                  <X className="w-6 h-6" aria-hidden="true" />
+                ) : (
+                  <Menu className="w-6 h-6" aria-hidden="true" />
+                )}
               </button>
             </div>
 
@@ -126,14 +110,7 @@ export default function NavBar() {
                 className="p-1 rounded-full hover:bg-gray-700 transition-colors"
                 aria-label="Email"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  className="w-6 h-6 sm:w-8 sm:h-8 text-white"
-                >
-                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-                </svg>
+                <Mail className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </a>
               <a
                 href="https://www.linkedin.com/in/shuzhao-feng/"
@@ -179,41 +156,18 @@ export default function NavBar() {
                 aria-label={t("nav.languageAria", "Change language")}
               >
                 {/* Mobile: Globe Icon */}
-                <svg
-                  className="w-5 h-5 md:hidden text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <Globe className="w-5 h-5 md:hidden text-white" />
                 {/* Desktop: Text Label */}
                 <span className="hidden md:flex md:flex-1 text-left truncate">
                   {currentLocaleLabel}
                 </span>
-                <svg
+                <ChevronDown
                   className="w-3 h-3 text-white ml-1 md:ml-2 hidden md:block"
                   style={{
                     transform: isLangOpen ? "rotate(180deg)" : "rotate(0deg)",
                     transition: "transform 0.15s ease-in-out",
                   }}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+                />
               </button>
 
               <div
@@ -236,13 +190,7 @@ export default function NavBar() {
                     >
                       <span>{loc.label}</span>
                       {i18n.language === loc.code && (
-                        <svg
-                          className="w-4 h-4 text-cyan-400"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                        >
-                          <path d="M20.285 6.709a1 1 0 00-1.414-1.418l-9.193 9.227-3.536-3.536A1 1 0 005.427 12.98l4.243 4.243a1 1 0 001.414 0l9.201-9.201z" />
-                        </svg>
+                        <Check className="w-4 h-4 text-cyan-400" />
                       )}
                     </button>
                   ))}
