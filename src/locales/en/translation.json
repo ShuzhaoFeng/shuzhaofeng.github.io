@@ -38,6 +38,9 @@
   "projects.footnote": "For a full list of my work, please visit my <0>GitHub profile</0>."
   ,"activity.headerTitle": "My Upcoming Event",
   "activity.buttonAriaLabel": "View next activity",
+  "activity.semla-2026.title": "SEMLA 2026",
+  "activity.semla-2026.location": "Montreal, Canada",
+  "activity.semla-2026.description": "I will be attending <0>SEMLA 2026</0> as a volunteer.",
   "activity.fse-2026.title": "FSE 2026",
   "activity.fse-2026.location": "Montreal, Canada",
   "activity.fse-2026.description": "I will be attending <0>FSE 2026 (co-located with AIware 2026)</0> to present our work."

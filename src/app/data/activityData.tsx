@@ -9,10 +9,30 @@ export interface Activity {
   startDate: Date;
   endDate: Date;
   location: string;
-  type: "conference" | "travel" | "presentation" | "meeting" | "other";
 }
 
 export const activities: Activity[] = [
+  {
+    id: "semla-2026",
+    title: "activity.semla-2026.title",
+    description: () => (
+      <Trans
+        i18nKey="activity.semla-2026.description"
+        components={[
+          <a
+            key="semla-2026-link"
+            href="https://semla.polymtl.ca/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-cyan-300 underline hover:text-cyan-200"
+          />,
+        ]}
+      />
+    ),
+    startDate: new Date("2026-06-01"),
+    endDate: new Date("2026-06-03"),
+    location: "activity.semla-2026.location",
+  },
   {
     id: "fse-2026",
     title: "activity.fse-2026.title",
@@ -33,7 +53,6 @@ export const activities: Activity[] = [
     startDate: new Date("2026-07-05"),
     endDate: new Date("2026-07-09"),
     location: "activity.fse-2026.location",
-    type: "conference",
   },
 ];
 
