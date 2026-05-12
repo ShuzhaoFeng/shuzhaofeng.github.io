@@ -77,10 +77,13 @@ export function formatActivityDateRange(
     zh: "zh-CN",
   };
   const locale = localeMap[language] ?? language;
+  // Format in UTC so calendar dates render the same regardless of viewer timezone.
+  // Activity dates are intentionally constructed as UTC ISO strings ("YYYY-MM-DD").
   const formatter = new Intl.DateTimeFormat(locale, {
     year: "numeric",
     month: "long",
     day: "numeric",
+    timeZone: "UTC",
   });
   return formatter.formatRange(activity.startDate, activity.endDate);
 }
