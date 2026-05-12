@@ -1,11 +1,15 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { currentActivity } from "../data/activityData";
+import {
+  getCurrentActivity,
+  formatActivityDateRange,
+} from "../data/activityData";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, MapPin, X } from "lucide-react";
 
 export default function ActivityWidget() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentActivity = getCurrentActivity();
   const [isOpen, setIsOpen] = useState(false); // Controls width
   const [showContent, setShowContent] = useState(false); // Controls content visibility
   const [isSpinning, setIsSpinning] = useState(false);
@@ -113,7 +117,12 @@ export default function ActivityWidget() {
                     <div className="flex items-center gap-4 pt-2 text-xs">
                       <div className="flex items-center gap-1 text-gray-400">
                         <CalendarDays className="w-3 h-3" aria-hidden="true" />
-                        <span>{t(currentActivity.date)}</span>
+                        <span>
+                          {formatActivityDateRange(
+                            currentActivity,
+                            i18n.language,
+                          )}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1 text-gray-400">
                         <MapPin className="w-3 h-3" aria-hidden="true" />

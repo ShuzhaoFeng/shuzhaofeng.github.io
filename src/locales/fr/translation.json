@@ -38,8 +38,7 @@
   "projects.footnote": "Pour une liste complète de mon travail, veuillez visiter mon <0>profil GitHub</0>.",
   "activity.headerTitle": "Mon événement à venir",
   "activity.buttonAriaLabel": "Voir la prochaine activité",
-  "activity.current.title": "FSE 2026",
-  "activity.current.date": "5-9 juillet 2026",
-  "activity.current.location": "Montréal, Canada",
-  "activity.current.description": "Je vais assister à <0>FSE 2026 (co-localisé avec AIware 2026)</0> pour présenter nos travaux."
+  "activity.fse-2026.title": "FSE 2026",
+  "activity.fse-2026.location": "Montréal, Canada",
+  "activity.fse-2026.description": "Je vais assister à <0>FSE 2026 (co-localisé avec AIware 2026)</0> pour présenter nos travaux."
 }

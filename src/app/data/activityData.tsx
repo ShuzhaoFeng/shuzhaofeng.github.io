@@ -6,43 +6,62 @@ export interface Activity {
   title: string;
   // description is a render function so the Trans node is created during render (inside providers)
   description: () => React.ReactNode;
-  date: string;
+  startDate: Date;
+  endDate: Date;
   location: string;
   type: "conference" | "travel" | "presentation" | "meeting" | "other";
 }
 
-// Current activity
-export const currentActivity: Activity | null = {
-  id: "fse-2026",
-  title: "activity.current.title",
-  description: () => (
-    <Trans
-      i18nKey="activity.current.description"
-      components={[
-        <a
-          key="fse-2026-link"
-          href="https://conf.researchr.org/home/fse-2026"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-cyan-300 underline hover:text-cyan-200"
-        />,
-      ]}
-    />
-  ),
-  date: "activity.current.date",
-  location: "activity.current.location",
-  type: "conference",
-};
-
-// You can add future activities here as well
-export const upcomingActivities: Activity[] = [
-  // Add more activities as needed
-  // {
-  //   id: "2",
-  //   title: i18n.t("activity.upcoming.title"),
-  //   description: i18n.t("activity.upcoming.description"),
-  //   date: i18n.t("activity.upcoming.date"),
-  //   location: i18n.t("activity.upcoming.location"),
-  //   type: "presentation",
-  // }
+export const activities: Activity[] = [
+  {
+    id: "fse-2026",
+    title: "activity.fse-2026.title",
+    description: () => (
+      <Trans
+        i18nKey="activity.fse-2026.description"
+        components={[
+          <a
+            key="fse-2026-link"
+            href="https://conf.researchr.org/home/fse-2026"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-cyan-300 underline hover:text-cyan-200"
+          />,
+        ]}
+      />
+    ),
+    startDate: new Date("2026-07-05"),
+    endDate: new Date("2026-07-09"),
+    location: "activity.fse-2026.location",
+    type: "conference",
+  },
 ];
+
+// Picks the next still-upcoming-or-ongoing activity (smallest startDate among
+// those whose endDate has not yet passed). Returns null if none remain.
+export function getCurrentActivity(now: Date = new Date()): Activity | null {
+  const upcoming = activities
+    .filter((a) => a.endDate.getTime() >= now.getTime())
+    .sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+  return upcoming[0] ?? null;
+}
+
+// Locale-aware pretty formatting for an activity's date range.
+// Uses Intl.DateTimeFormat#formatRange so single-day events collapse naturally.
+export function formatActivityDateRange(
+  activity: Activity,
+  language: string,
+): string {
+  const localeMap: Record<string, string> = {
+    en: "en-US",
+    fr: "fr-FR",
+    zh: "zh-CN",
+  };
+  const locale = localeMap[language] ?? language;
+  const formatter = new Intl.DateTimeFormat(locale, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  return formatter.formatRange(activity.startDate, activity.endDate);
+}
