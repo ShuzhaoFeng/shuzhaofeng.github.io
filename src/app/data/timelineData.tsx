@@ -7,14 +7,14 @@ import {
   Presentation,
 } from "lucide-react";
 
-const companies = [
+const companies: { name: string; href?: string; defunct?: boolean }[] = [
   {
     name: "Genetec",
     href: "https://www.genetec.com/",
   },
   {
     name: "X2O Media",
-    href: "https://www.x2omedia.com/",
+    defunct: true,
   },
   {
     name: "Coveo",
@@ -41,14 +41,23 @@ export const timelineEntries: TimelineEntryData[] = [
         <ul className="list-disc list-inside mt-2 text-cyan-300">
           {companies.map((company) => (
             <li key={company.name}>
-              <a
-                href={company.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:underline"
-              >
-                {company.name}
-              </a>
+              {company.href ? (
+                <a
+                  href={company.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  {company.name}
+                </a>
+              ) : (
+                <span>{company.name}</span>
+              )}
+              {company.defunct ? (
+                <span className="text-gray-400 italic ml-1">
+                  ({i18n.t("journey.noLongerOperational")})
+                </span>
+              ) : null}
             </li>
           ))}
         </ul>
