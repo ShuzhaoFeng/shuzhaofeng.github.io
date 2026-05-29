@@ -34,6 +34,27 @@ export const activities: Activity[] = [
     location: "activity.semla-2026.location",
   },
   {
+    id: "facct-2026",
+    title: "activity.facct-2026.title",
+    description: () => (
+      <Trans
+        i18nKey="activity.facct-2026.description"
+        components={[
+          <a
+            key="facct-2026-link"
+            href="https://facctconference.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-cyan-300 underline hover:text-cyan-200"
+          />,
+        ]}
+      />
+    ),
+    startDate: new Date("2026-06-25"),
+    endDate: new Date("2026-06-28"),
+    location: "activity.facct-2026.location",
+  },
+  {
     id: "fse-2026",
     title: "activity.fse-2026.title",
     description: () => (
