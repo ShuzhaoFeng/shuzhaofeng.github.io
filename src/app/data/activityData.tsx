@@ -1,5 +1,4 @@
 import React from "react";
-import { Trans } from "react-i18next";
 
 export interface Activity {
   id: string;
@@ -13,6 +12,15 @@ export interface Activity {
 
 export const activities: Activity[] = [
   // Example activity — copy this shape to add a new one:
+  //
+  // Note on i18n Trans interpolation & angle brackets:
+  // When formatting translated descriptions with links or styled elements, use numbered angle brackets
+  // (e.g., <0>link text</0>, <1>another link</1>) in the translation JSON files (src/locales/*/translation.json).
+  // Each numbered tag <n>...</n> corresponds to the n-th element (0-indexed) in the `components` array passed to <Trans />.
+  //
+  // Example JSON entry:
+  //   "activity.semla-2026.description": "I will be attending <0>SEMLA 2026</0> as a volunteer."
+  //
   // {
   //   id: "semla-2026",
   //   title: "activity.semla-2026.title",

@@ -1,8 +1,8 @@
 {
   "layout.title": "你好，我是冯书昭",
-  "layout.description": "冯书昭的个人网站，麦吉尔大学电气与计算机工程硕士研究生。",
+  "layout.description": "冯书昭的个人网站，麦吉尔大学电气与计算机工程博士研究生。",
   "main.hello": "你好，我是冯书昭",
-  "main.intro": "我目前正在麦吉尔大学攻读电气与计算机工程硕士学位。我的主要兴趣在于大语言生成模型，专攻于让所有人都能够构建软件，无论他们有什么样的技术背景。为此，我致力于增强大型语言模型的代码生成能力。展望未来，我希望探索这些模型的多模态能力，以进一步扩展人们可以用人工智能构建的内容。",
+  "main.intro": "我目前正在麦吉尔大学攻读电气与计算机工程博士学位。我的主要兴趣在于大语言生成模型，专攻于让所有人都能够构建软件，无论他们有什么样的技术背景。为此，我致力于增强大型语言模型的代码生成能力。展望未来，我希望探索这些模型的多模态能力，以进一步扩展人们可以用人工智能构建的内容。",
   "main.visitJourney": "访问<0>历程</0>页面，了解塑造今天的我的人生旅程。",
   "main.visitResearch": "访问<0>研究</0>页面，查看我的学术研究工作和发表论文。",
   "main.visitProjects": "访问<0>项目</0>页面，查看我正在或曾经使用软件工程技能开发的项目。",
@@ -17,7 +17,7 @@
   "journey.timeline.0": "我出生在中国，11岁时移居加拿大。",
   "journey.timeline.1": "2021年，我开始在麦吉尔大学攻读软件工程本科学位。在此期间，我曾在多家公司担任软件开发实习生，包括：",
   "journey.timeline.2": "2023年，我开始了我的第一次教学经历，担任麦吉尔大学的助教，支持ECSE 250 - 软件开发入门课程的学生。至今我仍在麦吉尔大学担任不同课程的助教。",
-  "journey.timeline.3": "2025年，完成本科学业后，我继续在麦吉尔大学攻读电气与计算机工程工程硕士学位。",
+  "journey.timeline.3": "2025年，完成本科学业后，我继续在麦吉尔大学攻读电气与计算机工程硕士学位，并于2026年提前转入（fast-track）博士学位项目。",
   "research.intro": "我的研究出版物和学术贡献集合。",
   "research.comingSoonTitle": "即将推出",
   "research.comingSoonDescription": "未来将添加更多研究...",
@@ -38,14 +38,5 @@
   "projects.features": "功能：",
   "projects.footnote": "如需查看我的完整工作列表，请访问我的<0>GitHub个人资料</0>。",
   "activity.headerTitle": "我的近期活动",
-  "activity.buttonAriaLabel": "查看下一个活动",
-  "activity.semla-2026.title": "SEMLA 2026",
-  "activity.semla-2026.location": "加拿大蒙特利尔",
-  "activity.semla-2026.description": "我将作为志愿者参加<0>SEMLA 2026</0>。",
-  "activity.facct-2026.title": "ACM FAccT 2026",
-  "activity.facct-2026.location": "加拿大蒙特利尔",
-  "activity.facct-2026.description": "我将参加<0>ACM FAccT 2026</0>。",
-  "activity.fse-2026.title": "FSE 2026",
-  "activity.fse-2026.location": "加拿大蒙特利尔",
-  "activity.fse-2026.description": "我将参加<0>FSE 2026（与 AIware 2026 同期举办）</0>并展示我们的工作。"
+  "activity.buttonAriaLabel": "查看下一个活动"
 }

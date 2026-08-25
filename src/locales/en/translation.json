@@ -1,8 +1,8 @@
 {
   "layout.title": "Hi, I'm Shuzhao Feng",
-  "layout.description": "Personal website of Shuzhao Feng, master's student in Electrical and Computer Engineering at McGill University.",
+  "layout.description": "Personal website of Shuzhao Feng, PhD student in Electrical and Computer Engineering at McGill University.",
   "main.hello": "Hello, I'm Shuzhao Feng",
-  "main.intro": "I'm currently pursuing a master's degree in Electrical and Computer Engineering at McGill University. My main interest lies in large generative models, with a particular focus on making software creation accessible to everyone, regardless of technical background. To this end, I am working on enhancing the code generation abilities of large language models. Looking ahead, I hope to explore the multimodal capabilities of these models to further expand what people can build with AI.",
+  "main.intro": "I'm currently pursuing a PhD in Electrical and Computer Engineering at McGill University. My main interest lies in large generative models, with a particular focus on making software creation accessible to everyone, regardless of technical background. To this end, I am working on enhancing the code generation abilities of large language models. Looking ahead, I hope to explore the multimodal capabilities of these models to further expand what people can build with AI.",
   "main.visitJourney": "Visit the <0>Journey</0> page to see my journey that made me who I am today.",
   "main.visitResearch": "Visit the <0>Research</0> page to see my academic research work and publications.",
   "main.visitProjects": "Visit the <0>Projects</0> page to see what I am or have been working on with my software engineering skills.",
@@ -17,7 +17,7 @@
   "journey.timeline.0": "I was born in China and moved to Canada at 11 years old.",
   "journey.timeline.1": "In 2021, I began pursuing my undergraduate degree in Software Engineering at McGill University. Along the way, I worked as a software development intern at several companies, namely:",
   "journey.timeline.2": "In 2023, I began my first experience teaching as a Teaching Assistant at McGill University, supporting students in ECSE 250 – Introduction to Software Development. I continue teaching at McGill to this day as a Teaching Assistant for different courses.",
-  "journey.timeline.3": "In 2025, after completing my undergraduate studies, I continued at McGill University to pursue a Master of Engineering in Electrical and Computer Engineering.",
+  "journey.timeline.3": "In 2025, after completing my undergraduate studies, I continued at McGill University to pursue a Master of Engineering in Electrical and Computer Engineering, and in 2026, I fast-tracked into a PhD in the same department.",
   "research.intro": "A collection of my research publications and academic contributions.",
   "research.comingSoonTitle": "Coming Soon",
   "research.comingSoonDescription": "More research will be added in the future...",
@@ -36,16 +36,7 @@
   "projects.comingSoonTitle": "Coming Soon",
   "projects.comingSoonDescription": "More projects will be added in the future...",
   "projects.features": "Features:",
-  "projects.footnote": "For a full list of my work, please visit my <0>GitHub profile</0>."
-  ,"activity.headerTitle": "My Upcoming Event",
-  "activity.buttonAriaLabel": "View next activity",
-  "activity.semla-2026.title": "SEMLA 2026",
-  "activity.semla-2026.location": "Montreal, Canada",
-  "activity.semla-2026.description": "I will be attending <0>SEMLA 2026</0> as a volunteer.",
-  "activity.facct-2026.title": "ACM FAccT 2026",
-  "activity.facct-2026.location": "Montreal, Canada",
-  "activity.facct-2026.description": "I will be attending <0>ACM FAccT 2026</0>.",
-  "activity.fse-2026.title": "FSE 2026",
-  "activity.fse-2026.location": "Montreal, Canada",
-  "activity.fse-2026.description": "I will be attending <0>FSE 2026 (co-located with AIware 2026)</0> to present our work."
+  "projects.footnote": "For a full list of my work, please visit my <0>GitHub profile</0>.",
+  "activity.headerTitle": "My Upcoming Event",
+  "activity.buttonAriaLabel": "View next activity"
 }

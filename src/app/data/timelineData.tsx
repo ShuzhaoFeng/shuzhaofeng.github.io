@@ -1,11 +1,6 @@
 import React from "react";
 import i18n from "../../i18n";
-import {
-  BriefcaseBusiness,
-  Clock3,
-  GraduationCap,
-  Presentation,
-} from "lucide-react";
+import { BriefcaseBusiness, Clock3, GraduationCap } from "lucide-react";
 
 const companies: { name: string; href?: string; defunct?: boolean }[] = [
   {
@@ -71,7 +66,7 @@ export const timelineEntries: TimelineEntryData[] = [
     description: () => <>{i18n.t("journey.timeline.2")}</>,
   },
   {
-    icon: <Presentation className="w-5 h-5 text-white" aria-hidden="true" />,
+    icon: <GraduationCap className="w-5 h-5 text-white" aria-hidden="true" />,
     description: () => <>{i18n.t("journey.timeline.3")}</>,
   },
 ];

@@ -1,8 +1,8 @@
 {
   "layout.title": "Bonjour, je suis Shuzhao Feng",
-  "layout.description": "Site web personnel de Shuzhao Feng, étudiant à la maîtrise en génie électrique et informatique à l'Université McGill.",
+  "layout.description": "Site web personnel de Shuzhao Feng, étudiant au doctorat en génie électrique et informatique à l'Université McGill.",
   "main.hello": "Bonjour, je suis Shuzhao Feng",
-  "main.intro": "Je poursuis actuellement une maîtrise en génie électrique et informatique à l'Université McGill. Mon intérêt principal réside dans les grands modèles génératifs, avec un accent particulier sur la création de logiciels accessible à tous, quel que soit leur bagage technique. À cette fin, je travaille à améliorer les capacités de génération de code des grands modèles de langage. En regardant vers l'avenir, j'espère explorer les capacités multimodales de ces modèles pour élargir davantage ce que les gens peuvent créer avec l'IA.",
+  "main.intro": "Je poursuis actuellement un doctorat en génie électrique et informatique à l'Université McGill. Mon intérêt principal réside dans les grands modèles génératifs, avec un accent particulier sur la création de logiciels accessible à tous, quel que soit leur bagage technique. À cette fin, je travaille à améliorer les capacités de génération de code des grands modèles de langage. En regardant vers l'avenir, j'espère explorer les capacités multimodales de ces modèles pour élargir davantage ce que les gens peuvent créer avec l'IA.",
   "main.visitJourney": "Visitez la page <0>Parcours</0> pour voir mon cheminement qui a fait de moi qui je suis aujourd'hui.",
   "main.visitResearch": "Visitez la page <0>Recherche</0> pour voir mes travaux de recherche académique et publications.",
   "main.visitProjects": "Visitez la page <0>Projets</0> pour voir ce sur quoi je travaille ou ai travaillé avec mes compétences en génie logiciel.",
@@ -17,7 +17,7 @@
   "journey.timeline.0": "Je suis né en Chine et j'ai déménagé au Canada à l'âge de 11 ans.",
   "journey.timeline.1": "En 2021, j'ai commencé à poursuivre mon baccalauréat en génie logiciel à l'Université McGill. En cours de route, j'ai travaillé comme stagiaire en développement logiciel dans plusieurs entreprises, notamment :",
   "journey.timeline.2": "En 2023, j'ai commencé ma première expérience d'enseignement en tant qu'assistant d'enseignement à l'Université McGill, soutenant les étudiants dans ECSE 250 – Introduction au développement logiciel. Je continue d'enseigner à McGill à ce jour en tant qu'assistant d'enseignement pour différents cours.",
-  "journey.timeline.3": "En 2025, après avoir terminé mes études de premier cycle, j'ai continué à l'Université McGill pour poursuivre une maîtrise en génie électrique et informatique.",
+  "journey.timeline.3": "En 2025, après avoir terminé mes études de premier cycle, j'ai continué à l'Université McGill pour poursuivre une maîtrise en génie électrique et informatique, puis en 2026, j'ai effectué un passage accéléré vers le doctorat dans le même département.",
   "research.intro": "Une collection de mes publications de recherche et contributions académiques.",
   "research.comingSoonTitle": "Bientôt disponible",
   "research.comingSoonDescription": "Plus de recherches seront ajoutées à l'avenir...",
@@ -38,14 +38,5 @@
   "projects.features": "Fonctionnalités :",
   "projects.footnote": "Pour une liste complète de mon travail, veuillez visiter mon <0>profil GitHub</0>.",
   "activity.headerTitle": "Mon événement à venir",
-  "activity.buttonAriaLabel": "Voir la prochaine activité",
-  "activity.semla-2026.title": "SEMLA 2026",
-  "activity.semla-2026.location": "Montréal, Canada",
-  "activity.semla-2026.description": "Je vais assister à <0>SEMLA 2026</0> en tant que bénévole.",
-  "activity.facct-2026.title": "ACM FAccT 2026",
-  "activity.facct-2026.location": "Montréal, Canada",
-  "activity.facct-2026.description": "Je vais assister à <0>ACM FAccT 2026</0>.",
-  "activity.fse-2026.title": "FSE 2026",
-  "activity.fse-2026.location": "Montréal, Canada",
-  "activity.fse-2026.description": "Je vais assister à <0>FSE 2026 (co-localisé avec AIware 2026)</0> pour présenter nos travaux."
+  "activity.buttonAriaLabel": "Voir la prochaine activité"
 }
