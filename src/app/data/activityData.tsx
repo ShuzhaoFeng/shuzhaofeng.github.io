@@ -12,69 +12,28 @@ export interface Activity {
 }
 
 export const activities: Activity[] = [
-  {
-    id: "semla-2026",
-    title: "activity.semla-2026.title",
-    description: () => (
-      <Trans
-        i18nKey="activity.semla-2026.description"
-        components={[
-          <a
-            key="semla-2026-link"
-            href="https://semla.polymtl.ca/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-cyan-300 underline hover:text-cyan-200"
-          />,
-        ]}
-      />
-    ),
-    startDate: new Date("2026-06-01"),
-    endDate: new Date("2026-06-03"),
-    location: "activity.semla-2026.location",
-  },
-  {
-    id: "facct-2026",
-    title: "activity.facct-2026.title",
-    description: () => (
-      <Trans
-        i18nKey="activity.facct-2026.description"
-        components={[
-          <a
-            key="facct-2026-link"
-            href="https://facctconference.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-cyan-300 underline hover:text-cyan-200"
-          />,
-        ]}
-      />
-    ),
-    startDate: new Date("2026-06-25"),
-    endDate: new Date("2026-06-28"),
-    location: "activity.facct-2026.location",
-  },
-  {
-    id: "fse-2026",
-    title: "activity.fse-2026.title",
-    description: () => (
-      <Trans
-        i18nKey="activity.fse-2026.description"
-        components={[
-          <a
-            key="fse-2026-link"
-            href="https://conf.researchr.org/home/fse-2026"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-cyan-300 underline hover:text-cyan-200"
-          />,
-        ]}
-      />
-    ),
-    startDate: new Date("2026-07-05"),
-    endDate: new Date("2026-07-09"),
-    location: "activity.fse-2026.location",
-  },
+  // Example activity — copy this shape to add a new one:
+  // {
+  //   id: "semla-2026",
+  //   title: "activity.semla-2026.title",
+  //   description: () => (
+  //     <Trans
+  //       i18nKey="activity.semla-2026.description"
+  //       components={[
+  //         <a
+  //           key="semla-2026-link"
+  //           href="https://semla.polymtl.ca/"
+  //           target="_blank"
+  //           rel="noopener noreferrer"
+  //           className="text-cyan-300 underline hover:text-cyan-200"
+  //         />,
+  //       ]}
+  //     />
+  //   ),
+  //   startDate: new Date("2026-06-01"),
+  //   endDate: new Date("2026-06-03"),
+  //   location: "activity.semla-2026.location",
+  // },
 ];
 
 // Picks the next still-upcoming-or-ongoing activity (smallest startDate among
