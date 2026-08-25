@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image, { StaticImageData } from "next/image";
 import { useTranslation } from "react-i18next";
 import { Download, ExternalLink, PlayCircle, Presentation } from "lucide-react";
@@ -37,9 +37,23 @@ export default function ResearchPaper({
 }: ResearchPaperProps) {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [isDownloadingSlides, setIsDownloadingSlides] = useState(false);
+  const pdfTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const slidesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (pdfTimeoutRef.current) clearTimeout(pdfTimeoutRef.current);
+      if (slidesTimeoutRef.current) clearTimeout(slidesTimeoutRef.current);
+    };
+  }, []);
 
   // Handle PDF download
   const handlePdfDownload = () => {
+    if (isDownloadingPdf) return;
+    setIsDownloadingPdf(true);
+
     if (pdfFile) {
       // Create a download link for the imported PDF
       const link = document.createElement("a");
@@ -52,10 +66,18 @@ export default function ResearchPaper({
       // Fallback to external URL
       window.open(pdfUrl, "_blank");
     }
+
+    if (pdfTimeoutRef.current) clearTimeout(pdfTimeoutRef.current);
+    pdfTimeoutRef.current = setTimeout(() => {
+      setIsDownloadingPdf(false);
+    }, 500);
   };
 
   // Handle slides download
   const handleSlidesDownload = () => {
+    if (isDownloadingSlides) return;
+    setIsDownloadingSlides(true);
+
     if (slidesFile) {
       // Create a download link for the imported slides
       const link = document.createElement("a");
@@ -68,6 +90,11 @@ export default function ResearchPaper({
       // Fallback to external URL
       window.open(slidesUrl, "_blank");
     }
+
+    if (slidesTimeoutRef.current) clearTimeout(slidesTimeoutRef.current);
+    slidesTimeoutRef.current = setTimeout(() => {
+      setIsDownloadingSlides(false);
+    }, 500);
   };
 
   // Get the first ~100 characters for the collapsed view
@@ -153,7 +180,8 @@ export default function ResearchPaper({
         {(pdfFile || pdfUrl) && (
           <button
             onClick={handlePdfDownload}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
+            disabled={isDownloadingPdf}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-colors"
           >
             <Download className="w-4 h-4" aria-hidden="true" />
             {t("research.downloadPdf")}
@@ -164,8 +192,9 @@ export default function ResearchPaper({
         {(slidesFile || slidesUrl) && (
           <button
             onClick={handleSlidesDownload}
+            disabled={isDownloadingSlides}
             aria-label="Download slides"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:hover:bg-purple-600 text-white text-sm font-medium rounded-lg transition-colors"
           >
             <Presentation className="w-4 h-4" aria-hidden="true" />
             {t("research.downloadSlides")}
