@@ -1,0 +1,21 @@
+name: setup-bun
+description: "Setup Bun ⚙️ - Cache dependencies ⚡ - Install dependencies 🔧"
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Bun ⚙️
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version-file: package.json
+
+    # Bun's global package cache, not node_modules: `bun install` always runs
+    # and links node_modules from this cache, so a hit only skips downloads.
+    - name: Cache dependencies ⚡
+      uses: actions/cache@v6
+      with:
+        path: ~/.bun/install/cache
+        key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+
+    - name: Install dependencies 🔧
+      shell: bash
+      run: bun install --frozen-lockfile
