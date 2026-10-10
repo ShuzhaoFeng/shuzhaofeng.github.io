@@ -282,7 +282,7 @@ export default function NavBar() {
                           setIsLangOpen(false);
                         });
                       }}
-                      className="flex items-center justify-between w-full text-left px-3 py-2 hover:bg-gray-700 text-white text-sm"
+                      className="flex items-center justify-between w-full text-left px-3 py-2 hover:bg-gray-700 text-white text-sm transition-colors"
                     >
                       <span>{loc.label}</span>
                       {i18n.language === loc.code && (

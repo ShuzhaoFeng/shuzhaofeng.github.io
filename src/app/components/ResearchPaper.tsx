@@ -255,12 +255,14 @@ export default function ResearchPaper({
           </a>
         )}
 
-        {/* Download PDF */}
+        {/* Download PDF. Each download button dims while its download starts;
+            its transition covers opacity as well as the hover colour, so the
+            dim and its restore ease. */}
         {(pdfFile || pdfUrl) && (
           <button
             onClick={handlePdfDownload}
             disabled={isDownloadingPdf}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-[background-color,opacity]"
           >
             <Download className="w-4 h-4" aria-hidden="true" />
             {t("research.downloadPdf")}
@@ -273,7 +275,7 @@ export default function ResearchPaper({
             onClick={handleSlidesDownload}
             disabled={isDownloadingSlides}
             aria-label="Download slides"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:hover:bg-purple-600 text-white text-sm font-medium rounded-lg transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:hover:bg-purple-600 text-white text-sm font-medium rounded-lg transition-[background-color,opacity]"
           >
             <Presentation className="w-4 h-4" aria-hidden="true" />
             {t("research.downloadSlides")}

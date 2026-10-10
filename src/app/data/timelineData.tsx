@@ -41,7 +41,9 @@ export const timelineEntries: TimelineEntryData[] = [
                   href={company.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:underline"
+                  // Always underlined, in transparent until hovered, so the
+                  // underline fades in instead of appearing at once.
+                  className="underline decoration-transparent hover:decoration-current transition-colors"
                 >
                   {company.name}
                 </a>

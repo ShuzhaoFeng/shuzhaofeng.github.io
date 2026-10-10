@@ -10,6 +10,13 @@ import { MoreHorizontal, Plus } from "lucide-react";
 
 type PageType = "home" | "journey" | "research" | "projects";
 
+// The home page's inline section links. An underline's appearance and a ring's
+// cannot ease as such, so both are always drawn and fade in by colour: the
+// underline from transparent to the text colour on hover, the focus ring from
+// transparent to cyan on focus.
+const inlineLinkClass =
+  "text-cyan-400 underline decoration-transparent hover:decoration-current ring-2 ring-transparent focus:outline-none focus:ring-cyan-400 transition-[text-decoration-color,box-shadow] bg-transparent border-none cursor-pointer";
+
 // Extend Window interface to include navigateToPage
 declare global {
   interface Window {
@@ -85,7 +92,7 @@ export default function RootPage() {
                     <button
                       key="journey"
                       onClick={() => handlePageChange("journey")}
-                      className="text-cyan-400 hover:underline focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-transparent border-none cursor-pointer"
+                      className={inlineLinkClass}
                     />,
                   ]}
                 />
@@ -97,7 +104,7 @@ export default function RootPage() {
                     <button
                       key="research"
                       onClick={() => handlePageChange("research")}
-                      className="text-cyan-400 hover:underline focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-transparent border-none cursor-pointer"
+                      className={inlineLinkClass}
                     />,
                   ]}
                 />
@@ -109,7 +116,7 @@ export default function RootPage() {
                     <button
                       key="projects"
                       onClick={() => handlePageChange("projects")}
-                      className="text-cyan-400 hover:underline focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-transparent border-none cursor-pointer"
+                      className={inlineLinkClass}
                     />,
                   ]}
                 />
