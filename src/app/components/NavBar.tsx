@@ -5,9 +5,64 @@ import { Check, ChevronDown, Globe, Mail, Menu, X } from "lucide-react";
 
 type PageType = "home" | "journey" | "research" | "projects";
 
+// One navigation item. The current item is the same <button> as the others,
+// so moving the marker is a class change the browser can ease, not a swap of
+// elements. Two stacked copies of the label share one grid cell: the regular
+// one shows when the item is not current, the bold cyan one when it is, and
+// the marker cross-fades between them. The cell takes the bold label's width,
+// so the neighbouring items do not shift when the weight changes.
+function NavItem({
+  label,
+  isCurrent,
+  animate,
+  onSelect,
+  className,
+}: {
+  label: string;
+  isCurrent: boolean;
+  // False until the visitor switches sections, so the switch to the saved
+  // section on mount shows the marker in place with no easing from Home.
+  animate: boolean;
+  onSelect: () => void;
+  className: string;
+}) {
+  const ease = "duration-200 ease-out";
+  return (
+    <button
+      type="button"
+      onClick={isCurrent ? undefined : onSelect}
+      aria-current={isCurrent ? "page" : undefined}
+      // The current item stays out of the tab order and keeps the default
+      // cursor, as when it was a plain span. The `!` outranks the global
+      // pointer-cursor rule for buttons in globals.css.
+      tabIndex={isCurrent ? -1 : undefined}
+      className={`group grid bg-transparent border-none ${
+        isCurrent ? "cursor-default!" : "cursor-pointer"
+      } ${className}`}
+    >
+      <span
+        className={`[grid-area:1/1] text-white group-hover:text-cyan-400 ${
+          animate ? "transition-[color,opacity]" : "transition-colors"
+        } ${ease} ${isCurrent ? "opacity-0" : "opacity-100"}`}
+      >
+        {label}
+      </span>
+      <span
+        aria-hidden="true"
+        className={`[grid-area:1/1] font-bold text-cyan-400 ${
+          animate ? `transition-opacity ${ease}` : ""
+        } ${isCurrent ? "opacity-100" : "opacity-0"}`}
+      >
+        {label}
+      </span>
+    </button>
+  );
+}
+
 export default function NavBar() {
   const [currentPage, setCurrentPage] = useState<PageType>("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hasNavigated, setHasNavigated] = useState(false);
 
   const { t, i18n } = useTranslation();
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -46,6 +101,7 @@ export default function NavBar() {
 
   const handleNavigate = (page: PageType) => {
     setCurrentPage(page);
+    setHasNavigated(true);
     setIsMobileMenuOpen(false);
     if (window.navigateToPage) {
       window.navigateToPage(page);
@@ -72,18 +128,13 @@ export default function NavBar() {
             <ul className="hidden md:flex gap-4 md:gap-8 text-base font-medium flex-1">
               {navLinks.map(({ page, label }) => (
                 <li key={page} className="min-w-max">
-                  {currentPage === page ? (
-                    <span className="text-cyan-400 font-bold cursor-default">
-                      {label}
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => handleNavigate(page)}
-                      className="hover:text-cyan-400 transition-colors text-white whitespace-nowrap bg-transparent border-none cursor-pointer font-base"
-                    >
-                      {label}
-                    </button>
-                  )}
+                  <NavItem
+                    label={label}
+                    isCurrent={currentPage === page}
+                    animate={hasNavigated}
+                    onSelect={() => handleNavigate(page)}
+                    className="whitespace-nowrap"
+                  />
                 </li>
               ))}
             </ul>
@@ -229,18 +280,13 @@ export default function NavBar() {
             <div className="border-t border-gray-600 px-4 py-3 space-y-3">
               {navLinks.map(({ page, label }) => (
                 <div key={page}>
-                  {currentPage === page ? (
-                    <span className="block text-cyan-400 font-bold py-2 text-base">
-                      {label}
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => handleNavigate(page)}
-                      className="block text-white hover:text-cyan-400 transition-colors py-2 text-base w-full text-left bg-transparent border-none cursor-pointer"
-                    >
-                      {label}
-                    </button>
-                  )}
+                  <NavItem
+                    label={label}
+                    isCurrent={currentPage === page}
+                    animate={hasNavigated}
+                    onSelect={() => handleNavigate(page)}
+                    className="w-full py-2 text-base text-left"
+                  />
                 </div>
               ))}
             </div>
