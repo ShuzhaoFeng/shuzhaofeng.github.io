@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import Image, { StaticImageData } from "next/image";
 import { useTranslation } from "react-i18next";
 import { Download, ExternalLink, PlayCircle, Presentation } from "lucide-react";
@@ -37,6 +37,13 @@ export default function ResearchPaper({
 }: ResearchPaperProps) {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
+  // Set by the first toggle, so the abstract and its control ease only on a
+  // visitor's change, not when the card first renders.
+  const [hasToggled, setHasToggled] = useState(false);
+  const abstractRef = useRef<HTMLDivElement>(null);
+  // The abstract's rendered height when the visitor toggled it, the start of
+  // the height change.
+  const fromHeightRef = useRef<number | null>(null);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const [isDownloadingSlides, setIsDownloadingSlides] = useState(false);
   const pdfTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -109,6 +116,61 @@ export default function ResearchPaper({
 
   const shortAbstract = getShortAbstract(abstract);
 
+  const toggleAbstract = () => {
+    if (abstractRef.current) {
+      // Mid-change, this is the height the box has reached, so a second
+      // toggle eases on from there instead of jumping.
+      fromHeightRef.current = abstractRef.current.getBoundingClientRect().height;
+    }
+    setHasToggled(true);
+    setIsExpanded((expanded) => !expanded);
+  };
+
+  // Eases the abstract's box from its old height to the new text's height.
+  // The new text is in place from the first frame; the box reveals or trims
+  // it as it eases. Measuring in JS and easing between pixel heights works
+  // in every current browser, unlike easing to "auto" (interpolate-size).
+  // If CSS gives the box no height transition (for example a reduced-motion
+  // rule), it takes the new height at once.
+  useLayoutEffect(() => {
+    const box = abstractRef.current;
+    const from = fromHeightRef.current;
+    fromHeightRef.current = null;
+    if (!box || from === null) return;
+
+    box.style.height = "";
+    const to = box.getBoundingClientRect().height;
+    if (from === to) return;
+
+    box.style.height = `${from}px`;
+    box.getBoundingClientRect(); // commit the start height before easing
+    box.style.height = `${to}px`;
+
+    const transition = box
+      .getAnimations()
+      .find(
+        (animation) =>
+          animation instanceof CSSTransition &&
+          animation.transitionProperty === "height",
+      );
+    if (!transition) {
+      box.style.height = "";
+      return;
+    }
+
+    // Back to auto height when the change settles, so the box follows the
+    // layout (for example a resized window). A later toggle that interrupts
+    // this change takes the box over instead.
+    let current = true;
+    const release = () => {
+      if (current) box.style.height = "";
+    };
+    transition.finished.then(release, release);
+    return () => {
+      current = false;
+    };
+  }, [isExpanded]);
+
   return (
     <div className="bg-gray-800/30 rounded-lg p-6 border border-gray-600 hover:border-gray-500 transition-colors">
       {/* Header with Image and Title */}
@@ -151,12 +213,29 @@ export default function ResearchPaper({
           {t("research.abstractHeading")}
         </h4>
         <div className="text-gray-300 leading-relaxed">
-          {isExpanded ? <p>{abstract}</p> : <p>{shortAbstract}</p>}
+          {/* The keys remount the text and the label on each toggle, so each
+              new one fades up from partly visible (abstract-swap). */}
+          <div
+            ref={abstractRef}
+            className="overflow-hidden transition-[height] duration-[220ms] ease-[cubic-bezier(0.2,0,0,1)]"
+          >
+            <p
+              key={isExpanded ? "full" : "short"}
+              className={hasToggled ? "abstract-swap" : undefined}
+            >
+              {isExpanded ? abstract : shortAbstract}
+            </p>
+          </div>
           <button
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={toggleAbstract}
             className="mt-2 text-cyan-400 hover:text-cyan-300 text-sm font-medium transition-colors cursor-pointer"
           >
-            {isExpanded ? t("research.showLess") : t("research.readMore")}
+            <span
+              key={isExpanded ? "less" : "more"}
+              className={hasToggled ? "abstract-swap" : undefined}
+            >
+              {isExpanded ? t("research.showLess") : t("research.readMore")}
+            </span>
           </button>
         </div>
       </div>
