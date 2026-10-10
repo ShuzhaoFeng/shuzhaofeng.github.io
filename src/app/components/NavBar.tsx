@@ -1,9 +1,37 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { flushSync } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { Check, ChevronDown, Globe, Mail, Menu, X } from "lucide-react";
 
 type PageType = "home" | "journey" | "research" | "projects";
+
+let currentLangFade: ViewTransition | null = null;
+
+// Runs a language switch as a view transition of the whole document, so every
+// translated string (navigation, page and activity widget) cross-fades at once
+// while unchanged pixels hold still. `flushSync` commits the new text inside
+// the callback, so the new language is in the first frame of the fade; nothing
+// remounts, so what the visitor opened or chose stays as it is. The
+// `data-lang-fade` attribute scopes the timing in globals.css to this
+// transition. Browsers without view transitions switch at once.
+function switchLanguageWithFade(apply: () => void) {
+  if (typeof document.startViewTransition !== "function") {
+    apply();
+    return;
+  }
+  const root = document.documentElement;
+  root.setAttribute("data-lang-fade", "");
+  const transition = document.startViewTransition(() => flushSync(apply));
+  currentLangFade = transition;
+  transition.finished.finally(() => {
+    // A newer switch may have taken over; leave its attribute in place.
+    if (currentLangFade === transition) {
+      currentLangFade = null;
+      root.removeAttribute("data-lang-fade");
+    }
+  });
+}
 
 // One navigation item. The current item is the same <button> as the others,
 // so moving the marker is a class change the browser can ease, not a swap of
@@ -224,7 +252,7 @@ export default function NavBar() {
                   {currentLocaleLabel}
                 </span>
                 <ChevronDown
-                  className="w-3 h-3 text-white ml-1 md:ml-2 hidden md:block"
+                  className="lang-chevron w-3 h-3 text-white ml-1 md:ml-2 hidden md:block"
                   style={{
                     transform: isLangOpen ? "rotate(180deg)" : "rotate(0deg)",
                     transition: "transform 0.15s ease-in-out",
@@ -233,7 +261,7 @@ export default function NavBar() {
               </button>
 
               <div
-                className={`absolute right-0 mt-2 w-44 rounded-md shadow-lg overflow-hidden z-50 transform transition-all duration-200 ease-in-out ${
+                className={`lang-menu absolute right-0 mt-2 w-44 rounded-md shadow-lg overflow-hidden z-50 transform transition-all duration-200 ease-in-out ${
                   isLangOpen
                     ? "opacity-100 scale-100 max-h-40 bg-gray-800 border border-gray-700"
                     : "opacity-0 scale-95 max-h-0 bg-gray-800 border border-gray-700 pointer-events-none"
@@ -245,8 +273,14 @@ export default function NavBar() {
                     <button
                       key={loc.code}
                       onClick={() => {
-                        i18n.changeLanguage(loc.code);
-                        setIsLangOpen(false);
+                        if (loc.code === i18n.language) {
+                          setIsLangOpen(false);
+                          return;
+                        }
+                        switchLanguageWithFade(() => {
+                          i18n.changeLanguage(loc.code);
+                          setIsLangOpen(false);
+                        });
                       }}
                       className="flex items-center justify-between w-full text-left px-3 py-2 hover:bg-gray-700 text-white text-sm"
                     >

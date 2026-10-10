@@ -66,3 +66,37 @@ button:disabled,
 .section-enter {
   animation: section-enter 220ms cubic-bezier(0.2, 0, 0, 1);
 }
+
+/* A language switch cross-fades the whole page (see NavBar). The new text is
+   in the incoming layer from the first frame; the old text fades out over the
+   same span. Opacity only. */
+html[data-lang-fade]::view-transition-old(root),
+html[data-lang-fade]::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* The language menu and its chevron run their own close and rotate
+   transitions. They are lifted out of the page's cross-fade and shown live,
+   with their old snapshot hidden, so those transitions look as they always
+   do instead of ghosted by the open menu. */
+html[data-lang-fade] .lang-menu {
+  view-transition-name: lang-menu;
+}
+
+html[data-lang-fade] .lang-chevron {
+  view-transition-name: lang-chevron;
+}
+
+html[data-lang-fade]::view-transition-group(lang-menu),
+html[data-lang-fade]::view-transition-group(lang-chevron),
+html[data-lang-fade]::view-transition-new(lang-menu),
+html[data-lang-fade]::view-transition-new(lang-chevron) {
+  animation: none;
+}
+
+html[data-lang-fade]::view-transition-old(lang-menu),
+html[data-lang-fade]::view-transition-old(lang-chevron) {
+  animation: none;
+  opacity: 0;
+}
