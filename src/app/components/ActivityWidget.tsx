@@ -7,32 +7,29 @@ import {
 import { useTranslation } from "react-i18next";
 import { CalendarDays, MapPin, X } from "lucide-react";
 
+// Every part of opening and closing runs together over this one span, set in
+// CSS transitions (not JS timers), so the whole change ends within ~220 ms.
+const EASE = "duration-[220ms] ease-[cubic-bezier(0.2,0,0,1)]";
+
 export default function ActivityWidget() {
   const { t, i18n } = useTranslation();
   const currentActivity = getCurrentActivity();
-  const [isOpen, setIsOpen] = useState(false); // Controls width
-  const [showContent, setShowContent] = useState(false); // Controls content visibility
-  const [isSpinning, setIsSpinning] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  // Counts calendar-button presses. Each press remounts the icon (keyed on
+  // this), which restarts its one-turn spin (activity-spin in globals.css).
+  const [spinCount, setSpinCount] = useState(0);
   const mainButtonRef = useRef<HTMLButtonElement | null>(null);
   const panelId = "activity-panel";
 
   const handleButtonClick = () => {
-    setIsSpinning(true);
-    if (!isOpen) {
-      setIsOpen(true);
-      setTimeout(() => setShowContent(true), 200); // Content expands after width
-    } else {
-      setShowContent(false); // Collapse content and width at the same time
-      setIsOpen(false);
-    }
-    setTimeout(() => setIsSpinning(false), 600);
+    setSpinCount((count) => count + 1);
+    setIsOpen((open) => !open);
   };
 
   // Close on Escape and return focus to main button
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
-        setShowContent(false);
         setIsOpen(false);
         // return focus to main button after next tick
         setTimeout(() => mainButtonRef.current?.focus(), 0);
@@ -53,14 +50,13 @@ export default function ActivityWidget() {
         {/* Expandable activity panel */}
         <div
           id={panelId}
-          className="bg-gray-800 border border-gray-600 rounded-lg shadow-lg overflow-hidden transition-all duration-500 ease-in-out"
+          className={`bg-gray-800 border border-gray-600 rounded-lg shadow-lg overflow-hidden transition-[width,min-width] ${EASE}`}
           style={{
             width: isOpen ? "min(calc(100vw - 6rem), 320px)" : "200px",
             minWidth: isOpen ? "280px" : "200px",
-            transitionDelay: !isOpen && !showContent ? "500ms" : "0ms",
           }}
         >
-          <div className="px-2 sm:px-3 py-1 sm:py-2 transition-all duration-500 ease-in-out">
+          <div className="px-2 sm:px-3 py-1 sm:py-2">
             {/* Header section - always visible */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -78,16 +74,12 @@ export default function ActivityWidget() {
 
               {/* Close button - only visible when expanded */}
               <div
-                className={`transition-all duration-500 ease-in-out ml-2 ${
+                className={`transition-[opacity,width] ${EASE} ml-2 ${
                   isOpen ? "opacity-100 w-4" : "opacity-0 w-0 overflow-hidden"
                 }`}
               >
                 <button
-                  onClick={() => {
-                    // Collapse content first, then close the panel to keep animations consistent
-                    setShowContent(false);
-                    setIsOpen(false);
-                  }}
+                  onClick={() => setIsOpen(false)}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   <X className="w-4 h-4" aria-hidden="true" />
@@ -95,17 +87,17 @@ export default function ActivityWidget() {
               </div>
             </div>
 
-            {/* Expanded content - only visible when open */}
+            {/* Expanded content - only visible when open. It eases in with
+                the width from the first frame, with no delay; the 0fr/1fr grid
+                row eases to the content's own height. */}
             <div
-              className="transition-all duration-500 ease-in-out overflow-hidden"
-              style={{
-                maxHeight: showContent ? "400px" : "0px",
-                opacity: showContent ? 1 : 0,
-                marginTop: showContent ? "12px" : "0px",
-                transitionDelay: isOpen && showContent ? "200ms" : "0ms",
-              }}
+              className={`grid transition-[grid-template-rows,opacity,margin-top] ${EASE} ${
+                isOpen
+                  ? "grid-rows-[1fr] opacity-100 mt-3"
+                  : "grid-rows-[0fr] opacity-0 mt-0"
+              }`}
             >
-              <div className="space-y-2">
+              <div className="min-h-0 overflow-hidden space-y-2">
                 {currentActivity ? (
                   <>
                     <p className="text-gray-300 text-xs leading-relaxed">
@@ -147,11 +139,10 @@ export default function ActivityWidget() {
         >
           <div className="relative">
             <CalendarDays
-              className="w-4 h-4 sm:w-5 sm:h-5"
-              style={{
-                transform: isSpinning ? "rotate(360deg)" : "rotate(0deg)",
-                transition: isSpinning ? "transform 0.6s ease-in-out" : "none",
-              }}
+              key={spinCount}
+              className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                spinCount > 0 ? "activity-spin" : ""
+              }`}
               aria-hidden="true"
             />
 
