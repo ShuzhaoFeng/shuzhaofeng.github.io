@@ -95,11 +95,22 @@ export default function NavBar() {
                 className="p-2 rounded-md text-white hover:bg-gray-700 transition-colors"
                 aria-label="Toggle mobile menu"
               >
-                {isMobileMenuOpen ? (
-                  <X className="w-6 h-6" aria-hidden="true" />
-                ) : (
-                  <Menu className="w-6 h-6" aria-hidden="true" />
-                )}
+                {/* Both icons stay mounted and cross-fade with a quarter turn,
+                    so the swap eases instead of jumping in one frame. */}
+                <span className="relative block w-6 h-6">
+                  <Menu
+                    className={`absolute inset-0 w-6 h-6 transition-[opacity,rotate] duration-200 ease-out ${
+                      isMobileMenuOpen ? "opacity-0 rotate-90" : "opacity-100 rotate-0"
+                    }`}
+                    aria-hidden="true"
+                  />
+                  <X
+                    className={`absolute inset-0 w-6 h-6 transition-[opacity,rotate] duration-200 ease-out ${
+                      isMobileMenuOpen ? "opacity-100 rotate-0" : "opacity-0 -rotate-90"
+                    }`}
+                    aria-hidden="true"
+                  />
+                </span>
               </button>
             </div>
 
@@ -201,9 +212,21 @@ export default function NavBar() {
         </div>
 
         {/* Mobile Dropdown Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-600">
-            <div className="px-4 py-3 space-y-3">
+        {/* Stays mounted so it can animate; the 0fr/1fr grid row eases the
+            height. While closed, `inert` drops the items from the tab order
+            and accessibility tree at once, and `invisible` hides them when the
+            collapse ends (a visibility transition shows at its start and hides
+            at its end). */}
+        <div
+          className={`md:hidden grid transition-[grid-template-rows,opacity,visibility] duration-200 ease-out ${
+            isMobileMenuOpen
+              ? "grid-rows-[1fr] opacity-100 visible"
+              : "grid-rows-[0fr] opacity-0 invisible"
+          }`}
+          inert={!isMobileMenuOpen}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <div className="border-t border-gray-600 px-4 py-3 space-y-3">
               {navLinks.map(({ page, label }) => (
                 <div key={page}>
                   {currentPage === page ? (
@@ -222,7 +245,7 @@ export default function NavBar() {
               ))}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );
