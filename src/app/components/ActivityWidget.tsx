@@ -9,6 +9,8 @@ import { CalendarDays, MapPin, X } from "lucide-react";
 
 // Every part of opening and closing runs together over this one span, set in
 // CSS transitions (not JS timers), so the whole change ends within ~220 ms.
+// Under reduced motion, globals.css keeps only the opacity fades: the width
+// and height change at once and the calendar icon does not turn.
 const EASE = "duration-[220ms] ease-[cubic-bezier(0.2,0,0,1)]";
 
 export default function ActivityWidget() {

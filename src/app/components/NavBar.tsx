@@ -175,16 +175,17 @@ export default function NavBar() {
                 aria-label="Toggle mobile menu"
               >
                 {/* Both icons stay mounted and cross-fade with a quarter turn,
-                    so the swap eases instead of jumping in one frame. */}
+                    so the swap eases instead of jumping in one frame. With
+                    reduced motion they stay upright and only cross-fade. */}
                 <span className="relative block w-6 h-6">
                   <Menu
-                    className={`absolute inset-0 w-6 h-6 transition-[opacity,rotate] duration-200 ease-out ${
+                    className={`absolute inset-0 w-6 h-6 transition-[opacity,rotate] duration-200 ease-out motion-reduce:rotate-0 ${
                       isMobileMenuOpen ? "opacity-0 rotate-90" : "opacity-100 rotate-0"
                     }`}
                     aria-hidden="true"
                   />
                   <X
-                    className={`absolute inset-0 w-6 h-6 transition-[opacity,rotate] duration-200 ease-out ${
+                    className={`absolute inset-0 w-6 h-6 transition-[opacity,rotate] duration-200 ease-out motion-reduce:rotate-0 ${
                       isMobileMenuOpen ? "opacity-100 rotate-0" : "opacity-0 -rotate-90"
                     }`}
                     aria-hidden="true"
@@ -251,6 +252,8 @@ export default function NavBar() {
                 <span className="hidden md:flex md:flex-1 text-left truncate">
                   {currentLocaleLabel}
                 </span>
+                {/* Its inline rotation turns at once under reduced motion
+                    (globals.css). */}
                 <ChevronDown
                   className="lang-chevron w-3 h-3 text-white ml-1 md:ml-2 hidden md:block"
                   style={{
@@ -260,8 +263,11 @@ export default function NavBar() {
                 />
               </button>
 
+              {/* With reduced motion the menu keeps its full size while
+                  closed (still transparent and click-through), so opening and
+                  closing are a plain fade with no scaling or height change. */}
               <div
-                className={`lang-menu absolute right-0 mt-2 w-44 rounded-md shadow-lg overflow-hidden z-50 transform transition-all duration-200 ease-in-out ${
+                className={`lang-menu absolute right-0 mt-2 w-44 rounded-md shadow-lg overflow-hidden z-50 transform transition-all duration-200 ease-in-out motion-reduce:scale-100 motion-reduce:max-h-40 ${
                   isLangOpen
                     ? "opacity-100 scale-100 max-h-40 bg-gray-800 border border-gray-700"
                     : "opacity-0 scale-95 max-h-0 bg-gray-800 border border-gray-700 pointer-events-none"

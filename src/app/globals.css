@@ -132,3 +132,47 @@ html[data-lang-fade]::view-transition-old(lang-chevron) {
   animation: none;
   opacity: 0;
 }
+
+/* Reduced motion. When the visitor's system asks for it, every
+   visitor-triggered change is instant or a fade: nothing slides, scales,
+   grows, shrinks or spins. The preference is read only through this media
+   query (and Tailwind's motion-reduce: variant, which compiles to it), never
+   in JavaScript, so the first render is the same on server and client. */
+@media (prefers-reduced-motion: reduce) {
+  /* Transitions keep only their colour and opacity properties (the
+     `transition-colors` set plus opacity, the focus ring's box-shadow and
+     visibility), so hovers, focus rings, dims and fades ease as before while
+     height, width, margin, grid rows, scale and rotation change at once.
+     `!important` lets this reach transitions set in inline styles too, such
+     as the language chevron's rotation. An element that had no transition
+     keeps none, since its duration stays 0s. The abstract's height easing
+     (ResearchPaper) finds no height transition and takes the new height at
+     once. */
+  *,
+  ::before,
+  ::after {
+    transition-property:
+      color, background-color, border-color, outline-color,
+      text-decoration-color, fill, stroke, --tw-gradient-from,
+      --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, visibility !important;
+  }
+
+  /* An entering section fades in place instead of rising. */
+  .section-enter {
+    animation-name: section-fade;
+  }
+
+  /* The activity widget's calendar icon does not turn. */
+  .activity-spin {
+    animation: none;
+  }
+}
+
+@keyframes section-fade {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
