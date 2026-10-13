@@ -1,13 +1,96 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { flushSync } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { Check, ChevronDown, Globe, Mail, Menu, X } from "lucide-react";
 
 type PageType = "home" | "journey" | "research" | "projects";
 
+let currentLangFade: ViewTransition | null = null;
+
+// Runs a language switch as a view transition of the whole document, so every
+// translated string (navigation, page and activity widget) cross-fades at once
+// while unchanged pixels hold still. `flushSync` commits the new text inside
+// the callback, so the new language is in the first frame of the fade; nothing
+// remounts, so what the visitor opened or chose stays as it is. The
+// `data-lang-fade` attribute scopes the timing in globals.css to this
+// transition. Browsers without view transitions switch at once.
+function switchLanguageWithFade(apply: () => void) {
+  if (typeof document.startViewTransition !== "function") {
+    apply();
+    return;
+  }
+  const root = document.documentElement;
+  root.setAttribute("data-lang-fade", "");
+  const transition = document.startViewTransition(() => flushSync(apply));
+  currentLangFade = transition;
+  transition.finished.finally(() => {
+    // A newer switch may have taken over; leave its attribute in place.
+    if (currentLangFade === transition) {
+      currentLangFade = null;
+      root.removeAttribute("data-lang-fade");
+    }
+  });
+}
+
+// One navigation item. The current item is the same <button> as the others,
+// so moving the marker is a class change the browser can ease, not a swap of
+// elements. Two stacked copies of the label share one grid cell: the regular
+// one shows when the item is not current, the bold cyan one when it is, and
+// the marker cross-fades between them. The cell takes the bold label's width,
+// so the neighbouring items do not shift when the weight changes.
+function NavItem({
+  label,
+  isCurrent,
+  animate,
+  onSelect,
+  className,
+}: {
+  label: string;
+  isCurrent: boolean;
+  // False until the visitor switches sections, so the switch to the saved
+  // section on mount shows the marker in place with no easing from Home.
+  animate: boolean;
+  onSelect: () => void;
+  className: string;
+}) {
+  const ease = "duration-200 ease-out";
+  return (
+    <button
+      type="button"
+      onClick={isCurrent ? undefined : onSelect}
+      aria-current={isCurrent ? "page" : undefined}
+      // The current item stays out of the tab order and keeps the default
+      // cursor, as when it was a plain span. The `!` outranks the global
+      // pointer-cursor rule for buttons in globals.css.
+      tabIndex={isCurrent ? -1 : undefined}
+      className={`group grid bg-transparent border-none ${
+        isCurrent ? "cursor-default!" : "cursor-pointer"
+      } ${className}`}
+    >
+      <span
+        className={`[grid-area:1/1] text-white group-hover:text-cyan-400 ${
+          animate ? "transition-[color,opacity]" : "transition-colors"
+        } ${ease} ${isCurrent ? "opacity-0" : "opacity-100"}`}
+      >
+        {label}
+      </span>
+      <span
+        aria-hidden="true"
+        className={`[grid-area:1/1] font-bold text-cyan-400 ${
+          animate ? `transition-opacity ${ease}` : ""
+        } ${isCurrent ? "opacity-100" : "opacity-0"}`}
+      >
+        {label}
+      </span>
+    </button>
+  );
+}
+
 export default function NavBar() {
   const [currentPage, setCurrentPage] = useState<PageType>("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hasNavigated, setHasNavigated] = useState(false);
 
   const { t, i18n } = useTranslation();
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -46,6 +129,7 @@ export default function NavBar() {
 
   const handleNavigate = (page: PageType) => {
     setCurrentPage(page);
+    setHasNavigated(true);
     setIsMobileMenuOpen(false);
     if (window.navigateToPage) {
       window.navigateToPage(page);
@@ -72,18 +156,13 @@ export default function NavBar() {
             <ul className="hidden md:flex gap-4 md:gap-8 text-base font-medium flex-1">
               {navLinks.map(({ page, label }) => (
                 <li key={page} className="min-w-max">
-                  {currentPage === page ? (
-                    <span className="text-cyan-400 font-bold cursor-default">
-                      {label}
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => handleNavigate(page)}
-                      className="hover:text-cyan-400 transition-colors text-white whitespace-nowrap bg-transparent border-none cursor-pointer font-base"
-                    >
-                      {label}
-                    </button>
-                  )}
+                  <NavItem
+                    label={label}
+                    isCurrent={currentPage === page}
+                    animate={hasNavigated}
+                    onSelect={() => handleNavigate(page)}
+                    className="whitespace-nowrap"
+                  />
                 </li>
               ))}
             </ul>
@@ -95,11 +174,23 @@ export default function NavBar() {
                 className="p-2 rounded-md text-white hover:bg-gray-700 transition-colors"
                 aria-label="Toggle mobile menu"
               >
-                {isMobileMenuOpen ? (
-                  <X className="w-6 h-6" aria-hidden="true" />
-                ) : (
-                  <Menu className="w-6 h-6" aria-hidden="true" />
-                )}
+                {/* Both icons stay mounted and cross-fade with a quarter turn,
+                    so the swap eases instead of jumping in one frame. With
+                    reduced motion they stay upright and only cross-fade. */}
+                <span className="relative block w-6 h-6">
+                  <Menu
+                    className={`absolute inset-0 w-6 h-6 transition-[opacity,rotate] duration-200 ease-out motion-reduce:rotate-0 ${
+                      isMobileMenuOpen ? "opacity-0 rotate-90" : "opacity-100 rotate-0"
+                    }`}
+                    aria-hidden="true"
+                  />
+                  <X
+                    className={`absolute inset-0 w-6 h-6 transition-[opacity,rotate] duration-200 ease-out motion-reduce:rotate-0 ${
+                      isMobileMenuOpen ? "opacity-100 rotate-0" : "opacity-0 -rotate-90"
+                    }`}
+                    aria-hidden="true"
+                  />
+                </span>
               </button>
             </div>
 
@@ -161,8 +252,10 @@ export default function NavBar() {
                 <span className="hidden md:flex md:flex-1 text-left truncate">
                   {currentLocaleLabel}
                 </span>
+                {/* Its inline rotation turns at once under reduced motion
+                    (globals.css). */}
                 <ChevronDown
-                  className="w-3 h-3 text-white ml-1 md:ml-2 hidden md:block"
+                  className="lang-chevron w-3 h-3 text-white ml-1 md:ml-2 hidden md:block"
                   style={{
                     transform: isLangOpen ? "rotate(180deg)" : "rotate(0deg)",
                     transition: "transform 0.15s ease-in-out",
@@ -170,8 +263,11 @@ export default function NavBar() {
                 />
               </button>
 
+              {/* With reduced motion the menu keeps its full size while
+                  closed (still transparent and click-through), so opening and
+                  closing are a plain fade with no scaling or height change. */}
               <div
-                className={`absolute right-0 mt-2 w-44 rounded-md shadow-lg overflow-hidden z-50 transform transition-all duration-200 ease-in-out ${
+                className={`lang-menu absolute right-0 mt-2 w-44 rounded-md shadow-lg overflow-hidden z-50 transform transition-all duration-200 ease-in-out motion-reduce:scale-100 motion-reduce:max-h-40 ${
                   isLangOpen
                     ? "opacity-100 scale-100 max-h-40 bg-gray-800 border border-gray-700"
                     : "opacity-0 scale-95 max-h-0 bg-gray-800 border border-gray-700 pointer-events-none"
@@ -183,10 +279,16 @@ export default function NavBar() {
                     <button
                       key={loc.code}
                       onClick={() => {
-                        i18n.changeLanguage(loc.code);
-                        setIsLangOpen(false);
+                        if (loc.code === i18n.language) {
+                          setIsLangOpen(false);
+                          return;
+                        }
+                        switchLanguageWithFade(() => {
+                          i18n.changeLanguage(loc.code);
+                          setIsLangOpen(false);
+                        });
                       }}
-                      className="flex items-center justify-between w-full text-left px-3 py-2 hover:bg-gray-700 text-white text-sm"
+                      className="flex items-center justify-between w-full text-left px-3 py-2 hover:bg-gray-700 text-white text-sm transition-colors"
                     >
                       <span>{loc.label}</span>
                       {i18n.language === loc.code && (
@@ -201,28 +303,35 @@ export default function NavBar() {
         </div>
 
         {/* Mobile Dropdown Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-600">
-            <div className="px-4 py-3 space-y-3">
+        {/* Stays mounted so it can animate; the 0fr/1fr grid row eases the
+            height. While closed, `inert` drops the items from the tab order
+            and accessibility tree at once, and `invisible` hides them when the
+            collapse ends (a visibility transition shows at its start and hides
+            at its end). */}
+        <div
+          className={`md:hidden grid transition-[grid-template-rows,opacity,visibility] duration-200 ease-out ${
+            isMobileMenuOpen
+              ? "grid-rows-[1fr] opacity-100 visible"
+              : "grid-rows-[0fr] opacity-0 invisible"
+          }`}
+          inert={!isMobileMenuOpen}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <div className="border-t border-gray-600 px-4 py-3 space-y-3">
               {navLinks.map(({ page, label }) => (
                 <div key={page}>
-                  {currentPage === page ? (
-                    <span className="block text-cyan-400 font-bold py-2 text-base">
-                      {label}
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => handleNavigate(page)}
-                      className="block text-white hover:text-cyan-400 transition-colors py-2 text-base w-full text-left bg-transparent border-none cursor-pointer"
-                    >
-                      {label}
-                    </button>
-                  )}
+                  <NavItem
+                    label={label}
+                    isCurrent={currentPage === page}
+                    animate={hasNavigated}
+                    onSelect={() => handleNavigate(page)}
+                    className="w-full py-2 text-base text-left"
+                  />
                 </div>
               ))}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );

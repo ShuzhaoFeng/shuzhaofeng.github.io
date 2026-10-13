@@ -49,3 +49,130 @@ button:disabled,
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-in-out;
 }
+
+/* A section the visitor switches to rises slightly into place. It starts
+   partly opaque, so its content shows from the first frame. */
+@keyframes section-enter {
+  from {
+    opacity: 0.35;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.section-enter {
+  animation: section-enter 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* A paper's new abstract text and its "Read more" / "Show less" label fade
+   up as the abstract eases open or closed (see ResearchPaper). They start
+   partly opaque, so the new text shows from the first frame, and run the
+   same span as the height change. */
+@keyframes abstract-swap {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.abstract-swap {
+  animation: abstract-swap 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* The activity widget's calendar icon turns once when its button is pressed
+   (see ActivityWidget), in step with the panel opening or closing. */
+@keyframes activity-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.activity-spin {
+  animation: activity-spin 250ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* A language switch cross-fades the whole page (see NavBar). The new text is
+   in the incoming layer from the first frame; the old text fades out over the
+   same span. Opacity only. */
+html[data-lang-fade]::view-transition-old(root),
+html[data-lang-fade]::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* The language menu and its chevron run their own close and rotate
+   transitions. They are lifted out of the page's cross-fade and shown live,
+   with their old snapshot hidden, so those transitions look as they always
+   do instead of ghosted by the open menu. */
+html[data-lang-fade] .lang-menu {
+  view-transition-name: lang-menu;
+}
+
+html[data-lang-fade] .lang-chevron {
+  view-transition-name: lang-chevron;
+}
+
+html[data-lang-fade]::view-transition-group(lang-menu),
+html[data-lang-fade]::view-transition-group(lang-chevron),
+html[data-lang-fade]::view-transition-new(lang-menu),
+html[data-lang-fade]::view-transition-new(lang-chevron) {
+  animation: none;
+}
+
+html[data-lang-fade]::view-transition-old(lang-menu),
+html[data-lang-fade]::view-transition-old(lang-chevron) {
+  animation: none;
+  opacity: 0;
+}
+
+/* Reduced motion. When the visitor's system asks for it, every
+   visitor-triggered change is instant or a fade: nothing slides, scales,
+   grows, shrinks or spins. The preference is read only through this media
+   query (and Tailwind's motion-reduce: variant, which compiles to it), never
+   in JavaScript, so the first render is the same on server and client. */
+@media (prefers-reduced-motion: reduce) {
+  /* Transitions keep only their colour and opacity properties (the
+     `transition-colors` set plus opacity, the focus ring's box-shadow and
+     visibility), so hovers, focus rings, dims and fades ease as before while
+     height, width, margin, grid rows, scale and rotation change at once.
+     `!important` lets this reach transitions set in inline styles too, such
+     as the language chevron's rotation. An element that had no transition
+     keeps none, since its duration stays 0s. The abstract's height easing
+     (ResearchPaper) finds no height transition and takes the new height at
+     once. */
+  *,
+  ::before,
+  ::after {
+    transition-property:
+      color, background-color, border-color, outline-color,
+      text-decoration-color, fill, stroke, --tw-gradient-from,
+      --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, visibility !important;
+  }
+
+  /* An entering section fades in place instead of rising. */
+  .section-enter {
+    animation-name: section-fade;
+  }
+
+  /* The activity widget's calendar icon does not turn. */
+  .activity-spin {
+    animation: none;
+  }
+}
+
+@keyframes section-fade {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
