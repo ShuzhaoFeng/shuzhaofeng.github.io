@@ -266,39 +266,48 @@ export default function NavBar() {
                 />
               </button>
 
-              {/* With reduced motion the menu keeps its full size while
-                  closed (still transparent and click-through), so opening and
-                  closing are a plain fade with no scaling or height change. */}
+              {/* Keep the rows mounted while their wrapper clips from the
+                  top. Visibility hides them after the collapse; inert and
+                  aria-hidden remove interaction and accessibility at once.
+                  Reduced motion changes the grid height instantly. */}
               <div
-                className={`lang-menu absolute right-0 mt-2 w-44 rounded-md shadow-lg overflow-hidden z-50 transform transition-all duration-200 ease-in-out motion-reduce:scale-100 motion-reduce:max-h-40 ${
+                className={`lang-menu absolute right-0 mt-2 w-44 grid z-50 transition-[grid-template-rows,visibility] duration-200 ease-in-out ${
                   isLangOpen
-                    ? "opacity-100 scale-100 max-h-40 bg-gray-800 border border-gray-700"
-                    : "opacity-0 scale-95 max-h-0 bg-gray-800 border border-gray-700 pointer-events-none"
+                    ? "grid-rows-[1fr] visible"
+                    : "grid-rows-[0fr] invisible pointer-events-none"
                 }`}
+                inert={!isLangOpen}
                 aria-hidden={!isLangOpen}
               >
-                <div className="flex flex-col">
-                  {locales.map((loc) => (
-                    <button
-                      key={loc.code}
-                      onClick={() => {
-                        if (loc.code === i18n.language) {
-                          setIsLangOpen(false);
-                          return;
-                        }
-                        switchLanguageWithFade(() => {
-                          i18n.changeLanguage(loc.code);
-                          setIsLangOpen(false);
-                        });
-                      }}
-                      className="flex items-center justify-between w-full text-left px-3 py-2 hover:bg-gray-700 text-white text-sm transition-colors"
-                    >
-                      <span>{loc.label}</span>
-                      {i18n.language === loc.code && (
-                        <Check className="w-4 h-4 text-cyan-400" />
-                      )}
-                    </button>
-                  ))}
+                <div className="min-h-0 overflow-hidden rounded-md shadow-lg">
+                  <div className="flex flex-col rounded-md bg-gray-800 border border-gray-700">
+                    {locales.map((loc) => (
+                      <button
+                        key={loc.code}
+                        onClick={() => {
+                          if (loc.code === i18n.language) {
+                            setIsLangOpen(false);
+                            return;
+                          }
+                          switchLanguageWithFade(() => {
+                            i18n.changeLanguage(loc.code);
+                            setIsLangOpen(false);
+                          });
+                        }}
+                        className="flex items-center justify-between w-full text-left px-3 py-2 hover:bg-gray-700 text-white text-sm transition-colors"
+                      >
+                        <span>{loc.label}</span>
+                        {/* Every row reserves the same icon space so changing
+                            selection can fade while the menu starts closing. */}
+                        <Check
+                          aria-hidden="true"
+                          className={`w-4 h-4 shrink-0 text-cyan-400 transition-opacity duration-150 ease-out ${
+                            i18n.language === loc.code ? "opacity-100" : "opacity-0"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
