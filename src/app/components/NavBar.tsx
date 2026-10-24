@@ -54,7 +54,7 @@ function NavItem({
   onSelect: () => void;
   className: string;
 }) {
-  const ease = "duration-200 ease-out";
+  const markerEase = "duration-[1364ms] ease-out";
   return (
     <button
       type="button"
@@ -72,16 +72,20 @@ function NavItem({
         // Keep opacity out of the pre-navigation transition even when the
         // global reduced-motion rule replaces transition-property. Colour
         // feedback still eases while the saved section restores instantly.
+        // Pin the safe property pair after navigation too, so the reduced-
+        // motion rule cannot change which duration belongs to each property.
         className={`[grid-area:1/1] text-white group-hover:text-cyan-400 ${
-          animate ? "transition-[color,opacity]" : "transition-colors!"
-        } ${ease} ${isCurrent ? "opacity-0" : "opacity-100"}`}
+          animate
+            ? "transition-[color,opacity]! duration-[200ms,1364ms]"
+            : "transition-colors! duration-200"
+        } ease-out ${isCurrent ? "opacity-0" : "opacity-100"}`}
       >
         {label}
       </span>
       <span
         aria-hidden="true"
         className={`[grid-area:1/1] font-bold text-cyan-400 ${
-          animate ? `transition-opacity ${ease}` : "transition-none! duration-0"
+          animate ? `transition-opacity ${markerEase}` : "transition-none! duration-0"
         } ${isCurrent ? "opacity-100" : "opacity-0"}`}
       >
         {label}

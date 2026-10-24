@@ -64,7 +64,7 @@ button:disabled,
 }
 
 .section-enter {
-  animation: section-enter 220ms cubic-bezier(0.2, 0, 0, 1);
+  animation: section-enter 1500ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 /* A paper's new abstract text and its "Read more" / "Show less" label fade
