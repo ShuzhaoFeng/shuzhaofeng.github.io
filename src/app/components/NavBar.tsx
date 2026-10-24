@@ -69,8 +69,11 @@ function NavItem({
       } ${className}`}
     >
       <span
+        // Keep opacity out of the pre-navigation transition even when the
+        // global reduced-motion rule replaces transition-property. Colour
+        // feedback still eases while the saved section restores instantly.
         className={`[grid-area:1/1] text-white group-hover:text-cyan-400 ${
-          animate ? "transition-[color,opacity]" : "transition-colors"
+          animate ? "transition-[color,opacity]" : "transition-colors!"
         } ${ease} ${isCurrent ? "opacity-0" : "opacity-100"}`}
       >
         {label}
@@ -78,7 +81,7 @@ function NavItem({
       <span
         aria-hidden="true"
         className={`[grid-area:1/1] font-bold text-cyan-400 ${
-          animate ? `transition-opacity ${ease}` : ""
+          animate ? `transition-opacity ${ease}` : "transition-none! duration-0"
         } ${isCurrent ? "opacity-100" : "opacity-0"}`}
       >
         {label}
