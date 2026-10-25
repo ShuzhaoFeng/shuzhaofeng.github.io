@@ -32,81 +32,111 @@ declare global {
   }
 }
 
+type SectionView = {
+  id: number;
+  page: PageType;
+  phase: "settled" | "exit" | "enter";
+  exitOpacity?: string;
+  exitNavHeight?: number;
+};
+
 export default function RootPage() {
-  const [views, setViews] = useState<SectionView[]>([
-    { id: 0, page: "home", entering: false, retiring: false },
-  ]);
+  const [view, setView] = useState<SectionView>({
+    id: 0, page: "home", phase: "settled",
+  });
+  const currentView = useRef(view);
   const [isLoaded, setIsLoaded] = useState(false);
-  const activePage = useRef<PageType>("home");
+  const destination = useRef<PageType>("home");
   const nextId = useRef(1);
   const stage = useRef<HTMLDivElement>(null);
+  const main = useRef<HTMLElement>(null);
   const transferFocus = useRef(false);
-  const [stageHeight, setStageHeight] = useState<number>();
-  const activeView = views.find((view) => !view.retiring)!;
+  const replaceView = useCallback((next: SectionView) => {
+    currentView.current = next;
+    setView(next);
+  }, []);
 
   useEffect(() => {
-    // Load saved page from localStorage before rendering
     const savedPage = localStorage.getItem("currentPage") as PageType;
     if (savedPage) {
-      activePage.current = savedPage;
-      setViews([{ id: 0, page: savedPage, entering: false, retiring: false }]);
+      destination.current = savedPage;
+      replaceView({ id: 0, page: savedPage, phase: "settled" });
     }
     setIsLoaded(true);
-  }, []);
+  }, [replaceView]);
 
   const handlePageChange = useCallback((page: PageType) => {
-    if (activePage.current === page) return;
-    const departing = stage.current?.querySelector<HTMLElement>(
-      ".section-view:not(.section-exit)",
-    );
-    const appearance = departing ? getComputedStyle(departing) : undefined;
-    // Interrupt an entrance at its rendered appearance, rather than flashing
-    // back to full opacity or dropping its unfinished translation.
-    const exitAppearance = appearance && {
-      opacity: appearance.opacity,
-      transform: appearance.transform,
-    };
-    activePage.current = page;
-    transferFocus.current = !!stage.current?.contains(document.activeElement);
-    const id = nextId.current++;
-    setViews((previous) => [
-      ...previous.map((view) =>
-        view.retiring ? view : { ...view, retiring: true, exitAppearance },
-      ),
-      { id, page, entering: true, retiring: false },
-    ]);
+    if (destination.current === page) return;
+    destination.current = page;
     localStorage.setItem("currentPage", page);
-  }, []);
-
-  const removeView = useCallback((id: number) => {
-    setViews((previous) =>
-      previous.filter((view) => view.id !== id || !view.retiring),
-    );
-  }, []);
+    const previous = currentView.current;
+    // During exit only the destination changes. No intermediate page mounts,
+    // even when the visitor returns to the outgoing page before it disappears.
+    if (previous.phase === "exit") return;
+    if (stage.current?.contains(document.activeElement)) {
+      main.current?.focus({ preventScroll: true });
+      transferFocus.current = true;
+    }
+    const element = stage.current?.querySelector(".section-view");
+    replaceView({
+      ...previous,
+      phase: "exit",
+      // An interrupted entrance leaves from its actual opacity without a flash.
+      exitOpacity: element ? getComputedStyle(element).opacity : "1",
+      exitNavHeight: main.current?.previousElementSibling?.getBoundingClientRect().height,
+    });
+  }, [replaceView]);
 
   useLayoutEffect(() => {
-    if (!isLoaded) return;
-    const element = stage.current?.querySelector<HTMLElement>(
-      `[data-section-instance="${activeView.id}"]`,
-    );
-    if (!element) return;
-    // Measure the live incoming view, including abstract and language changes.
-    // Retiring views may overflow this smoothly resizing area without clipping.
-    const measure = () => setStageHeight(element.offsetHeight);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    if (transferFocus.current) {
-      transferFocus.current = false;
+    const element = main.current;
+    const nav = element?.previousElementSibling;
+    if (view.phase !== "exit" || view.exitNavHeight === undefined || !element || !nav) return;
+    const navHeight = view.exitNavHeight;
+    // Closing the mobile menu removes flow height above main. Keep that space
+    // below the navbar until the outgoing section is empty, without delaying
+    // the menu's own collapse or changing the centered content area's height.
+    const preserveSpace = () => {
+      const space = Math.max(0, navHeight - nav.getBoundingClientRect().height);
+      element.style.setProperty("--section-nav-space", `${space}px`);
+    };
+    preserveSpace();
+    const observer = new ResizeObserver(preserveSpace);
+    observer.observe(nav);
+    return () => {
+      observer.disconnect();
+      element.style.removeProperty("--section-nav-space");
+    };
+  }, [view.id, view.phase, view.exitNavHeight]);
+
+  const onPhaseEnd = useCallback((id: number, phase: SectionView["phase"]) => {
+    const previous = currentView.current;
+    if (previous.id !== id || previous.phase !== phase) return;
+    if (phase === "exit") {
+      // The outgoing instance is empty now. The new instance's natural height
+      // establishes its centered position before its first visible frame.
+      replaceView({ id: nextId.current++, page: destination.current, phase: "enter" });
+    } else if (phase === "enter") {
+      replaceView({ ...previous, phase: "settled" });
+    }
+  }, [replaceView]);
+
+  const onVisible = useCallback((element: HTMLDivElement) => {
+    if (transferFocus.current && document.activeElement === main.current) {
       element.focus({ preventScroll: true });
     }
-    return () => observer.disconnect();
-  }, [activeView.id, isLoaded]);
+    transferFocus.current = false;
+  }, []);
 
-  // Make handlePageChange available globally for NavBar
   useEffect(() => {
+    // A later visitor action cancels the focus handoff, including a click on
+    // something that does not itself receive focus. Navigation keeps its focus.
+    const cancelTransfer = () => { transferFocus.current = false; };
+    document.addEventListener("pointerdown", cancelTransfer, true);
+    document.addEventListener("keydown", cancelTransfer, true);
     window.navigateToPage = handlePageChange;
     return () => {
+      document.removeEventListener("pointerdown", cancelTransfer, true);
+      document.removeEventListener("keydown", cancelTransfer, true);
       if (window.navigateToPage === handlePageChange) delete window.navigateToPage;
     };
   }, [handlePageChange]);
@@ -118,92 +148,89 @@ export default function RootPage() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
-      <div
-        ref={stage}
-        className={`section-stage ${views.some((view) => view.retiring) ? "section-stage-switching" : ""}`}
-        style={{ height: stageHeight }}
-      >
-        {views.map((view) => (
-          <SectionLayer key={view.id} view={view} onExit={removeView}>
-            <SectionContent
-              currentPage={view.page}
-              handlePageChange={handlePageChange}
-            />
-          </SectionLayer>
-        ))}
+    <main ref={main} tabIndex={-1} className="section-main flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
+      <div ref={stage} className="section-stage">
+        <SectionLayer key={view.id} view={view} onPhaseEnd={onPhaseEnd} onVisible={onVisible}>
+          <SectionContent currentPage={view.page} handlePageChange={handlePageChange} />
+        </SectionLayer>
       </div>
     </main>
   );
 }
 
-type SectionView = {
-  id: number;
-  page: PageType;
-  entering: boolean;
-  retiring: boolean;
-  exitAppearance?: { opacity: string; transform: string };
-};
-
 function SectionLayer({
   view,
-  onExit,
+  onPhaseEnd,
+  onVisible,
   children,
 }: {
   view: SectionView;
-  onExit: (id: number) => void;
+  onPhaseEnd: (id: number, phase: SectionView["phase"]) => void;
+  onVisible: (element: HTMLDivElement) => void;
   children: ReactNode;
 }) {
   const layer = useRef<HTMLDivElement>(null);
+  const [entranceVisible, setEntranceVisible] = useState(false);
+  const interactive = view.phase === "settled" || (view.phase === "enter" && entranceVisible);
 
   useLayoutEffect(() => {
-    if (!view.retiring || !layer.current) return;
+    if (view.phase === "settled" || !layer.current) return;
     const element = layer.current;
+    const name = `section-${view.phase}`;
     let disposed = false;
+    let frame = 0;
+    const reveal = () => {
+      if (disposed) return;
+      if (Number(getComputedStyle(element).opacity) > 0) {
+        setEntranceVisible(true);
+      } else {
+        frame = requestAnimationFrame(reveal);
+      }
+    };
+    if (view.phase === "enter") frame = requestAnimationFrame(reveal);
     const finish = () => {
-      if (!disposed) onExit(view.id);
+      if (!disposed) onPhaseEnd(view.id, view.phase);
     };
     const onAnimationFinished = (event: AnimationEvent) => {
-      // Child animations and a cancelled entrance do not finish this exit.
-      if (event.target === element && event.animationName === "section-exit") {
-        finish();
-      }
+      if (event.target === element && event.animationName === name) finish();
     };
     element.addEventListener("animationend", onAnimationFinished);
     element.addEventListener("animationcancel", onAnimationFinished);
     const style = getComputedStyle(element);
-    // Animation.finished also rejects on direct browser cancellation and when
-    // CSS disables an exit; those cases need not emit a CSS animationcancel.
-    // Observe only this layer's exit, never its interrupted entrance or children.
-    const exit = element.getAnimations().find(
-      (animation) =>
-        "animationName" in animation &&
-        animation.animationName === "section-exit",
+    const animation = element.getAnimations().find(
+      (candidate) => "animationName" in candidate && candidate.animationName === name,
     );
-    if (exit) void exit.finished.then(finish, finish);
-    const exitIndex = style.animationName.split(", ").indexOf("section-exit");
+    if (animation) void animation.finished.then(finish, finish);
+    const index = style.animationName.split(", ").indexOf(name);
     const durations = style.animationDuration.split(", ");
     const delays = style.animationDelay.split(", ");
     const milliseconds = (value: string) =>
       parseFloat(value) * (value.endsWith("ms") ? 1 : 1000);
-    // Also expire exits when animations are disabled or events never arrive
-    // (for example in a background tab). Each instance owns its own deadline.
-    const duration =
-      exitIndex < 0
-        ? 0
-        : Math.max(
-            0,
-            milliseconds(durations[exitIndex % durations.length]) +
-              milliseconds(delays[exitIndex % delays.length]),
-          );
-    const timeout = window.setTimeout(finish, duration);
+    const duration = index < 0 ? 0 : Math.max(0,
+      milliseconds(durations[index % durations.length]) +
+      milliseconds(delays[index % delays.length]),
+    );
+    // An active animation owns its boundary: elapsed wall time can run ahead of
+    // rendered playback and must never remove a visibly unfinished section.
+    // Absent, disabled, and zero-duration animations still complete explicitly;
+    // cancellation completes through the event or the rejected finished promise.
+    const timeout = !animation || duration <= 0
+      ? window.setTimeout(finish, 0)
+      : undefined;
     return () => {
       disposed = true;
-      window.clearTimeout(timeout);
+      cancelAnimationFrame(frame);
+      if (timeout !== undefined) window.clearTimeout(timeout);
       element.removeEventListener("animationend", onAnimationFinished);
       element.removeEventListener("animationcancel", onAnimationFinished);
     };
-  }, [view.id, view.retiring, onExit]);
+  }, [view.id, view.phase, onPhaseEnd]);
+
+  useLayoutEffect(() => {
+    // Run only after React has removed inert, so focus never targets a hidden
+    // or still inert incoming layer. The root checks for intervening actions.
+    if (interactive && layer.current) onVisible(layer.current);
+  }, [interactive, onVisible]);
 
   return (
     <div
@@ -211,18 +238,11 @@ function SectionLayer({
       data-section-instance={view.id}
       data-section={view.page}
       className={`section-view w-full flex flex-col items-center ${
-        view.retiring ? "section-exit" : view.entering ? "section-enter" : ""
+        view.phase === "settled" ? "" : `section-${view.phase}`
       }`}
-      style={
-        view.exitAppearance
-          ? ({
-              "--section-exit-opacity": view.exitAppearance.opacity,
-              "--section-exit-transform": view.exitAppearance.transform,
-            } as CSSProperties)
-          : undefined
-      }
-      inert={view.retiring}
-      aria-hidden={view.retiring || undefined}
+      style={view.phase === "exit" ? ({ "--section-exit-opacity": view.exitOpacity } as CSSProperties) : undefined}
+      inert={!interactive}
+      aria-hidden={!interactive || undefined}
       tabIndex={-1}
     >
       {children}
