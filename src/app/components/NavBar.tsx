@@ -33,61 +33,38 @@ function switchLanguageWithFade(apply: () => void) {
   });
 }
 
-// One navigation item. The current item is the same <button> as the others,
-// so moving the marker is a class change the browser can ease, not a swap of
-// elements. Two stacked copies of the label share one grid cell: the regular
-// one shows when the item is not current, the bold cyan one when it is, and
-// the marker cross-fades between them. The cell takes the bold label's width,
-// so the neighbouring items do not shift when the weight changes.
+// Reserve the bold label's width with an invisible measuring copy. Only one
+// label is painted; selection changes its weight and color while independent
+// hover color feedback keeps easing.
 function NavItem({
   label,
   isCurrent,
-  animate,
+  easeHover,
   onSelect,
   className,
 }: {
   label: string;
   isCurrent: boolean;
-  // False until the visitor switches sections, so the switch to the saved
-  // section on mount shows the marker in place with no easing from Home.
-  animate: boolean;
+  easeHover: boolean;
   onSelect: () => void;
   className: string;
 }) {
-  const markerEase = "duration-[1364ms] ease-out";
   return (
     <button
       type="button"
       onClick={isCurrent ? undefined : onSelect}
       aria-current={isCurrent ? "page" : undefined}
-      // The current item stays out of the tab order and keeps the default
-      // cursor, as when it was a plain span. The `!` outranks the global
-      // pointer-cursor rule for buttons in globals.css.
       tabIndex={isCurrent ? -1 : undefined}
       className={`group grid bg-transparent border-none ${
         isCurrent ? "cursor-default!" : "cursor-pointer"
       } ${className}`}
     >
-      <span
-        // Keep opacity out of the pre-navigation transition even when the
-        // global reduced-motion rule replaces transition-property. Colour
-        // feedback still eases while the saved section restores instantly.
-        // Pin the safe property pair after navigation too, so the reduced-
-        // motion rule cannot change which duration belongs to each property.
-        className={`[grid-area:1/1] text-white group-hover:text-cyan-400 ${
-          animate
-            ? "transition-[color,opacity]! duration-[200ms,1364ms]"
-            : "transition-colors! duration-200"
-        } ease-out ${isCurrent ? "opacity-0" : "opacity-100"}`}
-      >
-        {label}
+      <span className={`[grid-area:1/1] ${isCurrent ? "font-bold text-cyan-400" : "text-white"}`}>
+        <span className={`group-hover:text-cyan-400 ${easeHover ? "transition-colors! duration-200 ease-out" : "transition-none! duration-0"}`}>
+          {label}
+        </span>
       </span>
-      <span
-        aria-hidden="true"
-        className={`[grid-area:1/1] font-bold text-cyan-400 ${
-          animate ? `transition-opacity ${markerEase}` : "transition-none! duration-0"
-        } ${isCurrent ? "opacity-100" : "opacity-0"}`}
-      >
+      <span aria-hidden="true" className="[grid-area:1/1] invisible font-bold">
         {label}
       </span>
     </button>
@@ -97,7 +74,7 @@ function NavItem({
 export default function NavBar() {
   const [currentPage, setCurrentPage] = useState<PageType>("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [hasNavigated, setHasNavigated] = useState(false);
+  const [easeLabels, setEaseLabels] = useState(false);
 
   const { t, i18n } = useTranslation();
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -118,6 +95,16 @@ export default function NavBar() {
     if (savedPage) {
       setCurrentPage(savedPage);
     }
+    // Paint the restored selection with zero duration before enabling hover
+    // feedback. Inherited text colors otherwise transition from Home on load.
+    let enableFrame = 0;
+    const restoredFrame = requestAnimationFrame(() => {
+      enableFrame = requestAnimationFrame(() => setEaseLabels(true));
+    });
+    return () => {
+      cancelAnimationFrame(restoredFrame);
+      cancelAnimationFrame(enableFrame);
+    };
   }, []);
 
   useEffect(() => {
@@ -136,7 +123,6 @@ export default function NavBar() {
 
   const handleNavigate = (page: PageType) => {
     setCurrentPage(page);
-    setHasNavigated(true);
     setIsMobileMenuOpen(false);
     if (window.navigateToPage) {
       window.navigateToPage(page);
@@ -166,7 +152,7 @@ export default function NavBar() {
                   <NavItem
                     label={label}
                     isCurrent={currentPage === page}
-                    animate={hasNavigated}
+                    easeHover={easeLabels}
                     onSelect={() => handleNavigate(page)}
                     className="whitespace-nowrap"
                   />
@@ -339,7 +325,7 @@ export default function NavBar() {
                   <NavItem
                     label={label}
                     isCurrent={currentPage === page}
-                    animate={hasNavigated}
+                    easeHover={easeLabels}
                     onSelect={() => handleNavigate(page)}
                     className="w-full py-2 text-base text-left"
                   />

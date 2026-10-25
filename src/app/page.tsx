@@ -1,5 +1,13 @@
 "use client";
-import { useState, useEffect } from "react";
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useRef,
+  type ReactNode,
+  type CSSProperties,
+} from "react";
 import Profile from "./components/Profile";
 import { useTranslation, Trans } from "react-i18next";
 import { TimelineEntry, ResearchPaper, ProjectCard } from "./components";
@@ -24,32 +32,113 @@ declare global {
   }
 }
 
-export default function RootPage() {
-  const { t } = useTranslation();
-  const [currentPage, setCurrentPage] = useState<PageType>("home");
-  const [isLoaded, setIsLoaded] = useState(false);
-  // Only a switch the visitor makes animates the entering section; the
-  // section shown on first load, including a restored one, appears still.
-  const [hasSwitched, setHasSwitched] = useState(false);
+type SectionView = {
+  id: number;
+  page: PageType;
+  phase: "settled" | "exit" | "enter";
+  exitOpacity?: string;
+  exitNavHeight?: number;
+};
 
-  useEffect(() => {
-    // Load saved page from localStorage before rendering
-    const savedPage = localStorage.getItem("currentPage") as PageType;
-    if (savedPage) {
-      setCurrentPage(savedPage);
-    }
-    setIsLoaded(true);
+export default function RootPage() {
+  const [view, setView] = useState<SectionView>({
+    id: 0, page: "home", phase: "settled",
+  });
+  const currentView = useRef(view);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const destination = useRef<PageType>("home");
+  const nextId = useRef(1);
+  const stage = useRef<HTMLDivElement>(null);
+  const main = useRef<HTMLElement>(null);
+  const transferFocus = useRef(false);
+  const replaceView = useCallback((next: SectionView) => {
+    currentView.current = next;
+    setView(next);
   }, []);
 
-  const handlePageChange = (page: PageType) => {
-    setCurrentPage(page);
-    setHasSwitched(true);
-    localStorage.setItem("currentPage", page);
-  };
-
-  // Make handlePageChange available globally for NavBar
   useEffect(() => {
+    const savedPage = localStorage.getItem("currentPage") as PageType;
+    if (savedPage) {
+      destination.current = savedPage;
+      replaceView({ id: 0, page: savedPage, phase: "settled" });
+    }
+    setIsLoaded(true);
+  }, [replaceView]);
+
+  const handlePageChange = useCallback((page: PageType) => {
+    if (destination.current === page) return;
+    destination.current = page;
+    localStorage.setItem("currentPage", page);
+    const previous = currentView.current;
+    // During exit only the destination changes. No intermediate page mounts,
+    // even when the visitor returns to the outgoing page before it disappears.
+    if (previous.phase === "exit") return;
+    if (stage.current?.contains(document.activeElement)) {
+      main.current?.focus({ preventScroll: true });
+      transferFocus.current = true;
+    }
+    const element = stage.current?.querySelector(".section-view");
+    replaceView({
+      ...previous,
+      phase: "exit",
+      // An interrupted entrance leaves from its actual opacity without a flash.
+      exitOpacity: element ? getComputedStyle(element).opacity : "1",
+      exitNavHeight: main.current?.previousElementSibling?.getBoundingClientRect().height,
+    });
+  }, [replaceView]);
+
+  useLayoutEffect(() => {
+    const element = main.current;
+    const nav = element?.previousElementSibling;
+    if (view.phase !== "exit" || view.exitNavHeight === undefined || !element || !nav) return;
+    const navHeight = view.exitNavHeight;
+    // Closing the mobile menu removes flow height above main. Keep that space
+    // below the navbar until the outgoing section is empty, without delaying
+    // the menu's own collapse or changing the centered content area's height.
+    const preserveSpace = () => {
+      const space = Math.max(0, navHeight - nav.getBoundingClientRect().height);
+      element.style.setProperty("--section-nav-space", `${space}px`);
+    };
+    preserveSpace();
+    const observer = new ResizeObserver(preserveSpace);
+    observer.observe(nav);
+    return () => {
+      observer.disconnect();
+      element.style.removeProperty("--section-nav-space");
+    };
+  }, [view.id, view.phase, view.exitNavHeight]);
+
+  const onPhaseEnd = useCallback((id: number, phase: SectionView["phase"]) => {
+    const previous = currentView.current;
+    if (previous.id !== id || previous.phase !== phase) return;
+    if (phase === "exit") {
+      // The outgoing instance is empty now. The new instance's natural height
+      // establishes its centered position before its first visible frame.
+      replaceView({ id: nextId.current++, page: destination.current, phase: "enter" });
+    } else if (phase === "enter") {
+      replaceView({ ...previous, phase: "settled" });
+    }
+  }, [replaceView]);
+
+  const onVisible = useCallback((element: HTMLDivElement) => {
+    if (transferFocus.current && document.activeElement === main.current) {
+      element.focus({ preventScroll: true });
+    }
+    transferFocus.current = false;
+  }, []);
+
+  useEffect(() => {
+    // A later visitor action cancels the focus handoff, including a click on
+    // something that does not itself receive focus. Navigation keeps its focus.
+    const cancelTransfer = () => { transferFocus.current = false; };
+    document.addEventListener("pointerdown", cancelTransfer, true);
+    document.addEventListener("keydown", cancelTransfer, true);
     window.navigateToPage = handlePageChange;
+    return () => {
+      document.removeEventListener("pointerdown", cancelTransfer, true);
+      document.removeEventListener("keydown", cancelTransfer, true);
+      if (window.navigateToPage === handlePageChange) delete window.navigateToPage;
+    };
   }, [handlePageChange]);
 
   if (!isLoaded) {
@@ -59,16 +148,118 @@ export default function RootPage() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
-      {/* Keyed by section, so each switch mounts a fresh wrapper and replays
-          the entrance. The new section renders at once; nothing waits for the
-          old one to leave. */}
-      <div
-        key={currentPage}
-        className={`w-full flex flex-col items-center ${
-          hasSwitched ? "section-enter" : ""
-        }`}
-      >
+    <main ref={main} tabIndex={-1} className="section-main flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
+      <div ref={stage} className="section-stage">
+        <SectionLayer key={view.id} view={view} onPhaseEnd={onPhaseEnd} onVisible={onVisible}>
+          <SectionContent currentPage={view.page} handlePageChange={handlePageChange} />
+        </SectionLayer>
+      </div>
+    </main>
+  );
+}
+
+function SectionLayer({
+  view,
+  onPhaseEnd,
+  onVisible,
+  children,
+}: {
+  view: SectionView;
+  onPhaseEnd: (id: number, phase: SectionView["phase"]) => void;
+  onVisible: (element: HTMLDivElement) => void;
+  children: ReactNode;
+}) {
+  const layer = useRef<HTMLDivElement>(null);
+  const [entranceVisible, setEntranceVisible] = useState(false);
+  const interactive = view.phase === "settled" || (view.phase === "enter" && entranceVisible);
+
+  useLayoutEffect(() => {
+    if (view.phase === "settled" || !layer.current) return;
+    const element = layer.current;
+    const name = `section-${view.phase}`;
+    let disposed = false;
+    let frame = 0;
+    const reveal = () => {
+      if (disposed) return;
+      if (Number(getComputedStyle(element).opacity) > 0) {
+        setEntranceVisible(true);
+      } else {
+        frame = requestAnimationFrame(reveal);
+      }
+    };
+    if (view.phase === "enter") frame = requestAnimationFrame(reveal);
+    const finish = () => {
+      if (!disposed) onPhaseEnd(view.id, view.phase);
+    };
+    const onAnimationFinished = (event: AnimationEvent) => {
+      if (event.target === element && event.animationName === name) finish();
+    };
+    element.addEventListener("animationend", onAnimationFinished);
+    element.addEventListener("animationcancel", onAnimationFinished);
+    const style = getComputedStyle(element);
+    const animation = element.getAnimations().find(
+      (candidate) => "animationName" in candidate && candidate.animationName === name,
+    );
+    if (animation) void animation.finished.then(finish, finish);
+    const index = style.animationName.split(", ").indexOf(name);
+    const durations = style.animationDuration.split(", ");
+    const delays = style.animationDelay.split(", ");
+    const milliseconds = (value: string) =>
+      parseFloat(value) * (value.endsWith("ms") ? 1 : 1000);
+    const duration = index < 0 ? 0 : Math.max(0,
+      milliseconds(durations[index % durations.length]) +
+      milliseconds(delays[index % delays.length]),
+    );
+    // An active animation owns its boundary: elapsed wall time can run ahead of
+    // rendered playback and must never remove a visibly unfinished section.
+    // Absent, disabled, and zero-duration animations still complete explicitly;
+    // cancellation completes through the event or the rejected finished promise.
+    const timeout = !animation || duration <= 0
+      ? window.setTimeout(finish, 0)
+      : undefined;
+    return () => {
+      disposed = true;
+      cancelAnimationFrame(frame);
+      if (timeout !== undefined) window.clearTimeout(timeout);
+      element.removeEventListener("animationend", onAnimationFinished);
+      element.removeEventListener("animationcancel", onAnimationFinished);
+    };
+  }, [view.id, view.phase, onPhaseEnd]);
+
+  useLayoutEffect(() => {
+    // Run only after React has removed inert, so focus never targets a hidden
+    // or still inert incoming layer. The root checks for intervening actions.
+    if (interactive && layer.current) onVisible(layer.current);
+  }, [interactive, onVisible]);
+
+  return (
+    <div
+      ref={layer}
+      data-section-instance={view.id}
+      data-section={view.page}
+      className={`section-view w-full flex flex-col items-center ${
+        view.phase === "settled" ? "" : `section-${view.phase}`
+      }`}
+      style={view.phase === "exit" ? ({ "--section-exit-opacity": view.exitOpacity } as CSSProperties) : undefined}
+      inert={!interactive}
+      aria-hidden={!interactive || undefined}
+      tabIndex={-1}
+    >
+      {children}
+    </div>
+  );
+}
+
+function SectionContent({
+  currentPage,
+  handlePageChange,
+}: {
+  currentPage: PageType;
+  handlePageChange: (page: PageType) => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <>
         {currentPage === "home" && (
           <>
             <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-6xl gap-8 py-8">
@@ -269,8 +460,6 @@ export default function RootPage() {
             </div>
           </>
         )}
-      </div>
-
       <style jsx>{`
         .shiny-text {
           background: linear-gradient(90deg, #fff 0%, #b3b3b3 50%, #fff 100%);
@@ -281,6 +470,6 @@ export default function RootPage() {
           filter: drop-shadow(0 2px 8px #000a);
         }
       `}</style>
-    </main>
+    </>
   );
 }
