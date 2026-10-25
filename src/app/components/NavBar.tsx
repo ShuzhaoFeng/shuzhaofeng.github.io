@@ -1,13 +1,80 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { flushSync } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { Check, ChevronDown, Globe, Mail, Menu, X } from "lucide-react";
 
 type PageType = "home" | "journey" | "research" | "projects";
 
+let currentLangFade: ViewTransition | null = null;
+
+// Runs a language switch as a view transition of the whole document, so every
+// translated string (navigation, page and activity widget) cross-fades at once
+// while unchanged pixels hold still. `flushSync` commits the new text inside
+// the callback, so the new language is in the first frame of the fade; nothing
+// remounts, so what the visitor opened or chose stays as it is. The
+// `data-lang-fade` attribute scopes the timing in globals.css to this
+// transition. Browsers without view transitions switch at once.
+function switchLanguageWithFade(apply: () => void) {
+  if (typeof document.startViewTransition !== "function") {
+    apply();
+    return;
+  }
+  const root = document.documentElement;
+  root.setAttribute("data-lang-fade", "");
+  const transition = document.startViewTransition(() => flushSync(apply));
+  currentLangFade = transition;
+  transition.finished.finally(() => {
+    // A newer switch may have taken over; leave its attribute in place.
+    if (currentLangFade === transition) {
+      currentLangFade = null;
+      root.removeAttribute("data-lang-fade");
+    }
+  });
+}
+
+// Reserve the bold label's width with an invisible measuring copy. Only one
+// label is painted; selection changes its weight and color while independent
+// hover color feedback keeps easing.
+function NavItem({
+  label,
+  isCurrent,
+  easeHover,
+  onSelect,
+  className,
+}: {
+  label: string;
+  isCurrent: boolean;
+  easeHover: boolean;
+  onSelect: () => void;
+  className: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={isCurrent ? undefined : onSelect}
+      aria-current={isCurrent ? "page" : undefined}
+      tabIndex={isCurrent ? -1 : undefined}
+      className={`group grid bg-transparent border-none ${
+        isCurrent ? "cursor-default!" : "cursor-pointer"
+      } ${className}`}
+    >
+      <span className={`[grid-area:1/1] ${isCurrent ? "font-bold text-cyan-400" : "text-white"}`}>
+        <span className={`group-hover:text-cyan-400 ${easeHover ? "transition-colors! duration-200 ease-out" : "transition-none! duration-0"}`}>
+          {label}
+        </span>
+      </span>
+      <span aria-hidden="true" className="[grid-area:1/1] invisible font-bold">
+        {label}
+      </span>
+    </button>
+  );
+}
+
 export default function NavBar() {
   const [currentPage, setCurrentPage] = useState<PageType>("home");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [easeLabels, setEaseLabels] = useState(false);
 
   const { t, i18n } = useTranslation();
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -28,6 +95,16 @@ export default function NavBar() {
     if (savedPage) {
       setCurrentPage(savedPage);
     }
+    // Paint the restored selection with zero duration before enabling hover
+    // feedback. Inherited text colors otherwise transition from Home on load.
+    let enableFrame = 0;
+    const restoredFrame = requestAnimationFrame(() => {
+      enableFrame = requestAnimationFrame(() => setEaseLabels(true));
+    });
+    return () => {
+      cancelAnimationFrame(restoredFrame);
+      cancelAnimationFrame(enableFrame);
+    };
   }, []);
 
   useEffect(() => {
@@ -72,18 +149,13 @@ export default function NavBar() {
             <ul className="hidden md:flex gap-4 md:gap-8 text-base font-medium flex-1">
               {navLinks.map(({ page, label }) => (
                 <li key={page} className="min-w-max">
-                  {currentPage === page ? (
-                    <span className="text-cyan-400 font-bold cursor-default">
-                      {label}
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => handleNavigate(page)}
-                      className="hover:text-cyan-400 transition-colors text-white whitespace-nowrap bg-transparent border-none cursor-pointer font-base"
-                    >
-                      {label}
-                    </button>
-                  )}
+                  <NavItem
+                    label={label}
+                    isCurrent={currentPage === page}
+                    easeHover={easeLabels}
+                    onSelect={() => handleNavigate(page)}
+                    className="whitespace-nowrap"
+                  />
                 </li>
               ))}
             </ul>
@@ -95,11 +167,23 @@ export default function NavBar() {
                 className="p-2 rounded-md text-white hover:bg-gray-700 transition-colors"
                 aria-label="Toggle mobile menu"
               >
-                {isMobileMenuOpen ? (
-                  <X className="w-6 h-6" aria-hidden="true" />
-                ) : (
-                  <Menu className="w-6 h-6" aria-hidden="true" />
-                )}
+                {/* Both icons stay mounted and cross-fade with a quarter turn,
+                    so the swap eases instead of jumping in one frame. With
+                    reduced motion they stay upright and only cross-fade. */}
+                <span className="relative block w-6 h-6">
+                  <Menu
+                    className={`absolute inset-0 w-6 h-6 transition-[opacity,rotate] duration-200 ease-out motion-reduce:rotate-0 ${
+                      isMobileMenuOpen ? "opacity-0 rotate-90" : "opacity-100 rotate-0"
+                    }`}
+                    aria-hidden="true"
+                  />
+                  <X
+                    className={`absolute inset-0 w-6 h-6 transition-[opacity,rotate] duration-200 ease-out motion-reduce:rotate-0 ${
+                      isMobileMenuOpen ? "opacity-100 rotate-0" : "opacity-0 -rotate-90"
+                    }`}
+                    aria-hidden="true"
+                  />
+                </span>
               </button>
             </div>
 
@@ -161,8 +245,10 @@ export default function NavBar() {
                 <span className="hidden md:flex md:flex-1 text-left truncate">
                   {currentLocaleLabel}
                 </span>
+                {/* Its inline rotation turns at once under reduced motion
+                    (globals.css). */}
                 <ChevronDown
-                  className="w-3 h-3 text-white ml-1 md:ml-2 hidden md:block"
+                  className="lang-chevron w-3 h-3 text-white ml-1 md:ml-2 hidden md:block"
                   style={{
                     transform: isLangOpen ? "rotate(180deg)" : "rotate(0deg)",
                     transition: "transform 0.15s ease-in-out",
@@ -170,30 +256,48 @@ export default function NavBar() {
                 />
               </button>
 
+              {/* Keep the rows mounted while their wrapper clips from the
+                  top. Visibility hides them after the collapse; inert and
+                  aria-hidden remove interaction and accessibility at once.
+                  Reduced motion changes the grid height instantly. */}
               <div
-                className={`absolute right-0 mt-2 w-44 rounded-md shadow-lg overflow-hidden z-50 transform transition-all duration-200 ease-in-out ${
+                className={`lang-menu absolute right-0 mt-2 w-44 grid z-50 transition-[grid-template-rows,visibility] duration-200 ease-in-out ${
                   isLangOpen
-                    ? "opacity-100 scale-100 max-h-40 bg-gray-800 border border-gray-700"
-                    : "opacity-0 scale-95 max-h-0 bg-gray-800 border border-gray-700 pointer-events-none"
+                    ? "grid-rows-[1fr] visible"
+                    : "grid-rows-[0fr] invisible pointer-events-none"
                 }`}
+                inert={!isLangOpen}
                 aria-hidden={!isLangOpen}
               >
-                <div className="flex flex-col">
-                  {locales.map((loc) => (
-                    <button
-                      key={loc.code}
-                      onClick={() => {
-                        i18n.changeLanguage(loc.code);
-                        setIsLangOpen(false);
-                      }}
-                      className="flex items-center justify-between w-full text-left px-3 py-2 hover:bg-gray-700 text-white text-sm"
-                    >
-                      <span>{loc.label}</span>
-                      {i18n.language === loc.code && (
-                        <Check className="w-4 h-4 text-cyan-400" />
-                      )}
-                    </button>
-                  ))}
+                <div className="min-h-0 overflow-hidden rounded-md shadow-lg">
+                  <div className="flex flex-col rounded-md bg-gray-800 border border-gray-700">
+                    {locales.map((loc) => (
+                      <button
+                        key={loc.code}
+                        onClick={() => {
+                          if (loc.code === i18n.language) {
+                            setIsLangOpen(false);
+                            return;
+                          }
+                          switchLanguageWithFade(() => {
+                            i18n.changeLanguage(loc.code);
+                            setIsLangOpen(false);
+                          });
+                        }}
+                        className="flex items-center justify-between w-full text-left px-3 py-2 hover:bg-gray-700 text-white text-sm transition-colors"
+                      >
+                        <span>{loc.label}</span>
+                        {/* Every row reserves the same icon space so changing
+                            selection can fade while the menu starts closing. */}
+                        <Check
+                          aria-hidden="true"
+                          className={`w-4 h-4 shrink-0 text-cyan-400 transition-opacity duration-150 ease-out ${
+                            i18n.language === loc.code ? "opacity-100" : "opacity-0"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -201,28 +305,35 @@ export default function NavBar() {
         </div>
 
         {/* Mobile Dropdown Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-600">
-            <div className="px-4 py-3 space-y-3">
+        {/* Stays mounted so it can animate; the 0fr/1fr grid row eases the
+            height. While closed, `inert` drops the items from the tab order
+            and accessibility tree at once, and `invisible` hides them when the
+            collapse ends (a visibility transition shows at its start and hides
+            at its end). */}
+        <div
+          className={`md:hidden grid transition-[grid-template-rows,opacity,visibility] duration-200 ease-out ${
+            isMobileMenuOpen
+              ? "grid-rows-[1fr] opacity-100 visible"
+              : "grid-rows-[0fr] opacity-0 invisible"
+          }`}
+          inert={!isMobileMenuOpen}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <div className="border-t border-gray-600 px-4 py-3 space-y-3">
               {navLinks.map(({ page, label }) => (
                 <div key={page}>
-                  {currentPage === page ? (
-                    <span className="block text-cyan-400 font-bold py-2 text-base">
-                      {label}
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => handleNavigate(page)}
-                      className="block text-white hover:text-cyan-400 transition-colors py-2 text-base w-full text-left bg-transparent border-none cursor-pointer"
-                    >
-                      {label}
-                    </button>
-                  )}
+                  <NavItem
+                    label={label}
+                    isCurrent={currentPage === page}
+                    easeHover={easeLabels}
+                    onSelect={() => handleNavigate(page)}
+                    className="w-full py-2 text-base text-left"
+                  />
                 </div>
               ))}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );
