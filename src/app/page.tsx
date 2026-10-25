@@ -37,6 +37,7 @@ type SectionView = {
   page: PageType;
   phase: "settled" | "exit" | "enter";
   exitOpacity?: string;
+  exitTransform?: string;
   exitNavHeight?: number;
 };
 
@@ -58,10 +59,11 @@ export default function RootPage() {
 
   useEffect(() => {
     const savedPage = localStorage.getItem("currentPage") as PageType;
-    if (savedPage) {
-      destination.current = savedPage;
-      replaceView({ id: 0, page: savedPage, phase: "settled" });
-    }
+    const page = savedPage || "home";
+    destination.current = page;
+    // Resolve memory behind the loading boundary, then mount only that section
+    // in its entrance pose. Initial entry never requests a focus handoff.
+    replaceView({ id: 0, page, phase: "enter" });
     setIsLoaded(true);
   }, [replaceView]);
 
@@ -78,11 +80,14 @@ export default function RootPage() {
       transferFocus.current = true;
     }
     const element = stage.current?.querySelector(".section-view");
+    const pose = element ? getComputedStyle(element) : undefined;
     replaceView({
       ...previous,
       phase: "exit",
-      // An interrupted entrance leaves from its actual opacity without a flash.
-      exitOpacity: element ? getComputedStyle(element).opacity : "1",
+      // An interrupted entrance leaves from its painted pose, not the resting
+      // pose. Reduced-motion CSS also suppresses this captured translation.
+      exitOpacity: pose?.opacity ?? "1",
+      exitTransform: pose?.transform ?? "none",
       exitNavHeight: main.current?.previousElementSibling?.getBoundingClientRect().height,
     });
   }, [replaceView]);
@@ -240,7 +245,10 @@ function SectionLayer({
       className={`section-view w-full flex flex-col items-center ${
         view.phase === "settled" ? "" : `section-${view.phase}`
       }`}
-      style={view.phase === "exit" ? ({ "--section-exit-opacity": view.exitOpacity } as CSSProperties) : undefined}
+      style={view.phase === "exit" ? ({
+        "--section-exit-opacity": view.exitOpacity,
+        "--section-exit-transform": view.exitTransform,
+      } as CSSProperties) : undefined}
       inert={!interactive}
       aria-hidden={!interactive || undefined}
       tabIndex={-1}
