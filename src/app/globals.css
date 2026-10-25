@@ -50,21 +50,46 @@ button:disabled,
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* A section the visitor switches to rises slightly into place. It starts
-   partly opaque, so its content shows from the first frame. */
+/* Keep the current section's natural height throughout its visible phase.
+   Changing a centered stage's height moves its top edge, so the next section
+   replaces it only after the outgoing section is empty. No height easing or
+   section transforms may move the timeline while it is visible. */
+.section-main {
+  padding-top: var(--section-nav-space, 0px);
+  min-height: calc(100vh - 4rem + var(--section-nav-space, 0px));
+}
+
+.section-stage {
+  display: grid;
+  width: 100%;
+  isolation: isolate;
+}
+
+.section-view {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.section-view[inert] {
+  pointer-events: none;
+}
+
 @keyframes section-enter {
-  from {
-    opacity: 0.35;
-    transform: translateY(0.5rem);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .section-enter {
-  animation: section-enter 220ms cubic-bezier(0.2, 0, 0, 1);
+  animation: section-enter 750ms ease-in-out both;
+}
+
+@keyframes section-exit {
+  from { opacity: var(--section-exit-opacity, 1); }
+  to { opacity: 0; }
+}
+
+.section-exit {
+  animation: section-exit 750ms ease-in-out both;
 }
 
 /* A paper's new abstract text and its "Read more" / "Show less" label fade
@@ -157,22 +182,8 @@ html[data-lang-fade]::view-transition-old(lang-chevron) {
       --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, visibility !important;
   }
 
-  /* An entering section fades in place instead of rising. */
-  .section-enter {
-    animation-name: section-fade;
-  }
-
   /* The activity widget's calendar icon does not turn. */
   .activity-spin {
     animation: none;
-  }
-}
-
-@keyframes section-fade {
-  from {
-    opacity: 0.35;
-  }
-  to {
-    opacity: 1;
   }
 }
