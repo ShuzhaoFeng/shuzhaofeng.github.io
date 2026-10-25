@@ -1,5 +1,13 @@
 "use client";
-import { useState, useEffect } from "react";
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useRef,
+  type ReactNode,
+  type CSSProperties,
+} from "react";
 import Profile from "./components/Profile";
 import { useTranslation, Trans } from "react-i18next";
 import { TimelineEntry, ResearchPaper, ProjectCard } from "./components";
@@ -25,31 +33,82 @@ declare global {
 }
 
 export default function RootPage() {
-  const { t } = useTranslation();
-  const [currentPage, setCurrentPage] = useState<PageType>("home");
+  const [views, setViews] = useState<SectionView[]>([
+    { id: 0, page: "home", entering: false, retiring: false },
+  ]);
   const [isLoaded, setIsLoaded] = useState(false);
-  // Only a switch the visitor makes animates the entering section; the
-  // section shown on first load, including a restored one, appears still.
-  const [hasSwitched, setHasSwitched] = useState(false);
+  const activePage = useRef<PageType>("home");
+  const nextId = useRef(1);
+  const stage = useRef<HTMLDivElement>(null);
+  const transferFocus = useRef(false);
+  const [stageHeight, setStageHeight] = useState<number>();
+  const activeView = views.find((view) => !view.retiring)!;
 
   useEffect(() => {
     // Load saved page from localStorage before rendering
     const savedPage = localStorage.getItem("currentPage") as PageType;
     if (savedPage) {
-      setCurrentPage(savedPage);
+      activePage.current = savedPage;
+      setViews([{ id: 0, page: savedPage, entering: false, retiring: false }]);
     }
     setIsLoaded(true);
   }, []);
 
-  const handlePageChange = (page: PageType) => {
-    setCurrentPage(page);
-    setHasSwitched(true);
+  const handlePageChange = useCallback((page: PageType) => {
+    if (activePage.current === page) return;
+    const departing = stage.current?.querySelector<HTMLElement>(
+      ".section-view:not(.section-exit)",
+    );
+    const appearance = departing ? getComputedStyle(departing) : undefined;
+    // Interrupt an entrance at its rendered appearance, rather than flashing
+    // back to full opacity or dropping its unfinished translation.
+    const exitAppearance = appearance && {
+      opacity: appearance.opacity,
+      transform: appearance.transform,
+    };
+    activePage.current = page;
+    transferFocus.current = !!stage.current?.contains(document.activeElement);
+    const id = nextId.current++;
+    setViews((previous) => [
+      ...previous.map((view) =>
+        view.retiring ? view : { ...view, retiring: true, exitAppearance },
+      ),
+      { id, page, entering: true, retiring: false },
+    ]);
     localStorage.setItem("currentPage", page);
-  };
+  }, []);
+
+  const removeView = useCallback((id: number) => {
+    setViews((previous) =>
+      previous.filter((view) => view.id !== id || !view.retiring),
+    );
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!isLoaded) return;
+    const element = stage.current?.querySelector<HTMLElement>(
+      `[data-section-instance="${activeView.id}"]`,
+    );
+    if (!element) return;
+    // Measure the live incoming view, including abstract and language changes.
+    // Retiring views may overflow this smoothly resizing area without clipping.
+    const measure = () => setStageHeight(element.offsetHeight);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    if (transferFocus.current) {
+      transferFocus.current = false;
+      element.focus({ preventScroll: true });
+    }
+    return () => observer.disconnect();
+  }, [activeView.id, isLoaded]);
 
   // Make handlePageChange available globally for NavBar
   useEffect(() => {
     window.navigateToPage = handlePageChange;
+    return () => {
+      if (window.navigateToPage === handlePageChange) delete window.navigateToPage;
+    };
   }, [handlePageChange]);
 
   if (!isLoaded) {
@@ -60,15 +119,127 @@ export default function RootPage() {
 
   return (
     <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
-      {/* Keyed by section, so each switch mounts a fresh wrapper and replays
-          the entrance. The new section renders at once; nothing waits for the
-          old one to leave. */}
       <div
-        key={currentPage}
-        className={`w-full flex flex-col items-center ${
-          hasSwitched ? "section-enter" : ""
-        }`}
+        ref={stage}
+        className={`section-stage ${views.some((view) => view.retiring) ? "section-stage-switching" : ""}`}
+        style={{ height: stageHeight }}
       >
+        {views.map((view) => (
+          <SectionLayer key={view.id} view={view} onExit={removeView}>
+            <SectionContent
+              currentPage={view.page}
+              handlePageChange={handlePageChange}
+            />
+          </SectionLayer>
+        ))}
+      </div>
+    </main>
+  );
+}
+
+type SectionView = {
+  id: number;
+  page: PageType;
+  entering: boolean;
+  retiring: boolean;
+  exitAppearance?: { opacity: string; transform: string };
+};
+
+function SectionLayer({
+  view,
+  onExit,
+  children,
+}: {
+  view: SectionView;
+  onExit: (id: number) => void;
+  children: ReactNode;
+}) {
+  const layer = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (!view.retiring || !layer.current) return;
+    const element = layer.current;
+    let disposed = false;
+    const finish = () => {
+      if (!disposed) onExit(view.id);
+    };
+    const onAnimationFinished = (event: AnimationEvent) => {
+      // Child animations and a cancelled entrance do not finish this exit.
+      if (event.target === element && event.animationName === "section-exit") {
+        finish();
+      }
+    };
+    element.addEventListener("animationend", onAnimationFinished);
+    element.addEventListener("animationcancel", onAnimationFinished);
+    const style = getComputedStyle(element);
+    // Animation.finished also rejects on direct browser cancellation and when
+    // CSS disables an exit; those cases need not emit a CSS animationcancel.
+    // Observe only this layer's exit, never its interrupted entrance or children.
+    const exit = element.getAnimations().find(
+      (animation) =>
+        "animationName" in animation &&
+        animation.animationName === "section-exit",
+    );
+    if (exit) void exit.finished.then(finish, finish);
+    const exitIndex = style.animationName.split(", ").indexOf("section-exit");
+    const durations = style.animationDuration.split(", ");
+    const delays = style.animationDelay.split(", ");
+    const milliseconds = (value: string) =>
+      parseFloat(value) * (value.endsWith("ms") ? 1 : 1000);
+    // Also expire exits when animations are disabled or events never arrive
+    // (for example in a background tab). Each instance owns its own deadline.
+    const duration =
+      exitIndex < 0
+        ? 0
+        : Math.max(
+            0,
+            milliseconds(durations[exitIndex % durations.length]) +
+              milliseconds(delays[exitIndex % delays.length]),
+          );
+    const timeout = window.setTimeout(finish, duration);
+    return () => {
+      disposed = true;
+      window.clearTimeout(timeout);
+      element.removeEventListener("animationend", onAnimationFinished);
+      element.removeEventListener("animationcancel", onAnimationFinished);
+    };
+  }, [view.id, view.retiring, onExit]);
+
+  return (
+    <div
+      ref={layer}
+      data-section-instance={view.id}
+      data-section={view.page}
+      className={`section-view w-full flex flex-col items-center ${
+        view.retiring ? "section-exit" : view.entering ? "section-enter" : ""
+      }`}
+      style={
+        view.exitAppearance
+          ? ({
+              "--section-exit-opacity": view.exitAppearance.opacity,
+              "--section-exit-transform": view.exitAppearance.transform,
+            } as CSSProperties)
+          : undefined
+      }
+      inert={view.retiring}
+      aria-hidden={view.retiring || undefined}
+      tabIndex={-1}
+    >
+      {children}
+    </div>
+  );
+}
+
+function SectionContent({
+  currentPage,
+  handlePageChange,
+}: {
+  currentPage: PageType;
+  handlePageChange: (page: PageType) => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <>
         {currentPage === "home" && (
           <>
             <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-6xl gap-8 py-8">
@@ -269,8 +440,6 @@ export default function RootPage() {
             </div>
           </>
         )}
-      </div>
-
       <style jsx>{`
         .shiny-text {
           background: linear-gradient(90deg, #fff 0%, #b3b3b3 50%, #fff 100%);
@@ -281,6 +450,6 @@ export default function RootPage() {
           filter: drop-shadow(0 2px 8px #000a);
         }
       `}</style>
-    </main>
+    </>
   );
 }
