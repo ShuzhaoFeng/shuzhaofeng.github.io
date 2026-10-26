@@ -17,8 +17,7 @@ import { timelineEntries } from "./data/timelineData";
 import { researchPapers } from "./data/researchData";
 import { projects } from "./data/projectData";
 import { MoreHorizontal, Plus } from "lucide-react";
-
-type PageType = "home" | "journey" | "research" | "projects";
+import { isSectionId, readSectionMemory, writeSectionMemory, type SectionId as PageType } from "./section-memory";
 
 // The home page's inline section links. An underline's appearance and a ring's
 // cannot ease as such, so both are always drawn and fade in by colour: the
@@ -55,6 +54,7 @@ export default function RootPage() {
   const currentFlight = useRef(flight);
   const [isLoaded, setIsLoaded] = useState(false);
   const destination = useRef<PageType>("home");
+  const hasChosenSection = useRef(false);
   const nextId = useRef(1);
   const stage = useRef<HTMLDivElement>(null);
   const main = useRef<HTMLElement>(null);
@@ -67,8 +67,9 @@ export default function RootPage() {
   }, []);
 
   useEffect(() => {
-    const savedPage = localStorage.getItem("currentPage") as PageType;
-    const page = savedPage || "home";
+    // A section chosen before initialization takes precedence over restoration.
+    const page = hasChosenSection.current ? destination.current : readSectionMemory();
+    writeSectionMemory(page);
     destination.current = page;
     replaceFlight({ incoming: { id: 0, page, phase: "enter" } });
     setIsLoaded(true);
@@ -99,9 +100,11 @@ export default function RootPage() {
   }, [replaceFlight]);
 
   const handlePageChange = useCallback((page: PageType) => {
+    if (!isSectionId(page)) return;
+    hasChosenSection.current = true;
     if (destination.current === page) return;
     destination.current = page;
-    localStorage.setItem("currentPage", page);
+    writeSectionMemory(page);
     window.dispatchEvent(new CustomEvent("sectiondestinationchange", { detail: page }));
     const previous = currentFlight.current;
     if (previous.outgoing) {

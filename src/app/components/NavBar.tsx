@@ -4,8 +4,7 @@ import { flushSync } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { Check, ChevronDown, Globe, Mail, Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
-
-type PageType = "home" | "journey" | "research" | "projects";
+import { isSectionId, readSectionMemory, writeSectionMemory, type SectionId as PageType } from "../section-memory";
 
 let currentLangFade: ViewTransition | null = null;
 
@@ -75,6 +74,7 @@ function NavItem({
 export default function NavBar() {
   const isMainPage = usePathname() === "/";
   const [currentPage, setCurrentPage] = useState<PageType>("home");
+  const chosenSection = useRef<PageType | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [easeLabels, setEaseLabels] = useState(false);
 
@@ -91,12 +91,11 @@ export default function NavBar() {
   const currentLocaleLabel =
     locales.find((l) => l.code === i18n.language)?.label ?? locales[0].label;
 
-  // Load current page from localStorage on mount
   useEffect(() => {
-    const savedPage = localStorage.getItem("currentPage") as PageType;
-    if (savedPage) {
-      setCurrentPage(savedPage);
-    }
+    // The layout also renews visits to separate routes that have no root page.
+    const page = chosenSection.current ?? readSectionMemory();
+    setCurrentPage(page);
+    writeSectionMemory(page);
     // Paint the restored selection with zero duration before enabling hover
     // feedback. Inherited text colors otherwise transition from Home on load.
     let enableFrame = 0;
@@ -125,19 +124,23 @@ export default function NavBar() {
 
   useEffect(() => {
     const onDestinationChange = (event: Event) => {
-      setCurrentPage((event as CustomEvent<PageType>).detail);
+      const page: unknown = (event as CustomEvent).detail;
+      if (!isSectionId(page)) return;
+      chosenSection.current = page;
+      setCurrentPage(page);
     };
     window.addEventListener("sectiondestinationchange", onDestinationChange);
     return () => window.removeEventListener("sectiondestinationchange", onDestinationChange);
   }, []);
 
   const handleNavigate = (page: PageType) => {
+    chosenSection.current = page;
     setCurrentPage(page);
     setIsMobileMenuOpen(false);
     if (window.navigateToPage) {
       window.navigateToPage(page);
     } else {
-      localStorage.setItem("currentPage", page);
+      writeSectionMemory(page);
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- Reload the root so it restores the requested section.
       window.location.assign("/");
     }

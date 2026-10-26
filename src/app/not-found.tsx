@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "react-i18next";
+import { writeSectionMemory } from "./section-memory";
 
 export default function NotFound() {
   const { t, i18n } = useTranslation();
@@ -16,7 +17,7 @@ export default function NotFound() {
         <a
           className="not-found-home"
           href="/"
-          onClick={() => localStorage.setItem("currentPage", "home")}
+          onClick={() => writeSectionMemory("home")}
         >
           {t("notFound.home")}
         </a>
