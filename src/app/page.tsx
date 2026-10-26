@@ -5,9 +5,11 @@ import {
   useLayoutEffect,
   useCallback,
   useRef,
+  memo,
   type ReactNode,
   type CSSProperties,
 } from "react";
+import { flushSync } from "react-dom";
 import Profile from "./components/Profile";
 import { useTranslation, Trans } from "react-i18next";
 import { TimelineEntry, ResearchPaper, ProjectCard } from "./components";
@@ -35,90 +37,192 @@ declare global {
 type SectionView = {
   id: number;
   page: PageType;
-  phase: "settled" | "exit" | "enter";
+  phase: "waiting" | "settled" | "exit" | "enter";
   exitOpacity?: string;
+  exitTransform?: string;
+};
+
+type SectionFlight = {
+  outgoing?: SectionView;
+  incoming?: SectionView;
   exitNavHeight?: number;
 };
 
 export default function RootPage() {
-  const [view, setView] = useState<SectionView>({
-    id: 0, page: "home", phase: "settled",
+  const [flight, setFlight] = useState<SectionFlight>({
+    incoming: { id: 0, page: "home", phase: "settled" },
   });
-  const currentView = useRef(view);
+  const currentFlight = useRef(flight);
   const [isLoaded, setIsLoaded] = useState(false);
   const destination = useRef<PageType>("home");
   const nextId = useRef(1);
   const stage = useRef<HTMLDivElement>(null);
   const main = useRef<HTMLElement>(null);
   const transferFocus = useRef(false);
-  const replaceView = useCallback((next: SectionView) => {
-    currentView.current = next;
-    setView(next);
+  const outgoingId = flight.outgoing?.id;
+  const enteringId = flight.incoming?.phase === "waiting" ? undefined : flight.incoming?.id;
+  const replaceFlight = useCallback((next: SectionFlight) => {
+    currentFlight.current = next;
+    setFlight(next);
   }, []);
 
   useEffect(() => {
     const savedPage = localStorage.getItem("currentPage") as PageType;
-    if (savedPage) {
-      destination.current = savedPage;
-      replaceView({ id: 0, page: savedPage, phase: "settled" });
-    }
+    const page = savedPage || "home";
+    destination.current = page;
+    replaceFlight({ incoming: { id: 0, page, phase: "enter" } });
     setIsLoaded(true);
-  }, [replaceView]);
+  }, [replaceFlight]);
+
+  const beginExit = useCallback((view: SectionView) => {
+    const slot = stage.current?.querySelector<HTMLElement>(
+      `[data-section-instance="${view.id}"]`,
+    );
+    const element = slot?.querySelector<HTMLElement>(".section-view");
+    const pose = element ? getComputedStyle(element) : undefined;
+    if (slot?.contains(document.activeElement)) {
+      main.current?.focus({ preventScroll: true });
+      transferFocus.current = true;
+    }
+    if (slot) stage.current?.style.setProperty("--section-reserve-height", `${slot.offsetHeight}px`);
+    replaceFlight({
+      outgoing: {
+        ...view,
+        phase: "exit",
+        // Interrupted entrances depart from their currently painted pose.
+        exitOpacity: pose?.opacity ?? "1",
+        exitTransform: pose?.transform ?? "none",
+      },
+      incoming: { id: nextId.current++, page: destination.current, phase: "waiting" },
+      exitNavHeight: main.current?.previousElementSibling?.getBoundingClientRect().height,
+    });
+  }, [replaceFlight]);
 
   const handlePageChange = useCallback((page: PageType) => {
     if (destination.current === page) return;
     destination.current = page;
     localStorage.setItem("currentPage", page);
-    const previous = currentView.current;
-    // During exit only the destination changes. No intermediate page mounts,
-    // even when the visitor returns to the outgoing page before it disappears.
-    if (previous.phase === "exit") return;
-    if (stage.current?.contains(document.activeElement)) {
-      main.current?.focus({ preventScroll: true });
-      transferFocus.current = true;
+    window.dispatchEvent(new CustomEvent("sectiondestinationchange", { detail: page }));
+    const previous = currentFlight.current;
+    if (previous.outgoing) {
+      if (previous.incoming?.phase === "waiting") {
+        replaceFlight({
+          ...previous,
+          incoming: { id: nextId.current++, page, phase: "waiting" },
+        });
+      }
+      return;
     }
-    const element = stage.current?.querySelector(".section-view");
-    replaceView({
-      ...previous,
-      phase: "exit",
-      // An interrupted entrance leaves from its actual opacity without a flash.
-      exitOpacity: element ? getComputedStyle(element).opacity : "1",
-      exitNavHeight: main.current?.previousElementSibling?.getBoundingClientRect().height,
-    });
-  }, [replaceView]);
+    if (previous.incoming) beginExit(previous.incoming);
+  }, [beginExit, replaceFlight]);
 
   useLayoutEffect(() => {
-    const element = main.current;
-    const nav = element?.previousElementSibling;
-    if (view.phase !== "exit" || view.exitNavHeight === undefined || !element || !nav) return;
-    const navHeight = view.exitNavHeight;
-    // Closing the mobile menu removes flow height above main. Keep that space
-    // below the navbar until the outgoing section is empty, without delaying
-    // the menu's own collapse or changing the centered content area's height.
-    const preserveSpace = () => {
-      const space = Math.max(0, navHeight - nav.getBoundingClientRect().height);
-      element.style.setProperty("--section-nav-space", `${space}px`);
+    const element = stage.current;
+    return () => { element?.style.removeProperty("--section-exit-offset"); };
+  }, [outgoingId]);
+
+  useLayoutEffect(() => {
+    const element = stage.current;
+    const nav = main.current?.previousElementSibling;
+    const outgoing = flight.outgoing;
+    const slot = element?.querySelector<HTMLElement>(
+      `[data-section-instance="${outgoing?.id}"]`,
+    );
+    if (!outgoing || !element || !nav || !slot) {
+      element?.style.removeProperty("--section-reserve-height");
+      return;
+    }
+    const navHeight = flight.exitNavHeight ?? nav.getBoundingClientRect().height;
+    if (enteringId !== undefined) {
+      const restingTop = slot.getBoundingClientRect().top;
+      const stageBounds = element.getBoundingClientRect();
+      // Hand document height to the invisible incoming layer. The departing
+      // layer stays painted at the same viewport position through native clamp.
+      slot.style.position = "fixed";
+      slot.style.top = `${restingTop}px`;
+      slot.style.left = `${stageBounds.left}px`;
+      slot.style.width = `${stageBounds.width}px`;
+      element.style.removeProperty("--section-reserve-height");
+      const scrollingElement = document.scrollingElement;
+      const maximumScroll = Math.max(0,
+        (scrollingElement?.scrollHeight ?? 0) - document.documentElement.clientHeight,
+      );
+      const scrollOrigin = Math.min(window.scrollY, maximumScroll);
+      const followViewport = () => {
+        const bounds = element.getBoundingClientRect();
+        const currentMaximum = Math.max(0,
+          (scrollingElement?.scrollHeight ?? 0) - document.documentElement.clientHeight,
+        );
+        const scrollPosition = Math.min(window.scrollY, currentMaximum);
+        slot.style.top = `${restingTop - (scrollPosition - scrollOrigin)}px`;
+        slot.style.left = `${bounds.left}px`;
+        slot.style.width = `${bounds.width}px`;
+      };
+      const observer = new ResizeObserver(followViewport);
+      observer.observe(element);
+      window.addEventListener("scroll", followViewport, { passive: true });
+      return () => {
+        observer.disconnect();
+        window.removeEventListener("scroll", followViewport);
+        slot.style.removeProperty("position");
+        slot.style.removeProperty("top");
+        slot.style.removeProperty("left");
+        slot.style.removeProperty("width");
+        element.style.removeProperty("--section-exit-offset");
+      };
+    }
+    const preserveGeometry = () => {
+      // Only outgoing content compensates for the closing menu's lost height.
+      const offset = navHeight - nav.getBoundingClientRect().height;
+      element.style.setProperty("--section-exit-offset", `${offset}px`);
+      element.style.setProperty("--section-reserve-height", `${slot.offsetHeight + Math.max(0, offset)}px`);
     };
-    preserveSpace();
-    const observer = new ResizeObserver(preserveSpace);
+    preserveGeometry();
+    const observer = new ResizeObserver(preserveGeometry);
     observer.observe(nav);
+    observer.observe(slot);
     return () => {
       observer.disconnect();
-      element.style.removeProperty("--section-nav-space");
     };
-  }, [view.id, view.phase, view.exitNavHeight]);
+  }, [flight.outgoing, flight.exitNavHeight, enteringId]);
+
+  const onExitOverlap = useCallback((id: number) => {
+    const previous = currentFlight.current;
+    const incoming = previous.incoming;
+    if (previous.outgoing?.id !== id || incoming?.phase !== "waiting") return;
+    // Content is already laid out; commit only its entrance at the playback
+    // boundary rather than letting concurrent rendering defer that boundary.
+    flushSync(() => {
+      replaceFlight({
+        ...previous,
+        incoming: { ...incoming, phase: "enter" },
+      });
+    });
+  }, [replaceFlight]);
 
   const onPhaseEnd = useCallback((id: number, phase: SectionView["phase"]) => {
-    const previous = currentView.current;
-    if (previous.id !== id || previous.phase !== phase) return;
-    if (phase === "exit") {
-      // The outgoing instance is empty now. The new instance's natural height
-      // establishes its centered position before its first visible frame.
-      replaceView({ id: nextId.current++, page: destination.current, phase: "enter" });
-    } else if (phase === "enter") {
-      replaceView({ ...previous, phase: "settled" });
+    const previous = currentFlight.current;
+    if (phase === "exit" && previous.outgoing?.id === id) {
+      const incoming = previous.incoming ? {
+        ...previous.incoming,
+        phase: previous.incoming.phase === "waiting" ? "enter" as const : previous.incoming.phase,
+      } : {
+        id: nextId.current++, page: destination.current, phase: "enter" as const,
+      };
+      if (incoming.page !== destination.current) {
+        beginExit(incoming);
+      } else {
+        replaceFlight({ incoming });
+      }
+    } else if (phase === "enter" && previous.incoming?.id === id && previous.incoming.phase === phase) {
+      const incoming = { ...previous.incoming, phase: "settled" as const };
+      if (!previous.outgoing && incoming.page !== destination.current) {
+        beginExit(incoming);
+      } else {
+        replaceFlight({ ...previous, incoming });
+      }
     }
-  }, [replaceView]);
+  }, [replaceFlight, beginExit]);
 
   const onVisible = useCallback((element: HTMLDivElement) => {
     if (transferFocus.current && document.activeElement === main.current) {
@@ -128,8 +232,6 @@ export default function RootPage() {
   }, []);
 
   useEffect(() => {
-    // A later visitor action cancels the focus handoff, including a click on
-    // something that does not itself receive focus. Navigation keeps its focus.
     const cancelTransfer = () => { transferFocus.current = false; };
     document.addEventListener("pointerdown", cancelTransfer, true);
     document.addEventListener("keydown", cancelTransfer, true);
@@ -148,11 +250,13 @@ export default function RootPage() {
   }
 
   return (
-    <main ref={main} tabIndex={-1} className="section-main flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
+    <main ref={main} tabIndex={-1} className="section-main bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
       <div ref={stage} className="section-stage">
-        <SectionLayer key={view.id} view={view} onPhaseEnd={onPhaseEnd} onVisible={onVisible}>
-          <SectionContent currentPage={view.page} handlePageChange={handlePageChange} />
-        </SectionLayer>
+        {[flight.outgoing, flight.incoming].map((view) => view && (
+          <SectionLayer key={view.id} view={view} onPhaseEnd={onPhaseEnd} onExitOverlap={onExitOverlap} onVisible={onVisible}>
+            <SectionContent currentPage={view.page} handlePageChange={handlePageChange} />
+          </SectionLayer>
+        ))}
       </div>
     </main>
   );
@@ -161,11 +265,13 @@ export default function RootPage() {
 function SectionLayer({
   view,
   onPhaseEnd,
+  onExitOverlap,
   onVisible,
   children,
 }: {
   view: SectionView;
   onPhaseEnd: (id: number, phase: SectionView["phase"]) => void;
+  onExitOverlap: (id: number) => void;
   onVisible: (element: HTMLDivElement) => void;
   children: ReactNode;
 }) {
@@ -174,49 +280,49 @@ function SectionLayer({
   const interactive = view.phase === "settled" || (view.phase === "enter" && entranceVisible);
 
   useLayoutEffect(() => {
-    if (view.phase === "settled" || !layer.current) return;
+    if (view.phase === "settled" || view.phase === "waiting" || !layer.current) return;
     const element = layer.current;
     const name = `section-${view.phase}`;
     let disposed = false;
+    let completed = false;
+    let overlapped = false;
     let frame = 0;
-    const reveal = () => {
-      if (disposed) return;
-      if (Number(getComputedStyle(element).opacity) > 0) {
-        setEntranceVisible(true);
-      } else {
-        frame = requestAnimationFrame(reveal);
-      }
-    };
-    if (view.phase === "enter") frame = requestAnimationFrame(reveal);
     const finish = () => {
-      if (!disposed) onPhaseEnd(view.id, view.phase);
+      if (disposed || completed) return;
+      completed = true;
+      onPhaseEnd(view.id, view.phase);
     };
     const onAnimationFinished = (event: AnimationEvent) => {
       if (event.target === element && event.animationName === name) finish();
     };
     element.addEventListener("animationend", onAnimationFinished);
     element.addEventListener("animationcancel", onAnimationFinished);
-    const style = getComputedStyle(element);
     const animation = element.getAnimations().find(
       (candidate) => "animationName" in candidate && candidate.animationName === name,
     );
+    const observe = () => {
+      if (disposed || completed) return;
+      if (view.phase === "enter") {
+        if (Number(getComputedStyle(element).opacity) > 0) {
+          setEntranceVisible(true);
+          return;
+        }
+      } else if (!overlapped && animation) {
+        const timing = animation.effect?.getTiming();
+        const duration = typeof timing?.duration === "number" ? timing.duration : 600;
+        // Playback, including pauses/background throttling, owns the handoff.
+        if (Number(animation.currentTime) >= (timing?.delay ?? 0) + duration * 2 / 3) {
+          overlapped = true;
+          onExitOverlap(view.id);
+          return;
+        }
+      }
+      frame = requestAnimationFrame(observe);
+    };
+    frame = requestAnimationFrame(observe);
     if (animation) void animation.finished.then(finish, finish);
-    const index = style.animationName.split(", ").indexOf(name);
-    const durations = style.animationDuration.split(", ");
-    const delays = style.animationDelay.split(", ");
-    const milliseconds = (value: string) =>
-      parseFloat(value) * (value.endsWith("ms") ? 1 : 1000);
-    const duration = index < 0 ? 0 : Math.max(0,
-      milliseconds(durations[index % durations.length]) +
-      milliseconds(delays[index % delays.length]),
-    );
-    // An active animation owns its boundary: elapsed wall time can run ahead of
-    // rendered playback and must never remove a visibly unfinished section.
-    // Absent, disabled, and zero-duration animations still complete explicitly;
-    // cancellation completes through the event or the rejected finished promise.
-    const timeout = !animation || duration <= 0
-      ? window.setTimeout(finish, 0)
-      : undefined;
+    const duration = animation?.effect?.getComputedTiming().activeDuration;
+    const timeout = !animation || duration === 0 ? window.setTimeout(finish, 0) : undefined;
     return () => {
       disposed = true;
       cancelAnimationFrame(frame);
@@ -224,33 +330,37 @@ function SectionLayer({
       element.removeEventListener("animationend", onAnimationFinished);
       element.removeEventListener("animationcancel", onAnimationFinished);
     };
-  }, [view.id, view.phase, onPhaseEnd]);
+  }, [view.id, view.phase, onPhaseEnd, onExitOverlap]);
 
   useLayoutEffect(() => {
-    // Run only after React has removed inert, so focus never targets a hidden
-    // or still inert incoming layer. The root checks for intervening actions.
+    // React must remove inert before attempting the guarded focus handoff.
     if (interactive && layer.current) onVisible(layer.current);
   }, [interactive, onVisible]);
 
   return (
     <div
-      ref={layer}
       data-section-instance={view.id}
       data-section={view.page}
-      className={`section-view w-full flex flex-col items-center ${
-        view.phase === "settled" ? "" : `section-${view.phase}`
-      }`}
-      style={view.phase === "exit" ? ({ "--section-exit-opacity": view.exitOpacity } as CSSProperties) : undefined}
+      className={`section-slot ${view.phase === "exit" ? "section-outgoing" : view.phase === "waiting" ? "section-preparing" : ""}`}
       inert={!interactive}
       aria-hidden={!interactive || undefined}
-      tabIndex={-1}
     >
-      {children}
+      <div
+        ref={layer}
+        className={`section-view w-full flex flex-col items-center ${view.phase === "settled" ? "" : `section-${view.phase}`}`}
+        style={view.phase === "exit" ? ({
+          "--section-exit-opacity": view.exitOpacity,
+          "--section-exit-transform": view.exitTransform,
+        } as CSSProperties) : undefined}
+        tabIndex={-1}
+      >
+        {children}
+      </div>
     </div>
   );
 }
 
-function SectionContent({
+const SectionContent = memo(function SectionContent({
   currentPage,
   handlePageChange,
 }: {
@@ -472,4 +582,4 @@ function SectionContent({
       `}</style>
     </>
   );
-}
+});

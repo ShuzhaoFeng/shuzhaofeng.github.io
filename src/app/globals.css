@@ -50,46 +50,76 @@ button:disabled,
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Keep the current section's natural height throughout its visible phase.
-   Changing a centered stage's height moves its top edge, so the next section
-   replaces it only after the outgoing section is empty. No height easing or
-   section transforms may move the timeline while it is visible. */
 .section-main {
-  padding-top: var(--section-nav-space, 0px);
-  min-height: calc(100vh - 4rem + var(--section-nav-space, 0px));
+  min-height: calc(100vh - 4rem);
 }
 
 .section-stage {
-  display: grid;
+  position: relative;
   width: 100%;
+  min-height: var(--section-reserve-height, 0px);
   isolation: isolate;
+  overflow-anchor: none;
+}
+
+/* Each slot centers against the viewport independently of the other layer's
+   height. The outgoing overlay releases flow before incoming becomes visible. */
+.section-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 4rem);
+  width: 100%;
+}
+
+.section-outgoing {
+  position: absolute;
+  top: var(--section-exit-offset, 0px);
+  left: 0;
+}
+
+.section-preparing {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.section-waiting {
+  opacity: 0;
+  transform: translateY(24px);
 }
 
 .section-view {
-  grid-area: 1 / 1;
   min-width: 0;
 }
 
-.section-view[inert] {
+.section-slot[inert] {
   pointer-events: none;
 }
 
 @keyframes section-enter {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .section-enter {
-  animation: section-enter 750ms ease-in-out both;
+  animation: section-enter 600ms ease-in-out both;
 }
 
 @keyframes section-exit {
-  from { opacity: var(--section-exit-opacity, 1); }
-  to { opacity: 0; }
+  from {
+    opacity: var(--section-exit-opacity, 1);
+    transform: var(--section-exit-transform, translateY(0));
+  }
+  to { opacity: 0; transform: translateY(24px); }
 }
 
 .section-exit {
-  animation: section-exit 750ms ease-in-out both;
+  animation: section-exit 600ms ease-in-out both;
 }
 
 /* A paper's new abstract text and its "Read more" / "Show less" label fade
@@ -164,6 +194,12 @@ html[data-lang-fade]::view-transition-old(lang-chevron) {
    query (and Tailwind's motion-reduce: variant, which compiles to it), never
    in JavaScript, so the first render is the same on server and client. */
 @media (prefers-reduced-motion: reduce) {
+  /* Override even a pose captured before the preference changed, while the
+     same named animation keeps its fade timing and completion lifecycle. */
+  .section-view {
+    transform: none !important;
+  }
+
   /* Transitions keep only their colour and opacity properties (the
      `transition-colors` set plus opacity, the focus ring's box-shadow and
      visibility), so hovers, focus rings, dims and fades ease as before while

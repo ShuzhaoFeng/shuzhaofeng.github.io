@@ -121,6 +121,14 @@ export default function NavBar() {
     return () => document.removeEventListener("click", onDocClick);
   }, [isLangOpen]);
 
+  useEffect(() => {
+    const onDestinationChange = (event: Event) => {
+      setCurrentPage((event as CustomEvent<PageType>).detail);
+    };
+    window.addEventListener("sectiondestinationchange", onDestinationChange);
+    return () => window.removeEventListener("sectiondestinationchange", onDestinationChange);
+  }, []);
+
   const handleNavigate = (page: PageType) => {
     setCurrentPage(page);
     setIsMobileMenuOpen(false);
