@@ -50,26 +50,54 @@ button:disabled,
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Mobile menu collapse keeps its lost flow space below the navbar until the
-   outgoing section is empty. Only the content layer carries section motion;
-   the navigation, stage geometry and main background stay outside it. */
 .section-main {
-  padding-top: var(--section-nav-space, 0px);
-  min-height: calc(100vh - 4rem + var(--section-nav-space, 0px));
+  min-height: calc(100vh - 4rem);
 }
 
 .section-stage {
-  display: grid;
+  position: relative;
   width: 100%;
+  min-height: var(--section-reserve-height, 0px);
   isolation: isolate;
+  overflow-anchor: none;
+}
+
+/* Each slot centers against the viewport independently of the other layer's
+   height. The outgoing overlay releases flow before incoming becomes visible. */
+.section-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 4rem);
+  width: 100%;
+}
+
+.section-outgoing {
+  position: absolute;
+  top: var(--section-exit-offset, 0px);
+  left: 0;
+}
+
+.section-preparing {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.section-waiting {
+  opacity: 0;
+  transform: translateY(24px);
 }
 
 .section-view {
-  grid-area: 1 / 1;
   min-width: 0;
 }
 
-.section-view[inert] {
+.section-slot[inert] {
   pointer-events: none;
 }
 
