@@ -25,6 +25,107 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.site-nav :focus-visible,
+.not-found-home:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 4px;
+}
+
+.not-found {
+  line-height: normal;
+  min-height: calc(100svh - 64px);
+  padding: 64px 24px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(to bottom right, #000, #111827, #1f2937);
+}
+
+.not-found-message {
+  max-width: 600px;
+  min-width: 0;
+  text-align: center;
+}
+
+.not-found-code {
+  color: #22d3ee;
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0 0 16px;
+}
+
+.not-found h1 {
+  font-size: 36px;
+  line-height: 1.2;
+  letter-spacing: -0.6px;
+  margin: 0 0 16px;
+  font-weight: 700;
+}
+
+.not-found-description {
+  font-size: 18px;
+  line-height: 1.65;
+  color: #d1d5db;
+  margin: 0 0 32px;
+}
+
+.not-found-home {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 1px solid #4b5563;
+  border-radius: 8px;
+  color: #22d3ee;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.not-found-home:hover,
+.not-found-home:focus-visible {
+  background: #1f2937;
+  border-color: #22d3ee;
+}
+
+@media (max-width: 767px) {
+  .not-found {
+    padding: 48px 24px;
+  }
+
+  .not-found-code {
+    font-size: 22px;
+  }
+
+  .not-found h1 {
+    font-size: 30px;
+  }
+
+  .not-found-description {
+    font-size: 17px;
+    max-width: 320px;
+    margin: 0 auto 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .not-found-home {
+    transition: none;
+  }
+}
+
+@media (max-width: 359px) {
+  .site-nav-name {
+    margin-right: 0;
+  }
+
+  .site-nav-social svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
 /* Enforce cursor pointer on interactive buttons project-wide */
 button:not(:disabled),
 [role="button"]:not([aria-disabled="true"]) {

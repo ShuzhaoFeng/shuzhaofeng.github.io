@@ -38,5 +38,8 @@
   "projects.features": "Fonctionnalités :",
   "projects.footnote": "Pour une liste complète de mon travail, veuillez visiter mon <0>profil GitHub</0>.",
   "activity.headerTitle": "Mon événement à venir",
-  "activity.buttonAriaLabel": "Voir la prochaine activité"
+  "activity.buttonAriaLabel": "Voir la prochaine activité",
+  "notFound.title": "Page introuvable",
+  "notFound.description": "Cette page est introuvable.",
+  "notFound.home": "Retour à l’accueil"
 }

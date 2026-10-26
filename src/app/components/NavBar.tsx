@@ -3,8 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import { flushSync } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { Check, ChevronDown, Globe, Mail, Menu, X } from "lucide-react";
-
-type PageType = "home" | "journey" | "research" | "projects";
+import { usePathname } from "next/navigation";
+import { isSectionId, readSectionMemory, writeSectionMemory, type SectionId as PageType } from "../section-memory";
 
 let currentLangFade: ViewTransition | null = null;
 
@@ -72,7 +72,9 @@ function NavItem({
 }
 
 export default function NavBar() {
+  const isMainPage = usePathname() === "/";
   const [currentPage, setCurrentPage] = useState<PageType>("home");
+  const chosenSection = useRef<PageType | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [easeLabels, setEaseLabels] = useState(false);
 
@@ -89,12 +91,11 @@ export default function NavBar() {
   const currentLocaleLabel =
     locales.find((l) => l.code === i18n.language)?.label ?? locales[0].label;
 
-  // Load current page from localStorage on mount
   useEffect(() => {
-    const savedPage = localStorage.getItem("currentPage") as PageType;
-    if (savedPage) {
-      setCurrentPage(savedPage);
-    }
+    // The layout also renews visits to separate routes that have no root page.
+    const page = chosenSection.current ?? readSectionMemory();
+    setCurrentPage(page);
+    writeSectionMemory(page);
     // Paint the restored selection with zero duration before enabling hover
     // feedback. Inherited text colors otherwise transition from Home on load.
     let enableFrame = 0;
@@ -123,17 +124,25 @@ export default function NavBar() {
 
   useEffect(() => {
     const onDestinationChange = (event: Event) => {
-      setCurrentPage((event as CustomEvent<PageType>).detail);
+      const page: unknown = (event as CustomEvent).detail;
+      if (!isSectionId(page)) return;
+      chosenSection.current = page;
+      setCurrentPage(page);
     };
     window.addEventListener("sectiondestinationchange", onDestinationChange);
     return () => window.removeEventListener("sectiondestinationchange", onDestinationChange);
   }, []);
 
   const handleNavigate = (page: PageType) => {
+    chosenSection.current = page;
     setCurrentPage(page);
     setIsMobileMenuOpen(false);
     if (window.navigateToPage) {
       window.navigateToPage(page);
+    } else {
+      writeSectionMemory(page);
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- Reload the root so it restores the requested section.
+      window.location.assign("/");
     }
   };
 
@@ -145,11 +154,11 @@ export default function NavBar() {
   ];
 
   return (
-    <nav className="w-full sticky top-0 z-50 shadow-md">
+    <nav className="site-nav w-full sticky top-0 z-50 shadow-md">
       <div className="bg-gradient-to-t from-[#1e293b]/80 via-[#111827] to-black w-full">
         <div className="max-w-6xl mx-auto px-2 sm:px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-4 md:gap-8 w-full">
-            <div className="text-base sm:text-xl font-bold tracking-tight text-white drop-shadow-lg mr-2 sm:mr-6 min-w-max">
+            <div className="site-nav-name text-base sm:text-xl font-bold tracking-tight text-white drop-shadow-lg mr-2 sm:mr-6 min-w-max">
               {t("nav.name")}
             </div>
 
@@ -159,7 +168,7 @@ export default function NavBar() {
                 <li key={page} className="min-w-max">
                   <NavItem
                     label={label}
-                    isCurrent={currentPage === page}
+                    isCurrent={isMainPage && currentPage === page}
                     easeHover={easeLabels}
                     onSelect={() => handleNavigate(page)}
                     className="whitespace-nowrap"
@@ -196,7 +205,7 @@ export default function NavBar() {
             </div>
 
             {/* Social Icons */}
-            <div className="flex items-center justify-end min-w-max gap-1">
+            <div className="site-nav-social flex items-center justify-end min-w-max gap-1">
               <a
                 href="mailto:shuzhao.feng@mail.mcgill.ca"
                 className="p-1 rounded-full hover:bg-gray-700 transition-colors"
@@ -332,7 +341,7 @@ export default function NavBar() {
                 <div key={page}>
                   <NavItem
                     label={label}
-                    isCurrent={currentPage === page}
+                    isCurrent={isMainPage && currentPage === page}
                     easeHover={easeLabels}
                     onSelect={() => handleNavigate(page)}
                     className="w-full py-2 text-base text-left"

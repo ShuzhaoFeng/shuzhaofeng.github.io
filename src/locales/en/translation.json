@@ -38,5 +38,8 @@
   "projects.features": "Features:",
   "projects.footnote": "For a full list of my work, please visit my <0>GitHub profile</0>.",
   "activity.headerTitle": "My Upcoming Event",
-  "activity.buttonAriaLabel": "View next activity"
+  "activity.buttonAriaLabel": "View next activity",
+  "notFound.title": "Page not found",
+  "notFound.description": "This page could not be found.",
+  "notFound.home": "Back to home"
 }
