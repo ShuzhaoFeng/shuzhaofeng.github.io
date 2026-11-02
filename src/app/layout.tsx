@@ -1,10 +1,12 @@
-"use client";
-import { useTranslation } from "react-i18next";
+import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "./components/NavBar";
-import { ActivityWidget } from "./components";
+import ActivityWidget from "./components/ActivityWidget";
 import I18nProvider from "./i18n-provider";
+import { sharedMetadata } from "./site-metadata";
+
+export const metadata: Metadata = sharedMetadata;
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,13 +23,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { t } = useTranslation();
   return (
     <html lang="en">
-      <head>
-        <title>{t("layout.title")}</title>
-        <meta name="description" content={t("layout.description")} />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
