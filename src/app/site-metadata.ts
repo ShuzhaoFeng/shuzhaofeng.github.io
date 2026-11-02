@@ -29,3 +29,11 @@ export const sharedMetadata: Metadata = {
     images: [image],
   },
 };
+
+export function contentRouteMetadata(path: string): Metadata {
+  return {
+    alternates: { canonical: path },
+    // Route metadata replaces this object, so carry forward every shared field.
+    openGraph: { ...sharedMetadata.openGraph, url: path },
+  };
+}
