@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { flushSync } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { Check, ChevronDown, Globe, Mail, Menu, X } from "lucide-react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { isSectionId, readSectionMemory, writeSectionMemory, type SectionId as PageType } from "../section-memory";
 
@@ -35,7 +36,31 @@ function switchLanguageWithFade(apply: () => void) {
 
 // Reserve the bold label's width with an invisible measuring copy. Only one
 // label is painted; selection changes its weight and color while independent
-// hover color feedback keeps easing.
+// hover color feedback keeps easing. The item that holds it carries `group
+// grid`.
+function NavLabel({
+  label,
+  isCurrent,
+  easeHover,
+}: {
+  label: string;
+  isCurrent: boolean;
+  easeHover: boolean;
+}) {
+  return (
+    <>
+      <span className={`[grid-area:1/1] ${isCurrent ? "font-bold text-cyan-400" : "text-white"}`}>
+        <span className={`group-hover:text-cyan-400 ${easeHover ? "transition-colors! duration-200 ease-out" : "transition-none! duration-0"}`}>
+          {label}
+        </span>
+      </span>
+      <span aria-hidden="true" className="[grid-area:1/1] invisible font-bold">
+        {label}
+      </span>
+    </>
+  );
+}
+
 function NavItem({
   label,
   isCurrent,
@@ -59,20 +84,61 @@ function NavItem({
         isCurrent ? "cursor-default!" : "cursor-pointer"
       } ${className}`}
     >
-      <span className={`[grid-area:1/1] ${isCurrent ? "font-bold text-cyan-400" : "text-white"}`}>
-        <span className={`group-hover:text-cyan-400 ${easeHover ? "transition-colors! duration-200 ease-out" : "transition-none! duration-0"}`}>
-          {label}
-        </span>
-      </span>
-      <span aria-hidden="true" className="[grid-area:1/1] invisible font-bold">
-        {label}
-      </span>
+      <NavLabel label={label} isCurrent={isCurrent} easeHover={easeHover} />
     </button>
   );
 }
 
-export default function NavBar() {
-  const isMainPage = usePathname() === "/";
+// The blog is its own route, not a root section, so its item is a link rather
+// than a section switch. On the list it is current like a section item: out of
+// the tab order and inert. On a post it keeps the current style but stays a
+// working link back to the list, so `aria-current="true"` marks the place
+// without claiming the post is the list page.
+function BlogNavItem({
+  label,
+  blogPage,
+  easeHover,
+  onChoose,
+  className,
+}: {
+  label: string;
+  blogPage: "list" | "post" | null;
+  easeHover: boolean;
+  onChoose: () => void;
+  className: string;
+}) {
+  const isList = blogPage === "list";
+  return (
+    <Link
+      href="/blog/"
+      onClick={(event) => {
+        // Already on the list: nothing to open, as a current section item
+        // does nothing.
+        if (isList) event.preventDefault();
+        onChoose();
+      }}
+      aria-current={isList ? "page" : blogPage === "post" ? "true" : undefined}
+      tabIndex={isList ? -1 : undefined}
+      className={`group grid ${isList ? "cursor-default!" : "cursor-pointer"} ${className}`}
+    >
+      <NavLabel label={label} isCurrent={blogPage !== null} easeHover={easeHover} />
+    </Link>
+  );
+}
+
+// Under `trailingSlash: true` the pathname may or may not end in a slash, so
+// compare it without one.
+function blogPageOf(pathname: string): "list" | "post" | null {
+  const path = pathname.replace(/\/+$/, "");
+  if (path === "/blog") return "list";
+  if (path.startsWith("/blog/")) return "post";
+  return null;
+}
+
+export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
+  const pathname = usePathname();
+  const isMainPage = pathname === "/";
+  const blogPage = blogPageOf(pathname);
   const [currentPage, setCurrentPage] = useState<PageType>("home");
   const chosenSection = useRef<PageType | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -162,8 +228,13 @@ export default function NavBar() {
               {t("nav.name")}
             </div>
 
-            {/* Desktop Navigation */}
-            <ul className="hidden md:flex gap-4 md:gap-8 text-base font-medium flex-1">
+            {/* Desktop Navigation. The row does not wrap, so between `md` and
+                `lg` the items sit 14 px apart: that gives back all the width
+                the Blog item adds, and the language switcher stays fully
+                visible from the same width as with four items 32 px apart
+                (measured on /blog/ in en, fr and zh). From `lg` the 32 px
+                gaps return. */}
+            <ul className="hidden md:flex gap-3.5 lg:gap-8 text-base font-medium flex-1">
               {navLinks.map(({ page, label }) => (
                 <li key={page} className="min-w-max">
                   <NavItem
@@ -175,6 +246,17 @@ export default function NavBar() {
                   />
                 </li>
               ))}
+              {hasPosts && (
+                <li className="min-w-max">
+                  <BlogNavItem
+                    label={t("nav.blog")}
+                    blogPage={blogPage}
+                    easeHover={easeLabels}
+                    onChoose={() => setIsMobileMenuOpen(false)}
+                    className="whitespace-nowrap"
+                  />
+                </li>
+              )}
             </ul>
 
             {/* Mobile Menu Button */}
@@ -348,6 +430,17 @@ export default function NavBar() {
                   />
                 </div>
               ))}
+              {hasPosts && (
+                <div>
+                  <BlogNavItem
+                    label={t("nav.blog")}
+                    blogPage={blogPage}
+                    easeHover={easeLabels}
+                    onChoose={() => setIsMobileMenuOpen(false)}
+                    className="w-full py-2 text-base text-left"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
