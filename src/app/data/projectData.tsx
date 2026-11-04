@@ -53,7 +53,7 @@ export const projects: Project[] = [
     id: "personal-website",
     title: "ShuzhaoFeng.github.io",
     description:
-      "Of course I'm making this website! You're looking at it right now. This personal portfolio was built with Next.js and created entirely through voice commands to an AI agent.",
+      "Of course I'm making this website! You're looking at it right now. This personal portfolio was built with Next.js.",
     features:
       "Responsive design, dark theme, automated CI/CD deployment, modular components, and GitHub Pages hosting.",
     githubUrl: "https://github.com/ShuzhaoFeng/shuzhaofeng.github.io",
