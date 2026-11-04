@@ -4,7 +4,34 @@ import { ReactNode, useEffect, useState } from "react";
 import { I18nextProvider } from "react-i18next";
 import i18n from "../i18n";
 
-export default function I18nProvider({ children }: { children: ReactNode }) {
+type MetadataKeys = { title: string; description: string };
+
+const siteKeys: MetadataKeys = { title: "layout.title", description: "layout.description" };
+const blogKeys: MetadataKeys = { title: "blog.metaTitle", description: "blog.metaDescription" };
+
+/**
+ * The translation keys of the shown page's own title and description, or
+ * `null` on a blog post: posts are English only, so a post keeps the English
+ * title and summary its exported head holds. Matching the published post
+ * names, not just the `/blog/` prefix, keeps the site's translated metadata
+ * on 404 pages under `/blog/`, including `/blog/` itself when there is no post.
+ */
+function metadataKeys(pathname: string, postNames: readonly string[]): MetadataKeys | null {
+  // Under `trailingSlash: true` the pathname may or may not end in a slash.
+  const path = pathname.replace(/\/+$/, "");
+  if (path === "/blog") return postNames.length > 0 ? blogKeys : siteKeys;
+  if (postNames.some((name) => path === `/blog/${name}`)) return null;
+  return siteKeys;
+}
+
+export default function I18nProvider({
+  children,
+  postNames,
+}: {
+  children: ReactNode;
+  /** The published posts' names, read from `content/blog/` at build time. */
+  postNames: readonly string[];
+}) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -23,8 +50,12 @@ export default function I18nProvider({ children }: { children: ReactNode }) {
     if (!isLoaded) return;
 
     const synchronizeMetadata = () => {
-      const title = i18n.t("layout.title");
-      const description = i18n.t("layout.description");
+      // The sync is set up once per load, so each run reads the page shown
+      // now: in-page navigation changes the page without setting it up again.
+      const keys = metadataKeys(window.location.pathname, postNames);
+      if (!keys) return;
+      const title = i18n.t(keys.title);
+      const description = i18n.t(keys.description);
       if (document.title !== title) document.title = title;
 
       // Reuse the exported tags so route and image identity remain server-owned.
@@ -62,7 +93,7 @@ export default function I18nProvider({ children }: { children: ReactNode }) {
       i18n.off("languageChanged", synchronizeMetadata);
       observer.disconnect();
     };
-  }, [isLoaded]);
+  }, [isLoaded, postNames]);
 
   if (!isLoaded) {
     return (

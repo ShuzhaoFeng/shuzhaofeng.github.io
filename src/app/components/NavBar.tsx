@@ -1,10 +1,17 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type MouseEvent as ReactMouseEvent } from "react";
 import { flushSync } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { Check, ChevronDown, Globe, Mail, Menu, X } from "lucide-react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { isSectionId, readSectionMemory, writeSectionMemory, type SectionId as PageType } from "../section-memory";
+import {
+  isSectionId,
+  readSectionMemory,
+  writeSectionMemory,
+  type RememberedPlace,
+  type SectionId as PageType,
+} from "../section-memory";
 
 let currentLangFade: ViewTransition | null = null;
 
@@ -35,7 +42,31 @@ function switchLanguageWithFade(apply: () => void) {
 
 // Reserve the bold label's width with an invisible measuring copy. Only one
 // label is painted; selection changes its weight and color while independent
-// hover color feedback keeps easing.
+// hover color feedback keeps easing. The item that holds it carries `group
+// grid`.
+function NavLabel({
+  label,
+  isCurrent,
+  easeHover,
+}: {
+  label: string;
+  isCurrent: boolean;
+  easeHover: boolean;
+}) {
+  return (
+    <>
+      <span className={`[grid-area:1/1] ${isCurrent ? "font-bold text-cyan-400" : "text-white"}`}>
+        <span className={`group-hover:text-cyan-400 ${easeHover ? "transition-colors! duration-200 ease-out" : "transition-none! duration-0"}`}>
+          {label}
+        </span>
+      </span>
+      <span aria-hidden="true" className="[grid-area:1/1] invisible font-bold">
+        {label}
+      </span>
+    </>
+  );
+}
+
 function NavItem({
   label,
   isCurrent,
@@ -59,21 +90,75 @@ function NavItem({
         isCurrent ? "cursor-default!" : "cursor-pointer"
       } ${className}`}
     >
-      <span className={`[grid-area:1/1] ${isCurrent ? "font-bold text-cyan-400" : "text-white"}`}>
-        <span className={`group-hover:text-cyan-400 ${easeHover ? "transition-colors! duration-200 ease-out" : "transition-none! duration-0"}`}>
-          {label}
-        </span>
-      </span>
-      <span aria-hidden="true" className="[grid-area:1/1] invisible font-bold">
-        {label}
-      </span>
+      <NavLabel label={label} isCurrent={isCurrent} easeHover={easeHover} />
     </button>
   );
 }
 
-export default function NavBar() {
-  const isMainPage = usePathname() === "/";
-  const [currentPage, setCurrentPage] = useState<PageType>("home");
+// The blog is its own route, not a root section, so its item is a link rather
+// than a section switch. On the list it is current like a section item: out of
+// the tab order and inert. On a post it keeps the current style but stays a
+// working link back to the list, so `aria-current="true"` marks the place
+// without claiming the post is the list page. `onChoose` sees the click after
+// the list's own `preventDefault`, and may prevent the link's navigation too.
+function BlogNavItem({
+  label,
+  blogPage,
+  easeHover,
+  onChoose,
+  className,
+}: {
+  label: string;
+  blogPage: "list" | "post" | null;
+  easeHover: boolean;
+  onChoose: (event: ReactMouseEvent<HTMLAnchorElement>) => void;
+  className: string;
+}) {
+  const isList = blogPage === "list";
+  return (
+    <Link
+      href="/blog/"
+      onClick={(event) => {
+        // Already on the list: nothing to open, as a current section item
+        // does nothing.
+        if (isList) event.preventDefault();
+        onChoose(event);
+      }}
+      aria-current={isList ? "page" : blogPage === "post" ? "true" : undefined}
+      tabIndex={isList ? -1 : undefined}
+      className={`group grid ${isList ? "cursor-default!" : "cursor-pointer"} ${className}`}
+    >
+      <NavLabel label={label} isCurrent={blogPage !== null} easeHover={easeHover} />
+    </Link>
+  );
+}
+
+// Under `trailingSlash: true` the pathname may or may not end in a slash, so
+// compare it without one.
+function blogPageOf(pathname: string): "list" | "post" | null {
+  const path = pathname.replace(/\/+$/, "");
+  if (path === "/blog") return "list";
+  if (path.startsWith("/blog/")) return "post";
+  return null;
+}
+
+export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
+  const pathname = usePathname();
+  const isMainPage = pathname === "/";
+  // Blog chosen on `/`: the item is current at once, as a chosen section's
+  // is, while the visible section leaves. A section choice cancels it, and any
+  // change of route ends it, since the pathname then says where the visitor is.
+  const [blogChosen, setBlogChosen] = useState(false);
+  const [blogChosenPathname, setBlogChosenPathname] = useState(pathname);
+  if (blogChosenPathname !== pathname) {
+    setBlogChosenPathname(pathname);
+    setBlogChosen(false);
+  }
+  const blogPage = blogChosen ? "list" : blogPageOf(pathname);
+  // A remembered Blog marks no section: on `/` the root page either reopens
+  // the blog list or announces the section it shows instead
+  // (`sectiondestinationchange`), and elsewhere sections are not current anyway.
+  const [currentPage, setCurrentPage] = useState<RememberedPlace>("home");
   const chosenSection = useRef<PageType | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [easeLabels, setEaseLabels] = useState(false);
@@ -93,7 +178,11 @@ export default function NavBar() {
 
   useEffect(() => {
     // The layout also renews visits to separate routes that have no root page.
-    const page = chosenSection.current ?? readSectionMemory();
+    // The blog pages' own effects run after this one and record Blog.
+    const remembered = chosenSection.current ?? readSectionMemory();
+    // With no post the blog is hidden, so a remembered Blog opens Home, as on
+    // the root page.
+    const page = remembered === "blog" && !hasPosts ? "home" : remembered;
     setCurrentPage(page);
     writeSectionMemory(page);
     // Paint the restored selection with zero duration before enabling hover
@@ -106,7 +195,7 @@ export default function NavBar() {
       cancelAnimationFrame(restoredFrame);
       cancelAnimationFrame(enableFrame);
     };
-  }, []);
+  }, [hasPosts]);
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
@@ -128,6 +217,7 @@ export default function NavBar() {
       if (!isSectionId(page)) return;
       chosenSection.current = page;
       setCurrentPage(page);
+      setBlogChosen(false);
     };
     window.addEventListener("sectiondestinationchange", onDestinationChange);
     return () => window.removeEventListener("sectiondestinationchange", onDestinationChange);
@@ -136,6 +226,7 @@ export default function NavBar() {
   const handleNavigate = (page: PageType) => {
     chosenSection.current = page;
     setCurrentPage(page);
+    setBlogChosen(false);
     setIsMobileMenuOpen(false);
     if (window.navigateToPage) {
       window.navigateToPage(page);
@@ -144,6 +235,27 @@ export default function NavBar() {
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- Reload the root so it restores the requested section.
       window.location.assign("/");
     }
+  };
+
+  // On `/` a plain click on Blog plays the visible section's exit before the
+  // blog opens. Modified clicks (new tab or window) keep the link's default,
+  // and elsewhere the link navigates as usual.
+  const handleBlogChoice = (event: ReactMouseEvent<HTMLAnchorElement>) => {
+    setIsMobileMenuOpen(false);
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      !window.navigateToBlog
+    ) {
+      return;
+    }
+    event.preventDefault();
+    setBlogChosen(true);
+    window.navigateToBlog();
   };
 
   const navLinks = [
@@ -162,19 +274,32 @@ export default function NavBar() {
               {t("nav.name")}
             </div>
 
-            {/* Desktop Navigation */}
-            <ul className="hidden md:flex gap-4 md:gap-8 text-base font-medium flex-1">
+            {/* Desktop Navigation. The row does not wrap, so between `md` and
+                `lg` the items sit 14 px apart, which offsets the width the
+                Blog item adds. From `lg` the 32 px gaps return. */}
+            <ul className="hidden md:flex gap-3.5 lg:gap-8 text-base font-medium flex-1">
               {navLinks.map(({ page, label }) => (
                 <li key={page} className="min-w-max">
                   <NavItem
                     label={label}
-                    isCurrent={isMainPage && currentPage === page}
+                    isCurrent={isMainPage && !blogChosen && currentPage === page}
                     easeHover={easeLabels}
                     onSelect={() => handleNavigate(page)}
                     className="whitespace-nowrap"
                   />
                 </li>
               ))}
+              {hasPosts && (
+                <li className="min-w-max">
+                  <BlogNavItem
+                    label={t("nav.blog")}
+                    blogPage={blogPage}
+                    easeHover={easeLabels}
+                    onChoose={handleBlogChoice}
+                    className="whitespace-nowrap"
+                  />
+                </li>
+              )}
             </ul>
 
             {/* Mobile Menu Button */}
@@ -341,13 +466,24 @@ export default function NavBar() {
                 <div key={page}>
                   <NavItem
                     label={label}
-                    isCurrent={isMainPage && currentPage === page}
+                    isCurrent={isMainPage && !blogChosen && currentPage === page}
                     easeHover={easeLabels}
                     onSelect={() => handleNavigate(page)}
                     className="w-full py-2 text-base text-left"
                   />
                 </div>
               ))}
+              {hasPosts && (
+                <div>
+                  <BlogNavItem
+                    label={t("nav.blog")}
+                    blogPage={blogPage}
+                    easeHover={easeLabels}
+                    onChoose={handleBlogChoice}
+                    className="w-full py-2 text-base text-left"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

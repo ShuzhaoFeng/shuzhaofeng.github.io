@@ -115,6 +115,456 @@ body {
   }
 }
 
+/* Blog. Plain CSS under the blog's own class names. Colours are the site's
+   Tailwind palette variables, so the blog renders the same colours as the
+   rest of the site. Hover colour and dot fills ease over 0.2s; under reduced
+   motion the global rule below keeps these colour transitions. */
+.blog-main {
+  --blog-ink: #ffffff;
+  --blog-text: var(--color-gray-200);
+  --blog-soft: var(--color-gray-300);
+  --blog-muted: var(--color-gray-400);
+  --blog-accent: var(--color-cyan-400);
+  --blog-accent-hover: var(--color-cyan-300);
+  --blog-line: var(--color-cyan-500);
+  --blog-rule: var(--color-gray-700);
+  min-height: calc(100vh - 4rem);
+  background: linear-gradient(to bottom right, #000, var(--color-gray-900), var(--color-gray-800));
+  color: var(--blog-text);
+  padding: 0 16px 96px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.blog-main :focus-visible {
+  outline: 2px solid var(--blog-accent);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.blog-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Blog list */
+
+.blog-intro {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 24px 0 40px;
+  text-align: center;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--blog-soft);
+}
+
+.blog-timeline {
+  position: relative;
+  list-style: none;
+  max-width: 50rem;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Journey's cyan axis, here running through the posts in time order. On
+   desktop it runs between the date gutter (10rem) and the titles, through the
+   centre of the 32px dot column. */
+.blog-timeline::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: calc(10rem + 15px);
+  border-left: 1px solid var(--blog-line);
+}
+
+.blog-entry {
+  position: relative;
+  display: grid;
+  grid-template-columns: 10rem 32px minmax(0, 1fr);
+  grid-template-areas:
+    "date dot title"
+    ".    .   summary";
+  padding-bottom: 48px;
+}
+
+.blog-entry:last-child {
+  padding-bottom: 0;
+}
+
+.blog-entry-title {
+  grid-area: title;
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: var(--blog-ink);
+}
+
+.blog-entry-title a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease-out;
+}
+
+/* The whole entry is the link's target; the title stays its only name. */
+.blog-entry-title a::after {
+  content: "";
+  position: absolute;
+  inset: -12px -16px 24px -16px;
+}
+
+.blog-entry:last-child .blog-entry-title a::after {
+  bottom: -12px;
+}
+
+.blog-entry:hover .blog-entry-title a {
+  color: var(--blog-accent);
+}
+
+.blog-entry-date {
+  grid-area: date;
+  align-self: start;
+  padding: 4px 16px 0 0;
+  text-align: right;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--blog-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A hollow cyan dot on the axis, ringed in the page colour so the axis stops
+   short of it; it fills on hover. */
+.blog-entry-dot {
+  grid-area: dot;
+  justify-self: center;
+  margin-top: 8px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--color-gray-900);
+  box-shadow: inset 0 0 0 2px var(--blog-line), 0 0 0 4px var(--color-gray-900);
+  transition: background-color 0.2s ease-out;
+}
+
+.blog-entry:hover .blog-entry-dot {
+  background: var(--blog-accent);
+}
+
+.blog-entry-summary {
+  grid-area: summary;
+  margin: 10px 0 0;
+  max-width: 34rem;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--blog-soft);
+}
+
+/* Phones: the axis moves to the left edge and the date sits under the
+   title. */
+@media (max-width: 639px) {
+  .blog-intro {
+    font-size: 17px;
+    padding: 20px 4px 32px;
+  }
+
+  .blog-timeline {
+    padding-left: 4px;
+  }
+
+  .blog-timeline::before {
+    left: calc(4px + 9px);
+  }
+
+  .blog-entry {
+    grid-template-columns: 19px minmax(0, 1fr);
+    column-gap: 14px;
+    grid-template-areas:
+      "dot title"
+      ".   date"
+      ".   summary";
+    padding-bottom: 36px;
+  }
+
+  .blog-entry-title {
+    font-size: 20px;
+  }
+
+  .blog-entry-title a::after {
+    inset: -10px -8px 20px -8px;
+  }
+
+  .blog-entry-date {
+    text-align: left;
+    padding: 6px 0 0;
+    font-size: 15px;
+  }
+
+  .blog-entry-dot {
+    margin-top: 7px;
+  }
+
+  .blog-entry-summary {
+    margin-top: 8px;
+    font-size: 16px;
+  }
+}
+
+/* Blog post: one centred reading column of about 70 characters a line. */
+
+.post {
+  max-width: 36rem;
+  margin: 0 auto;
+  padding-top: 40px;
+}
+
+.post-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-left: -4px;
+  padding: 0 4px;
+  color: var(--blog-accent);
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease-out;
+}
+
+.post-back svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.post-back:hover {
+  color: var(--blog-accent-hover);
+}
+
+.post-header {
+  margin: 20px 0 40px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--blog-rule);
+}
+
+.post-title {
+  margin: 0;
+  font-size: 38px;
+  line-height: 1.18;
+  letter-spacing: -0.6px;
+  font-weight: 700;
+  color: var(--blog-ink);
+  text-wrap: balance;
+}
+
+.post-date {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--blog-muted);
+}
+
+/* A hollow dot: the post's place on the list's timeline. */
+.post-date::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--blog-line);
+}
+
+.post-body {
+  font-size: 18px;
+  line-height: 1.75;
+  color: var(--blog-text);
+}
+
+.post-body > * {
+  margin: 0 0 1.25em;
+}
+
+.post-body h2 {
+  margin: 2em 0 0.6em;
+  font-size: 25px;
+  line-height: 1.3;
+  letter-spacing: -0.3px;
+  font-weight: 700;
+  color: var(--blog-ink);
+}
+
+.post-body h3 {
+  margin: 1.7em 0 0.5em;
+  font-size: 20px;
+  line-height: 1.35;
+  font-weight: 700;
+  color: var(--blog-ink);
+}
+
+.post-body a {
+  color: var(--blog-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--blog-accent) 50%, transparent);
+  transition: color 0.2s ease-out, text-decoration-color 0.2s ease-out;
+}
+
+.post-body a:hover {
+  color: var(--blog-accent-hover);
+  text-decoration-color: currentColor;
+}
+
+.post-body blockquote {
+  margin: 1.75em 0;
+  padding: 2px 0 2px 22px;
+  border-left: 3px solid var(--blog-line);
+  font-size: 20px;
+  line-height: 1.6;
+  color: var(--blog-soft);
+}
+
+.post-body blockquote p {
+  margin: 0;
+}
+
+.post-body ul,
+.post-body ol {
+  padding-left: 1.4em;
+}
+
+.post-body ul {
+  list-style: disc;
+}
+
+.post-body ol {
+  list-style: decimal;
+}
+
+.post-body li {
+  margin: 0.4em 0;
+  padding-left: 0.2em;
+}
+
+.post-body li::marker {
+  color: var(--blog-accent);
+}
+
+.post-body figure {
+  margin: 2em 0;
+}
+
+.post-body figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid var(--color-gray-600);
+  box-sizing: border-box;
+}
+
+.post-body figcaption {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--blog-muted);
+  text-align: center;
+}
+
+.post-body code {
+  font-family: var(--font-geist-mono), ui-monospace, Consolas, monospace;
+  font-size: 0.85em;
+  padding: 0.12em 0.4em;
+  border-radius: 4px;
+  background: var(--color-gray-800);
+  border: 1px solid var(--blog-rule);
+  color: var(--blog-text);
+}
+
+/* Code blocks never wrap: a wide one scrolls inside itself. */
+.post-body pre {
+  margin: 1.5em 0 1.75em;
+  padding: 18px 20px;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: rgb(16 24 40 / 0.85);
+  border: 1px solid var(--blog-rule);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.post-body pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: inherit;
+  color: var(--blog-text);
+}
+
+.post-footer {
+  margin-top: 56px;
+  padding-top: 20px;
+  border-top: 1px solid var(--blog-rule);
+}
+
+@media (max-width: 639px) {
+  .post {
+    padding-top: 16px;
+  }
+
+  .post-header {
+    margin: 12px 0 28px;
+    padding-bottom: 22px;
+  }
+
+  .post-title {
+    font-size: 29px;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+  }
+
+  .post-body {
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .post-body h2 {
+    font-size: 22px;
+  }
+
+  .post-body h3 {
+    font-size: 19px;
+  }
+
+  .post-body blockquote {
+    font-size: 18px;
+    padding-left: 16px;
+  }
+
+  .post-body figure img {
+    padding: 10px;
+  }
+
+  .post-body pre {
+    margin-left: -4px;
+    margin-right: -4px;
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+}
+
 @media (max-width: 359px) {
   .site-nav-name {
     margin-right: 0;
@@ -223,6 +673,14 @@ button:disabled,
   animation: section-exit 600ms ease-in-out both;
 }
 
+/* Blog pages are their own routes, so their content enters on mount with the
+   root sections' entrance: on load, from the navigation (after the home
+   page's section exit, see root-page.tsx), from a list entry and from an
+   "All posts" link. */
+.blog-enter {
+  animation: section-enter 600ms ease-in-out both;
+}
+
 /* A paper's new abstract text and its "Read more" / "Show less" label fade
    up as the abstract eases open or closed (see ResearchPaper). They start
    partly opaque, so the new text shows from the first frame, and run the
@@ -296,8 +754,10 @@ html[data-lang-fade]::view-transition-old(lang-chevron) {
    in JavaScript, so the first render is the same on server and client. */
 @media (prefers-reduced-motion: reduce) {
   /* Override even a pose captured before the preference changed, while the
-     same named animation keeps its fade timing and completion lifecycle. */
-  .section-view {
+     same named animation keeps its fade timing and completion lifecycle.
+     The blog's entrance likewise only fades. */
+  .section-view,
+  .blog-enter {
     transform: none !important;
   }
 

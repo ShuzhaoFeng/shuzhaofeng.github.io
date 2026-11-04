@@ -10,6 +10,7 @@ import {
   type CSSProperties,
 } from "react";
 import { flushSync } from "react-dom";
+import { useRouter } from "next/navigation";
 import Profile from "./components/Profile";
 import { useTranslation, Trans } from "react-i18next";
 import { TimelineEntry, ResearchPaper, ProjectCard } from "./components";
@@ -26,11 +27,29 @@ import { isSectionId, readSectionMemory, writeSectionMemory, type SectionId as P
 const inlineLinkClass =
   "text-cyan-400 underline decoration-transparent hover:decoration-current ring-2 ring-transparent focus:outline-none focus:ring-cyan-400 transition-[text-decoration-color,box-shadow] bg-transparent border-none cursor-pointer";
 
-// Extend Window interface to include navigateToPage
+// The root page's hooks for the navigation bar. They exist only while the root
+// page is mounted, so without them the bar treats the visitor as on another
+// route.
 declare global {
   interface Window {
     navigateToPage?: (page: PageType) => void;
+    // Plays the visible section's exit, then opens the blog list.
+    navigateToBlog?: () => void;
   }
+}
+
+const blogPath = "/blog/";
+
+// The root section last shown or chosen on `/` in this page load. It lives at
+// module level so it outlives the root page, which unmounts while the blog
+// shows, and it resets on a fresh page load (a new visit, a typed address or a
+// reload). Unset, the root page restores from memory and may reopen the blog;
+// set, a root page mounted again by Back or Forward shows the section the
+// visitor left instead, so returning from the blog never bounces back to it.
+let pageLoadSection: PageType | undefined;
+
+function recordPageLoadSection(page: PageType) {
+  pageLoadSection = page;
 }
 
 type SectionView = {
@@ -47,7 +66,9 @@ type SectionFlight = {
   exitNavHeight?: number;
 };
 
-export default function RootPage() {
+// `hasPosts` comes from the build (page.tsx): with no post the blog is hidden,
+// so a remembered Blog opens Home.
+export default function RootPage({ hasPosts }: { hasPosts: boolean }) {
   const [flight, setFlight] = useState<SectionFlight>({
     incoming: { id: 0, page: "home", phase: "settled" },
   });
@@ -59,6 +80,13 @@ export default function RootPage() {
   const stage = useRef<HTMLDivElement>(null);
   const main = useRef<HTMLElement>(null);
   const transferFocus = useRef(false);
+  // Set while the visible section leaves for the blog: no section waits to
+  // enter, and the blog opens when the last exit ends.
+  const leavingForBlog = useRef(false);
+  // Set when this page load's first visit to `/` reopens the remembered blog:
+  // the placeholder stays until the list's load replaces `/`.
+  const reopeningBlog = useRef(false);
+  const router = useRouter();
   const outgoingId = flight.outgoing?.id;
   const enteringId = flight.incoming?.phase === "waiting" ? undefined : flight.incoming?.id;
   const replaceFlight = useCallback((next: SectionFlight) => {
@@ -67,13 +95,60 @@ export default function RootPage() {
   }, []);
 
   useEffect(() => {
-    // A section chosen before initialization takes precedence over restoration.
-    const page = hasChosenSection.current ? destination.current : readSectionMemory();
+    // Strict Mode runs this again on the same instance; the blog is already
+    // on its way.
+    if (reopeningBlog.current) return;
+    let page: PageType;
+    if (hasChosenSection.current) {
+      // A section chosen before initialization takes precedence over restoration.
+      page = destination.current;
+    } else if (pageLoadSection !== undefined) {
+      // Back or Forward to `/` within this page load: the section the visitor
+      // left stays, and memory records it again.
+      page = pageLoadSection;
+    } else {
+      const remembered = readSectionMemory();
+      // Only a fresh load of `/` itself (a new visit, a typed address, a
+      // reload of `/` or the reopen's own target) reopens the blog. A Back or
+      // Forward that loads `/` again, because the browser kept no copy of the
+      // page, would otherwise read the Blog that the list wrote since, show
+      // the list twice and overwrite the visitor's `/` entry; it shows Home
+      // instead, written back below.
+      const navigation = performance.getEntriesByType("navigation")[0] as
+        | PerformanceNavigationTiming
+        | undefined;
+      const historyLoad = navigation?.type === "back_forward";
+      // Leaving the blog for a section is always a full load of `/`, so a
+      // page load that began on another route (say a reload of `/blog/`)
+      // reaches `/` only by Back or Forward: it too shows Home and keeps the
+      // visitor's `/` entry.
+      const loadedAtRoot = navigation === undefined || new URL(navigation.name).pathname === "/";
+      if (remembered === "blog" && hasPosts && !historyLoad && loadedAtRoot) {
+        reopeningBlog.current = true;
+        // A full load rather than a client navigation, so the list's head
+        // carries only its own canonical and link-preview tags; `/`'s would
+        // otherwise stay beside them and a shared list could carry `/`.
+        // Replace rather than assign, so Back from the list leaves the site
+        // instead of returning to `/` and opening the blog again. The
+        // placeholder covers the wait, so Home does not flash.
+        window.location.replace(blogPath);
+        return;
+      }
+      page = remembered === "blog" ? "home" : remembered;
+    }
+    recordPageLoadSection(page);
     writeSectionMemory(page);
     destination.current = page;
+    // The bar marks what shows, as after a choice, and its other items open
+    // their sections. Without this, a section restored from the page-load
+    // record or the Home fallback would sit under a bar still marking the
+    // section it last chose. The bar's listener is already in place: it
+    // precedes the page in the layout, so its effects run first. On a fresh
+    // load this is the section the bar read from memory, so nothing changes.
+    window.dispatchEvent(new CustomEvent("sectiondestinationchange", { detail: page }));
     replaceFlight({ incoming: { id: 0, page, phase: "enter" } });
     setIsLoaded(true);
-  }, [replaceFlight]);
+  }, [hasPosts, replaceFlight]);
 
   const beginExit = useCallback((view: SectionView) => {
     const slot = stage.current?.querySelector<HTMLElement>(
@@ -94,21 +169,38 @@ export default function RootPage() {
         exitOpacity: pose?.opacity ?? "1",
         exitTransform: pose?.transform ?? "none",
       },
-      incoming: { id: nextId.current++, page: destination.current, phase: "waiting" },
+      incoming: leavingForBlog.current
+        ? undefined
+        : { id: nextId.current++, page: destination.current, phase: "waiting" },
       exitNavHeight: main.current?.previousElementSibling?.getBoundingClientRect().height,
     });
   }, [replaceFlight]);
 
+  const openBlog = useCallback(() => {
+    // The router now owns the page. Dropping the hooks makes a section chosen
+    // before the blog shows reload `/` with that section, as from any other
+    // route, instead of reaching a root page that is about to unmount.
+    delete window.navigateToPage;
+    delete window.navigateToBlog;
+    router.push(blogPath);
+  }, [router]);
+
   const handlePageChange = useCallback((page: PageType) => {
     if (!isSectionId(page)) return;
     hasChosenSection.current = true;
-    if (destination.current === page) return;
+    // The latest choice wins: a section chosen during the blog exit cancels
+    // the blog, and enters even when it is the section that is leaving.
+    const cancelsBlog = leavingForBlog.current;
+    leavingForBlog.current = false;
+    if (!cancelsBlog && destination.current === page) return;
     destination.current = page;
+    recordPageLoadSection(page);
     writeSectionMemory(page);
     window.dispatchEvent(new CustomEvent("sectiondestinationchange", { detail: page }));
     const previous = currentFlight.current;
     if (previous.outgoing) {
-      if (previous.incoming?.phase === "waiting") {
+      // An exit for the blog has no section waiting to enter yet.
+      if (!previous.incoming || previous.incoming.phase === "waiting") {
         replaceFlight({
           ...previous,
           incoming: { id: nextId.current++, page, phase: "waiting" },
@@ -118,6 +210,26 @@ export default function RootPage() {
     }
     if (previous.incoming) beginExit(previous.incoming);
   }, [beginExit, replaceFlight]);
+
+  // Blog chosen on `/`: the visible section leaves as in a switch between
+  // sections, but nothing enters; the blog opens when the exit ends.
+  const handleBlogChoice = useCallback(() => {
+    if (leavingForBlog.current) return;
+    leavingForBlog.current = true;
+    // Fetch the list during the exit so it can show as soon as the exit ends.
+    router.prefetch(blogPath);
+    const previous = currentFlight.current;
+    if (previous.outgoing) {
+      // Mid-switch, the section still waiting to enter is dropped. One already
+      // entering leaves once the departing section is gone (onPhaseEnd).
+      if (previous.incoming?.phase === "waiting") {
+        replaceFlight({ ...previous, incoming: undefined });
+      }
+      return;
+    }
+    if (previous.incoming) beginExit(previous.incoming);
+    else openBlog();
+  }, [beginExit, openBlog, replaceFlight, router]);
 
   useLayoutEffect(() => {
     const element = stage.current;
@@ -206,6 +318,13 @@ export default function RootPage() {
   const onPhaseEnd = useCallback((id: number, phase: SectionView["phase"]) => {
     const previous = currentFlight.current;
     if (phase === "exit" && previous.outgoing?.id === id) {
+      if (leavingForBlog.current) {
+        // A section that began entering before Blog was chosen leaves too.
+        // The departed layer stays at its end pose until the route changes.
+        if (previous.incoming) beginExit(previous.incoming);
+        else openBlog();
+        return;
+      }
       const incoming = previous.incoming ? {
         ...previous.incoming,
         phase: previous.incoming.phase === "waiting" ? "enter" as const : previous.incoming.phase,
@@ -225,7 +344,7 @@ export default function RootPage() {
         replaceFlight({ ...previous, incoming });
       }
     }
-  }, [replaceFlight, beginExit]);
+  }, [replaceFlight, beginExit, openBlog]);
 
   const onVisible = useCallback((element: HTMLDivElement) => {
     if (transferFocus.current && document.activeElement === main.current) {
@@ -238,13 +357,19 @@ export default function RootPage() {
     const cancelTransfer = () => { transferFocus.current = false; };
     document.addEventListener("pointerdown", cancelTransfer, true);
     document.addEventListener("keydown", cancelTransfer, true);
-    window.navigateToPage = handlePageChange;
+    // While the remembered blog reopens there is no section to switch from,
+    // so the bar acts as on another route: a section reloads `/` with it.
+    if (!reopeningBlog.current) {
+      window.navigateToPage = handlePageChange;
+      window.navigateToBlog = handleBlogChoice;
+    }
     return () => {
       document.removeEventListener("pointerdown", cancelTransfer, true);
       document.removeEventListener("keydown", cancelTransfer, true);
       if (window.navigateToPage === handlePageChange) delete window.navigateToPage;
+      if (window.navigateToBlog === handleBlogChoice) delete window.navigateToBlog;
     };
-  }, [handlePageChange]);
+  }, [handlePageChange, handleBlogChoice]);
 
   if (!isLoaded) {
     return (
