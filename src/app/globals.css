@@ -115,11 +115,10 @@ body {
   }
 }
 
-/* Blog. The look confirmed in gather (DL-038 mockups), ported as plain CSS
-   under the blog's own class names. Colours are the site's Tailwind palette
-   variables, so the blog renders the same colours as the rest of the site.
-   Hover colour and dot fills ease over 0.2s; under reduced motion the global
-   rule below keeps these colour transitions. */
+/* Blog. Plain CSS under the blog's own class names. Colours are the site's
+   Tailwind palette variables, so the blog renders the same colours as the
+   rest of the site. Hover colour and dot fills ease over 0.2s; under reduced
+   motion the global rule below keeps these colour transitions. */
 .blog-main {
   --blog-ink: #ffffff;
   --blog-text: var(--color-gray-200);
@@ -213,8 +212,7 @@ body {
   transition: color 0.2s ease-out;
 }
 
-/* The whole entry is the link's target; the title stays its only name. The
-   overlay reaches past the entry's padding to the next entry's edge. */
+/* The whole entry is the link's target; the title stays its only name. */
 .blog-entry-title a::after {
   content: "";
   position: absolute;
@@ -439,8 +437,6 @@ body {
   margin: 0;
 }
 
-/* The mockups style only bulleted lists; numbered lists, which the first post
-   uses, get the same treatment with decimal markers. */
 .post-body ul,
 .post-body ol {
   padding-left: 1.4em;

@@ -46,9 +46,8 @@ export function writeSectionMemory(section: RememberedPlace, now = Date.now()): 
 // runs no effect. Leaving the blog for a main section is a full load of `/`, so
 // Back can bring the cached blog page back while memory still holds the section
 // that was left; without this the next visit would open that section, not the
-// blog. The pages still enter the cache: an `unload` listener would keep them
-// out and slow every Back and Forward on the site. Returns the cleanup, so a
-// page's effect can be `useEffect(recordBlogWhileShown, [])`.
+// blog. Returns the cleanup, so a page's effect can be
+// `useEffect(recordBlogWhileShown, [])`.
 export function recordBlogWhileShown(): () => void {
   writeSectionMemory("blog");
   const onPageShow = (event: PageTransitionEvent) => {

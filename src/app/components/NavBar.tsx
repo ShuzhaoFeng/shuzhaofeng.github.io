@@ -275,11 +275,8 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
             </div>
 
             {/* Desktop Navigation. The row does not wrap, so between `md` and
-                `lg` the items sit 14 px apart: that gives back all the width
-                the Blog item adds, and the language switcher stays fully
-                visible from the same width as with four items 32 px apart
-                (measured on /blog/ in en, fr and zh). From `lg` the 32 px
-                gaps return. */}
+                `lg` the items sit 14 px apart, which offsets the width the
+                Blog item adds. From `lg` the 32 px gaps return. */}
             <ul className="hidden md:flex gap-3.5 lg:gap-8 text-base font-medium flex-1">
               {navLinks.map(({ page, label }) => (
                 <li key={page} className="min-w-max">
