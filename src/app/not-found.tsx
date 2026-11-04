@@ -1,11 +1,12 @@
 "use client";
 
 import { useTranslation } from "react-i18next";
+import { partLanguage } from "./language";
 import { writeSectionMemory } from "./section-memory";
 
 export default function NotFound() {
   const { t, i18n } = useTranslation();
-  const language = i18n.resolvedLanguage === "zh" ? "zh-Hans" : i18n.resolvedLanguage;
+  const language = partLanguage(i18n.resolvedLanguage);
 
   return (
     <main className="not-found">

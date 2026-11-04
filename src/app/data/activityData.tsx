@@ -1,4 +1,5 @@
 import React from "react";
+import { intlLocale } from "../language";
 
 export interface Activity {
   id: string;
@@ -59,12 +60,7 @@ export function formatActivityDateRange(
   activity: Activity,
   language: string,
 ): string {
-  const localeMap: Record<string, string> = {
-    en: "en-US",
-    fr: "fr-FR",
-    zh: "zh-CN",
-  };
-  const locale = localeMap[language] ?? language;
+  const locale = intlLocale(language);
   // Format in UTC so calendar dates render the same regardless of viewer timezone.
   // Activity dates are intentionally constructed as UTC ISO strings ("YYYY-MM-DD").
   const formatter = new Intl.DateTimeFormat(locale, {
