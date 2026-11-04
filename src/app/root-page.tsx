@@ -10,6 +10,7 @@ import {
   type CSSProperties,
 } from "react";
 import { flushSync } from "react-dom";
+import { useRouter } from "next/navigation";
 import Profile from "./components/Profile";
 import { useTranslation, Trans } from "react-i18next";
 import { TimelineEntry, ResearchPaper, ProjectCard } from "./components";
@@ -26,12 +27,18 @@ import { isSectionId, readSectionMemory, writeSectionMemory, type SectionId as P
 const inlineLinkClass =
   "text-cyan-400 underline decoration-transparent hover:decoration-current ring-2 ring-transparent focus:outline-none focus:ring-cyan-400 transition-[text-decoration-color,box-shadow] bg-transparent border-none cursor-pointer";
 
-// Extend Window interface to include navigateToPage
+// The root page's hooks for the navigation bar. They exist only while the root
+// page is mounted, so without them the bar treats the visitor as on another
+// route.
 declare global {
   interface Window {
     navigateToPage?: (page: PageType) => void;
+    // Plays the visible section's exit, then opens the blog list.
+    navigateToBlog?: () => void;
   }
 }
+
+const blogPath = "/blog/";
 
 type SectionView = {
   id: number;
@@ -59,6 +66,10 @@ export default function RootPage() {
   const stage = useRef<HTMLDivElement>(null);
   const main = useRef<HTMLElement>(null);
   const transferFocus = useRef(false);
+  // Set while the visible section leaves for the blog: no section waits to
+  // enter, and the blog opens when the last exit ends.
+  const leavingForBlog = useRef(false);
+  const router = useRouter();
   const outgoingId = flight.outgoing?.id;
   const enteringId = flight.incoming?.phase === "waiting" ? undefined : flight.incoming?.id;
   const replaceFlight = useCallback((next: SectionFlight) => {
@@ -94,21 +105,37 @@ export default function RootPage() {
         exitOpacity: pose?.opacity ?? "1",
         exitTransform: pose?.transform ?? "none",
       },
-      incoming: { id: nextId.current++, page: destination.current, phase: "waiting" },
+      incoming: leavingForBlog.current
+        ? undefined
+        : { id: nextId.current++, page: destination.current, phase: "waiting" },
       exitNavHeight: main.current?.previousElementSibling?.getBoundingClientRect().height,
     });
   }, [replaceFlight]);
 
+  const openBlog = useCallback(() => {
+    // The router now owns the page. Dropping the hooks makes a section chosen
+    // before the blog shows reload `/` with that section, as from any other
+    // route, instead of reaching a root page that is about to unmount.
+    delete window.navigateToPage;
+    delete window.navigateToBlog;
+    router.push(blogPath);
+  }, [router]);
+
   const handlePageChange = useCallback((page: PageType) => {
     if (!isSectionId(page)) return;
     hasChosenSection.current = true;
-    if (destination.current === page) return;
+    // The latest choice wins: a section chosen during the blog exit cancels
+    // the blog, and enters even when it is the section that is leaving.
+    const cancelsBlog = leavingForBlog.current;
+    leavingForBlog.current = false;
+    if (!cancelsBlog && destination.current === page) return;
     destination.current = page;
     writeSectionMemory(page);
     window.dispatchEvent(new CustomEvent("sectiondestinationchange", { detail: page }));
     const previous = currentFlight.current;
     if (previous.outgoing) {
-      if (previous.incoming?.phase === "waiting") {
+      // An exit for the blog has no section waiting to enter yet.
+      if (!previous.incoming || previous.incoming.phase === "waiting") {
         replaceFlight({
           ...previous,
           incoming: { id: nextId.current++, page, phase: "waiting" },
@@ -118,6 +145,26 @@ export default function RootPage() {
     }
     if (previous.incoming) beginExit(previous.incoming);
   }, [beginExit, replaceFlight]);
+
+  // Blog chosen on `/`: the visible section leaves as in a switch between
+  // sections, but nothing enters; the blog opens when the exit ends.
+  const handleBlogChoice = useCallback(() => {
+    if (leavingForBlog.current) return;
+    leavingForBlog.current = true;
+    // Fetch the list during the exit so it can show as soon as the exit ends.
+    router.prefetch(blogPath);
+    const previous = currentFlight.current;
+    if (previous.outgoing) {
+      // Mid-switch, the section still waiting to enter is dropped. One already
+      // entering leaves once the departing section is gone (onPhaseEnd).
+      if (previous.incoming?.phase === "waiting") {
+        replaceFlight({ ...previous, incoming: undefined });
+      }
+      return;
+    }
+    if (previous.incoming) beginExit(previous.incoming);
+    else openBlog();
+  }, [beginExit, openBlog, replaceFlight, router]);
 
   useLayoutEffect(() => {
     const element = stage.current;
@@ -206,6 +253,13 @@ export default function RootPage() {
   const onPhaseEnd = useCallback((id: number, phase: SectionView["phase"]) => {
     const previous = currentFlight.current;
     if (phase === "exit" && previous.outgoing?.id === id) {
+      if (leavingForBlog.current) {
+        // A section that began entering before Blog was chosen leaves too.
+        // The departed layer stays at its end pose until the route changes.
+        if (previous.incoming) beginExit(previous.incoming);
+        else openBlog();
+        return;
+      }
       const incoming = previous.incoming ? {
         ...previous.incoming,
         phase: previous.incoming.phase === "waiting" ? "enter" as const : previous.incoming.phase,
@@ -225,7 +279,7 @@ export default function RootPage() {
         replaceFlight({ ...previous, incoming });
       }
     }
-  }, [replaceFlight, beginExit]);
+  }, [replaceFlight, beginExit, openBlog]);
 
   const onVisible = useCallback((element: HTMLDivElement) => {
     if (transferFocus.current && document.activeElement === main.current) {
@@ -239,12 +293,14 @@ export default function RootPage() {
     document.addEventListener("pointerdown", cancelTransfer, true);
     document.addEventListener("keydown", cancelTransfer, true);
     window.navigateToPage = handlePageChange;
+    window.navigateToBlog = handleBlogChoice;
     return () => {
       document.removeEventListener("pointerdown", cancelTransfer, true);
       document.removeEventListener("keydown", cancelTransfer, true);
       if (window.navigateToPage === handlePageChange) delete window.navigateToPage;
+      if (window.navigateToBlog === handleBlogChoice) delete window.navigateToBlog;
     };
-  }, [handlePageChange]);
+  }, [handlePageChange, handleBlogChoice]);
 
   if (!isLoaded) {
     return (

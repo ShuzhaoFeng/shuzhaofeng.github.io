@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type MouseEvent as ReactMouseEvent } from "react";
 import { flushSync } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { Check, ChevronDown, Globe, Mail, Menu, X } from "lucide-react";
@@ -93,7 +93,8 @@ function NavItem({
 // than a section switch. On the list it is current like a section item: out of
 // the tab order and inert. On a post it keeps the current style but stays a
 // working link back to the list, so `aria-current="true"` marks the place
-// without claiming the post is the list page.
+// without claiming the post is the list page. `onChoose` sees the click after
+// the list's own `preventDefault`, and may prevent the link's navigation too.
 function BlogNavItem({
   label,
   blogPage,
@@ -104,7 +105,7 @@ function BlogNavItem({
   label: string;
   blogPage: "list" | "post" | null;
   easeHover: boolean;
-  onChoose: () => void;
+  onChoose: (event: ReactMouseEvent<HTMLAnchorElement>) => void;
   className: string;
 }) {
   const isList = blogPage === "list";
@@ -115,7 +116,7 @@ function BlogNavItem({
         // Already on the list: nothing to open, as a current section item
         // does nothing.
         if (isList) event.preventDefault();
-        onChoose();
+        onChoose(event);
       }}
       aria-current={isList ? "page" : blogPage === "post" ? "true" : undefined}
       tabIndex={isList ? -1 : undefined}
@@ -138,7 +139,16 @@ function blogPageOf(pathname: string): "list" | "post" | null {
 export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
   const pathname = usePathname();
   const isMainPage = pathname === "/";
-  const blogPage = blogPageOf(pathname);
+  // Blog chosen on `/`: the item is current at once, as a chosen section's
+  // is, while the visible section leaves. A section choice cancels it, and any
+  // change of route ends it, since the pathname then says where the visitor is.
+  const [blogChosen, setBlogChosen] = useState(false);
+  const [blogChosenPathname, setBlogChosenPathname] = useState(pathname);
+  if (blogChosenPathname !== pathname) {
+    setBlogChosenPathname(pathname);
+    setBlogChosen(false);
+  }
+  const blogPage = blogChosen ? "list" : blogPageOf(pathname);
   const [currentPage, setCurrentPage] = useState<PageType>("home");
   const chosenSection = useRef<PageType | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -194,6 +204,7 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
       if (!isSectionId(page)) return;
       chosenSection.current = page;
       setCurrentPage(page);
+      setBlogChosen(false);
     };
     window.addEventListener("sectiondestinationchange", onDestinationChange);
     return () => window.removeEventListener("sectiondestinationchange", onDestinationChange);
@@ -202,6 +213,7 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
   const handleNavigate = (page: PageType) => {
     chosenSection.current = page;
     setCurrentPage(page);
+    setBlogChosen(false);
     setIsMobileMenuOpen(false);
     if (window.navigateToPage) {
       window.navigateToPage(page);
@@ -210,6 +222,27 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- Reload the root so it restores the requested section.
       window.location.assign("/");
     }
+  };
+
+  // On `/` a plain click on Blog plays the visible section's exit before the
+  // blog opens. Modified clicks (new tab or window) keep the link's default,
+  // and elsewhere the link navigates as usual.
+  const handleBlogChoice = (event: ReactMouseEvent<HTMLAnchorElement>) => {
+    setIsMobileMenuOpen(false);
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      !window.navigateToBlog
+    ) {
+      return;
+    }
+    event.preventDefault();
+    setBlogChosen(true);
+    window.navigateToBlog();
   };
 
   const navLinks = [
@@ -239,7 +272,7 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
                 <li key={page} className="min-w-max">
                   <NavItem
                     label={label}
-                    isCurrent={isMainPage && currentPage === page}
+                    isCurrent={isMainPage && !blogChosen && currentPage === page}
                     easeHover={easeLabels}
                     onSelect={() => handleNavigate(page)}
                     className="whitespace-nowrap"
@@ -252,7 +285,7 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
                     label={t("nav.blog")}
                     blogPage={blogPage}
                     easeHover={easeLabels}
-                    onChoose={() => setIsMobileMenuOpen(false)}
+                    onChoose={handleBlogChoice}
                     className="whitespace-nowrap"
                   />
                 </li>
@@ -423,7 +456,7 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
                 <div key={page}>
                   <NavItem
                     label={label}
-                    isCurrent={isMainPage && currentPage === page}
+                    isCurrent={isMainPage && !blogChosen && currentPage === page}
                     easeHover={easeLabels}
                     onSelect={() => handleNavigate(page)}
                     className="w-full py-2 text-base text-left"
@@ -436,7 +469,7 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
                     label={t("nav.blog")}
                     blogPage={blogPage}
                     easeHover={easeLabels}
-                    onChoose={() => setIsMobileMenuOpen(false)}
+                    onChoose={handleBlogChoice}
                     className="w-full py-2 text-base text-left"
                   />
                 </div>

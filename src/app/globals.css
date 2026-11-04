@@ -677,6 +677,14 @@ button:disabled,
   animation: section-exit 600ms ease-in-out both;
 }
 
+/* Blog pages are their own routes, so their content enters on mount with the
+   root sections' entrance: on load, from the navigation (after the home
+   page's section exit, see root-page.tsx), from a list entry and from an
+   "All posts" link. */
+.blog-enter {
+  animation: section-enter 600ms ease-in-out both;
+}
+
 /* A paper's new abstract text and its "Read more" / "Show less" label fade
    up as the abstract eases open or closed (see ResearchPaper). They start
    partly opaque, so the new text shows from the first frame, and run the
@@ -750,8 +758,10 @@ html[data-lang-fade]::view-transition-old(lang-chevron) {
    in JavaScript, so the first render is the same on server and client. */
 @media (prefers-reduced-motion: reduce) {
   /* Override even a pose captured before the preference changed, while the
-     same named animation keeps its fade timing and completion lifecycle. */
-  .section-view {
+     same named animation keeps its fade timing and completion lifecycle.
+     The blog's entrance likewise only fades. */
+  .section-view,
+  .blog-enter {
     transform: none !important;
   }
 

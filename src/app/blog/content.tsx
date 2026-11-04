@@ -21,28 +21,32 @@ export default function BlogListPage({ posts }: { posts: PostEntry[] }) {
 
   return (
     <main className="blog-main">
-      {/* The navigation already names the page, so the heading is for
-          assistive technology only. */}
-      <h1 className="blog-sr-only" lang={lang}>
-        {t("nav.blog")}
-      </h1>
-      <p className="blog-intro" lang={lang}>
-        {t("blog.intro")}
-      </p>
-      <ol className="blog-timeline">
-        {posts.map((post) => (
-          <li key={post.name} className="blog-entry">
-            <h2 className="blog-entry-title">
-              <Link href={`/blog/${post.name}/`}>{post.title}</Link>
-            </h2>
-            <time className="blog-entry-date" dateTime={post.date} lang={lang}>
-              {formatPostDate(post.date, language)}
-            </time>
-            <span className="blog-entry-dot" aria-hidden="true" />
-            <p className="blog-entry-summary">{post.summary}</p>
-          </li>
-        ))}
-      </ol>
+      {/* The content, not the page background, plays the section entrance
+          on each arrival (globals.css). */}
+      <div className="blog-enter">
+        {/* The navigation already names the page, so the heading is for
+            assistive technology only. */}
+        <h1 className="blog-sr-only" lang={lang}>
+          {t("nav.blog")}
+        </h1>
+        <p className="blog-intro" lang={lang}>
+          {t("blog.intro")}
+        </p>
+        <ol className="blog-timeline">
+          {posts.map((post) => (
+            <li key={post.name} className="blog-entry">
+              <h2 className="blog-entry-title">
+                <Link href={`/blog/${post.name}/`}>{post.title}</Link>
+              </h2>
+              <time className="blog-entry-date" dateTime={post.date} lang={lang}>
+                {formatPostDate(post.date, language)}
+              </time>
+              <span className="blog-entry-dot" aria-hidden="true" />
+              <p className="blog-entry-summary">{post.summary}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
     </main>
   );
 }

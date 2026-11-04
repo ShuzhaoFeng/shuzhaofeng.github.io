@@ -27,7 +27,9 @@ export default function PostPage({ post }: { post: Post }) {
 
   return (
     <main className="blog-main">
-      <article className="post">
+      {/* The content, not the page background, plays the section entrance
+          on each arrival (globals.css). */}
+      <article className="post blog-enter">
         {backLink}
         <header className="post-header">
           <h1 className="post-title">{post.title}</h1>
