@@ -1,7 +1,9 @@
 "use client";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { partLanguage } from "../language";
+import { recordBlogWhileShown } from "../section-memory";
 import { formatPostDate } from "./post-date";
 // Type-only, so it is erased from the client bundle: `posts.ts` reads the file
 // system and must not run here.
@@ -18,6 +20,11 @@ export default function BlogListPage({ posts }: { posts: PostEntry[] }) {
   const { t, i18n } = useTranslation();
   const language = i18n.resolvedLanguage ?? "en";
   const lang = partLanguage(language);
+
+  // Viewing the list, including a Back or Forward that the browser restores
+  // from its cache, records Blog as the last section viewed, so the next visit
+  // to `/` reopens it (root-page.tsx).
+  useEffect(recordBlogWhileShown, []);
 
   return (
     <main className="blog-main">

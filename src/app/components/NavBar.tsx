@@ -5,7 +5,13 @@ import { useTranslation } from "react-i18next";
 import { Check, ChevronDown, Globe, Mail, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { isSectionId, readSectionMemory, writeSectionMemory, type SectionId as PageType } from "../section-memory";
+import {
+  isSectionId,
+  readSectionMemory,
+  writeSectionMemory,
+  type RememberedPlace,
+  type SectionId as PageType,
+} from "../section-memory";
 
 let currentLangFade: ViewTransition | null = null;
 
@@ -149,7 +155,10 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
     setBlogChosen(false);
   }
   const blogPage = blogChosen ? "list" : blogPageOf(pathname);
-  const [currentPage, setCurrentPage] = useState<PageType>("home");
+  // A remembered Blog marks no section: on `/` the root page either reopens
+  // the blog list or announces the section it shows instead
+  // (`sectiondestinationchange`), and elsewhere sections are not current anyway.
+  const [currentPage, setCurrentPage] = useState<RememberedPlace>("home");
   const chosenSection = useRef<PageType | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [easeLabels, setEaseLabels] = useState(false);
@@ -169,7 +178,11 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
 
   useEffect(() => {
     // The layout also renews visits to separate routes that have no root page.
-    const page = chosenSection.current ?? readSectionMemory();
+    // The blog pages' own effects run after this one and record Blog.
+    const remembered = chosenSection.current ?? readSectionMemory();
+    // With no post the blog is hidden, so a remembered Blog opens Home, as on
+    // the root page.
+    const page = remembered === "blog" && !hasPosts ? "home" : remembered;
     setCurrentPage(page);
     writeSectionMemory(page);
     // Paint the restored selection with zero duration before enabling hover
@@ -182,7 +195,7 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
       cancelAnimationFrame(restoredFrame);
       cancelAnimationFrame(enableFrame);
     };
-  }, []);
+  }, [hasPosts]);
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
