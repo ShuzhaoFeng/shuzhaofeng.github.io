@@ -11,10 +11,10 @@ export default function TimelineEntry({
 }: TimelineEntryProps) {
   return (
     <li className="mb-10 ml-6">
-      <span className="absolute flex items-center justify-center w-8 h-8 bg-cyan-500 rounded-full -left-4 ring-4 ring-gray-900">
+      <span className="absolute flex items-center justify-center w-8 h-8 bg-site-axis rounded-full -left-4 ring-4 ring-site-timeline-ring">
         {icon}
       </span>
-      <div className="mb-4 text-base font-normal text-gray-300">
+      <div className="mb-4 text-base font-normal text-site-soft">
         {typeof description === "function" ? description() : description}
       </div>
     </li>

@@ -7,10 +7,10 @@ import { Plus } from "lucide-react";
 export default function ResearchPage() {
   const { t } = useTranslation();
   return (
-    <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
+    <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center site-page text-site-ink px-2 sm:px-4">
       {/* Small descriptive message */}
       <div className="w-full max-w-4xl mx-auto mt-4 mb-8">
-        <p className="text-center text-lg text-gray-300">
+        <p className="text-center text-lg text-site-soft">
           {t("research.intro")}
         </p>
       </div>
@@ -37,23 +37,23 @@ export default function ResearchPage() {
         ))}
 
         {/* Coming Soon Card */}
-        <div className="bg-gray-800/30 rounded-lg p-6 border border-gray-600 opacity-60">
+        <div className="bg-site-card rounded-lg p-6 border border-site-border-strong site-placeholder">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center">
-              <Plus className="w-6 h-6 text-gray-400" aria-hidden="true" />
+            <div className="w-12 h-12 bg-site-placeholder-icon rounded-lg flex items-center justify-center">
+              <Plus className="w-6 h-6 text-site-muted" aria-hidden="true" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-400">
+            <h3 className="text-xl font-semibold text-site-muted">
               {t("research.comingSoonTitle")}
             </h3>
           </div>
-          <p className="text-gray-400 mb-4">
+          <p className="text-site-muted mb-4">
             {t("research.comingSoonDescription")}
           </p>
         </div>
       </div>
 
       <div className="text-center mt-12 mb-8">
-        <p className="text-gray-400 italic">
+        <p className="text-site-muted italic">
           <Trans
             i18nKey="research.footnote"
             components={[
@@ -62,7 +62,7 @@ export default function ResearchPage() {
                 href="https://scholar.google.com/citations?hl=en&authuser=3&user=shY8hM0AAAAJ"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                className="text-site-link-contrast hover:text-site-link-contrast-hover transition-colors"
               />,
             ]}
           />

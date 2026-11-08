@@ -25,7 +25,7 @@ import { isSectionId, readSectionMemory, writeSectionMemory, type SectionId as P
 // underline from transparent to the text colour on hover, the focus ring from
 // transparent to cyan on focus.
 const inlineLinkClass =
-  "text-cyan-400 underline decoration-transparent hover:decoration-current ring-2 ring-transparent focus:outline-none focus:ring-cyan-400 transition-[text-decoration-color,box-shadow] bg-transparent border-none cursor-pointer";
+  "text-site-accent underline decoration-transparent hover:decoration-current ring-2 ring-transparent focus:outline-none focus:ring-site-accent transition-[text-decoration-color,box-shadow] bg-transparent border-none cursor-pointer";
 
 // The root page's hooks for the navigation bar. They exist only while the root
 // page is mounted, so without them the bar treats the visitor as on another
@@ -378,7 +378,7 @@ export default function RootPage({ hasPosts }: { hasPosts: boolean }) {
   }
 
   return (
-    <main ref={main} tabIndex={-1} className="section-main bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
+    <main ref={main} tabIndex={-1} className="section-main site-page text-site-ink px-2 sm:px-4">
       <div ref={stage} className="section-stage">
         {[flight.outgoing, flight.incoming].map((view) => view && (
           <SectionLayer key={view.id} view={view} onPhaseEnd={onPhaseEnd} onExitOverlap={onExitOverlap} onVisible={onVisible}>
@@ -552,14 +552,14 @@ const SectionContent = memo(function SectionContent({
               </p>
             </div>
             <div className="text-center mt-12">
-              <p className="text-gray-400 italic">{t("main.footnote")}</p>
+              <p className="text-site-muted italic">{t("main.footnote")}</p>
             </div>
           </>
         )}
 
         {currentPage === "journey" && (
           <section className="w-full max-w-2xl mx-auto mt-4">
-            <ol className="relative border-l border-cyan-500">
+            <ol className="relative border-l border-site-axis">
               {timelineEntries.map((entry, index) => (
                 <TimelineEntry
                   key={index}
@@ -568,13 +568,13 @@ const SectionContent = memo(function SectionContent({
                 />
               ))}
               <li className="ml-6">
-                <span className="absolute flex items-center justify-center w-8 h-8 bg-gray-700 rounded-full -left-4 ring-4 ring-gray-900">
+                <span className="absolute flex items-center justify-center w-8 h-8 bg-site-hover rounded-full -left-4 ring-4 ring-site-timeline-ring">
                   <MoreHorizontal
-                    className="w-5 h-5 text-white"
+                    className="w-5 h-5 text-site-ink"
                     aria-hidden="true"
                   />
                 </span>
-                <p className="mb-4 text-base font-normal text-gray-500 italic">
+                <p className="mb-4 text-base font-normal text-site-ink italic">
                   {t("journey.toBeContinued")}
                 </p>
               </li>
@@ -585,7 +585,7 @@ const SectionContent = memo(function SectionContent({
         {currentPage === "research" && (
           <>
             <div className="w-full max-w-4xl mx-auto mt-4 mb-8">
-              <p className="text-center text-lg text-gray-300">
+              <p className="text-center text-lg text-site-soft">
                 {t("research.intro")}
               </p>
             </div>
@@ -608,22 +608,22 @@ const SectionContent = memo(function SectionContent({
                   recordingUrl={p.recordingUrl}
                 />
               ))}
-              <div className="bg-gray-800/30 rounded-lg p-6 border border-gray-600 opacity-60">
+              <div className="bg-site-card rounded-lg p-6 border border-site-border-strong site-placeholder">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center">
-                    <Plus className="w-6 h-6 text-gray-400" aria-hidden="true" />
+                  <div className="w-12 h-12 bg-site-placeholder-icon rounded-lg flex items-center justify-center">
+                    <Plus className="w-6 h-6 text-site-muted" aria-hidden="true" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-400">
+                  <h3 className="text-xl font-semibold text-site-muted">
                     {t("research.comingSoonTitle")}
                   </h3>
                 </div>
-                <p className="text-gray-400 mb-4">
+                <p className="text-site-muted mb-4">
                   {t("research.comingSoonDescription")}
                 </p>
               </div>
             </div>
             <div className="text-center mt-12 mb-8">
-              <p className="text-gray-400 italic">
+              <p className="text-site-muted italic">
                 <Trans
                   i18nKey="research.footnote"
                   components={[
@@ -632,7 +632,7 @@ const SectionContent = memo(function SectionContent({
                       href="https://scholar.google.com/citations?hl=en&authuser=3&user=shY8hM0AAAAJ"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                      className="text-site-link-contrast hover:text-site-link-contrast-hover transition-colors"
                     />,
                   ]}
                 />
@@ -644,7 +644,7 @@ const SectionContent = memo(function SectionContent({
         {currentPage === "projects" && (
           <>
             <div className="w-full max-w-4xl mx-auto mt-4 mb-8">
-              <p className="text-center text-lg text-gray-300">
+              <p className="text-center text-lg text-site-soft">
                 {t("projects.intro")}
               </p>
             </div>
@@ -662,25 +662,25 @@ const SectionContent = memo(function SectionContent({
                     techStack={p.techStack}
                   />
                 ))}
-                <div className="bg-gray-800/30 rounded-lg p-6 border border-gray-600 opacity-60">
+                <div className="bg-site-card rounded-lg p-6 border border-site-border-strong site-placeholder">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-site-placeholder-icon rounded-lg flex items-center justify-center">
                       <MoreHorizontal
-                        className="w-6 h-6 text-gray-400"
+                        className="w-6 h-6 text-site-muted"
                         aria-hidden="true"
                       />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-400">
+                    <h3 className="text-xl font-semibold text-site-muted">
                       {t("projects.comingSoonTitle")}
                     </h3>
                   </div>
-                  <p className="text-gray-400 mb-4">
+                  <p className="text-site-muted mb-4">
                     {t("projects.comingSoonDescription")}
                   </p>
                 </div>
               </div>
               <div className="text-center mt-12">
-                <p className="text-gray-400 italic">
+                <p className="text-site-muted italic">
                   <Trans
                     i18nKey="projects.footnote"
                     components={[
@@ -689,7 +689,7 @@ const SectionContent = memo(function SectionContent({
                         href="https://github.com/ShuzhaoFeng"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                        className="text-site-link-contrast hover:text-site-link-contrast-hover transition-colors"
                       />,
                     ]}
                   />
@@ -700,12 +700,12 @@ const SectionContent = memo(function SectionContent({
         )}
       <style jsx>{`
         .shiny-text {
-          background: linear-gradient(90deg, #fff 0%, #b3b3b3 50%, #fff 100%);
+          background: var(--site-heading-gradient);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
           text-fill-color: transparent;
-          filter: drop-shadow(0 2px 8px #000a);
+          filter: var(--site-heading-shadow);
         }
       `}</style>
     </>

@@ -33,7 +33,7 @@ export const timelineEntries: TimelineEntryData[] = [
     description: () => (
       <>
         <p>{i18n.t("journey.timeline.1")}</p>
-        <ul className="list-disc list-inside mt-2 text-cyan-300">
+        <ul className="list-disc list-inside mt-2 text-site-accent-hover">
           {companies.map((company) => (
             <li key={company.name}>
               {company.href ? (
@@ -51,7 +51,7 @@ export const timelineEntries: TimelineEntryData[] = [
                 <span>{company.name}</span>
               )}
               {company.defunct ? (
-                <span className="text-gray-400 italic ml-1">
+                <span className="text-site-muted italic ml-1">
                   ({i18n.t("journey.noLongerOperational")})
                 </span>
               ) : null}

@@ -8,10 +8,10 @@ export default function ProjectsPage() {
   const { t } = useTranslation();
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
+    <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center site-page text-site-ink px-2 sm:px-4">
       {/* Small descriptive message */}
       <div className="w-full max-w-4xl mx-auto mt-4 mb-8">
-        <p className="text-center text-lg text-gray-300">
+        <p className="text-center text-lg text-site-soft">
           {t("projects.intro")}
         </p>
       </div>
@@ -32,26 +32,26 @@ export default function ProjectsPage() {
           ))}
 
           {/* Placeholder for future projects */}
-          <div className="bg-gray-800/30 rounded-lg p-6 border border-gray-600 opacity-60">
+          <div className="bg-site-card rounded-lg p-6 border border-site-border-strong site-placeholder">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-site-placeholder-icon rounded-lg flex items-center justify-center">
                 <MoreHorizontal
-                  className="w-6 h-6 text-gray-400"
+                  className="w-6 h-6 text-site-muted"
                   aria-hidden="true"
                 />
               </div>
-              <h3 className="text-xl font-semibold text-gray-400">
+              <h3 className="text-xl font-semibold text-site-muted">
                 {t("projects.comingSoonTitle")}
               </h3>
             </div>
-            <p className="text-gray-400 mb-4">
+            <p className="text-site-muted mb-4">
               {t("projects.comingSoonDescription")}
             </p>
           </div>
         </div>
 
         <div className="text-center mt-12">
-          <p className="text-gray-400 italic">
+          <p className="text-site-muted italic">
             <Trans
               i18nKey="projects.footnote"
               components={[
@@ -60,7 +60,7 @@ export default function ProjectsPage() {
                   href="https://github.com/ShuzhaoFeng"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                  className="text-site-link-contrast hover:text-site-link-contrast-hover transition-colors"
                 />,
               ]}
             />

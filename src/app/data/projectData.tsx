@@ -1,6 +1,8 @@
 import React from "react";
 import { Braces, Code2, MonitorSmartphone } from "lucide-react";
 
+export type ProjectTagTone = "neutral" | "blue" | "cyan" | "indigo" | "green" | "yellow" | "purple" | "orange";
+
 export interface Project {
   id: string;
   title: string;
@@ -9,7 +11,7 @@ export interface Project {
   githubUrl?: string;
   icon: React.ReactNode;
   iconColor: string;
-  techStack: Array<{ name: string; color: string }>;
+  techStack: Array<{ name: string; tone: ProjectTagTone }>;
 }
 
 export const projects: Project[] = [
@@ -24,11 +26,11 @@ export const projects: Project[] = [
     icon: <Code2 className="w-6 h-6 text-white" aria-hidden="true" />,
     iconColor: "bg-indigo-500",
     techStack: [
-      { name: "Next.js", color: "bg-gray-600/20 text-gray-300" },
-      { name: "TypeScript", color: "bg-blue-600/20 text-blue-300" },
-      { name: "Tailwind CSS", color: "bg-cyan-600/20 text-cyan-300" },
-      { name: "discord.js", color: "bg-indigo-600/20 text-indigo-300" },
-      { name: "Express", color: "bg-gray-600/20 text-gray-300" },
+      { name: "Next.js", tone: "neutral" },
+      { name: "TypeScript", tone: "blue" },
+      { name: "Tailwind CSS", tone: "cyan" },
+      { name: "discord.js", tone: "indigo" },
+      { name: "Express", tone: "neutral" },
     ],
   },
   {
@@ -42,11 +44,11 @@ export const projects: Project[] = [
     icon: <Braces className="w-6 h-6 text-white" aria-hidden="true" />,
     iconColor: "bg-blue-500",
     techStack: [
-      { name: "C#", color: "bg-blue-600/20 text-blue-300" },
-      { name: ".NET", color: "bg-green-600/20 text-green-300" },
-      { name: "JsonPath", color: "bg-yellow-600/20 text-yellow-300" },
-      { name: "Newtonsoft.Json", color: "bg-purple-600/20 text-purple-300" },
-      { name: "NuGet", color: "bg-orange-600/20 text-orange-300" },
+      { name: "C#", tone: "blue" },
+      { name: ".NET", tone: "green" },
+      { name: "JsonPath", tone: "yellow" },
+      { name: "Newtonsoft.Json", tone: "purple" },
+      { name: "NuGet", tone: "orange" },
     ],
   },
   {
@@ -62,11 +64,11 @@ export const projects: Project[] = [
     ),
     iconColor: "bg-green-500",
     techStack: [
-      { name: "Next.js", color: "bg-gray-600/20 text-gray-300" },
-      { name: "TypeScript", color: "bg-blue-600/20 text-blue-300" },
-      { name: "Tailwind CSS", color: "bg-cyan-600/20 text-cyan-300" },
-      { name: "GitHub Pages", color: "bg-purple-600/20 text-purple-300" },
-      { name: "GitHub Actions", color: "bg-green-600/20 text-green-300" },
+      { name: "Next.js", tone: "neutral" },
+      { name: "TypeScript", tone: "blue" },
+      { name: "Tailwind CSS", tone: "cyan" },
+      { name: "GitHub Pages", tone: "purple" },
+      { name: "GitHub Actions", tone: "green" },
     ],
   },
 ];

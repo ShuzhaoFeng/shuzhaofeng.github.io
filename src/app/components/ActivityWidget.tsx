@@ -52,7 +52,7 @@ export default function ActivityWidget() {
         {/* Expandable activity panel */}
         <div
           id={panelId}
-          className={`bg-gray-800 border border-gray-600 rounded-lg shadow-lg overflow-hidden transition-[width,min-width] ${EASE}`}
+          className={`bg-site-surface border border-site-border-strong rounded-lg shadow-lg overflow-hidden transition-[width,min-width] ${EASE}`}
           style={{
             width: isOpen ? "min(calc(100vw - 6rem), 320px)" : "200px",
             minWidth: isOpen ? "280px" : "200px",
@@ -63,11 +63,11 @@ export default function ActivityWidget() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0 flex-1">
                 <div className="min-w-0 flex-1">
-                  <div className="text-white text-sm font-semibold truncate">
+                  <div className="text-site-ink text-sm font-semibold truncate">
                     {t("activity.headerTitle")}
                   </div>
                   {currentActivity ? (
-                    <div className="text-gray-300 text-sm font-medium truncate">
+                    <div className="text-site-soft text-sm font-medium truncate">
                       {t(currentActivity.title)}
                     </div>
                   ) : null}
@@ -82,7 +82,7 @@ export default function ActivityWidget() {
               >
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-site-muted hover:text-site-ink transition-colors"
                 >
                   <X className="w-4 h-4" aria-hidden="true" />
                 </button>
@@ -102,14 +102,14 @@ export default function ActivityWidget() {
               <div className="min-h-0 overflow-hidden space-y-2">
                 {currentActivity ? (
                   <>
-                    <p className="text-gray-300 text-xs leading-relaxed">
+                    <p className="text-site-soft text-xs leading-relaxed">
                       {typeof currentActivity.description === "function"
                         ? currentActivity.description()
                         : currentActivity.description}
                     </p>
 
                     <div className="flex items-center gap-4 pt-2 text-xs">
-                      <div className="flex items-center gap-1 text-gray-400">
+                      <div className="flex items-center gap-1 text-site-muted">
                         <CalendarDays className="w-3 h-3" aria-hidden="true" />
                         <span>
                           {formatActivityDateRange(
@@ -118,7 +118,7 @@ export default function ActivityWidget() {
                           )}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1 text-gray-400">
+                      <div className="flex items-center gap-1 text-site-muted">
                         <MapPin className="w-3 h-3" aria-hidden="true" />
                         <span>{t(currentActivity.location)}</span>
                       </div>
@@ -134,7 +134,7 @@ export default function ActivityWidget() {
         <button
           ref={mainButtonRef}
           onClick={handleButtonClick}
-          className="bg-cyan-500 hover:bg-cyan-600 text-white p-2 sm:p-3 rounded-full shadow-lg transition-colors flex-shrink-0"
+          className="bg-site-axis hover:bg-site-axis-hover text-white p-2 sm:p-3 rounded-full shadow-lg transition-colors flex-shrink-0"
           aria-label={t("activity.buttonAriaLabel")}
           aria-controls={panelId}
           aria-expanded={isOpen}

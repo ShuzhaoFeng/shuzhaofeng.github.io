@@ -6,7 +6,7 @@ export default function MainPage() {
   const { t } = useTranslation();
   return (
     <>
-      <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white px-2 sm:px-4">
+      <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center site-page text-site-ink px-2 sm:px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-6xl gap-8 py-8">
           <div className="flex items-center justify-center order-1 lg:order-1">
             <Profile />
@@ -28,7 +28,7 @@ export default function MainPage() {
                 <a
                   key="journey"
                   href="/journey"
-                  className="text-cyan-400 hover:underline focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                  className="text-site-accent hover:underline focus:outline-none focus:ring-2 focus:ring-site-accent"
                 />,
               ]}
             />
@@ -40,7 +40,7 @@ export default function MainPage() {
                 <a
                   key="research"
                   href="/research"
-                  className="text-cyan-400 hover:underline focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                  className="text-site-accent hover:underline focus:outline-none focus:ring-2 focus:ring-site-accent"
                 />,
               ]}
             />
@@ -52,23 +52,23 @@ export default function MainPage() {
                 <a
                   key="projects"
                   href="/projects"
-                  className="text-cyan-400 hover:underline focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                  className="text-site-accent hover:underline focus:outline-none focus:ring-2 focus:ring-site-accent"
                 />,
               ]}
             />
           </p>
         </div>
         <div className="text-center mt-12 pb-20">
-          <p className="text-gray-400 italic">{t("main.footnote")}</p>
+          <p className="text-site-muted italic">{t("main.footnote")}</p>
         </div>
         <style jsx>{`
           .shiny-text {
-            background: linear-gradient(90deg, #fff 0%, #b3b3b3 50%, #fff 100%);
+            background: var(--site-heading-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             text-fill-color: transparent;
-            filter: drop-shadow(0 2px 8px #000a);
+            filter: var(--site-heading-shadow);
           }
         `}</style>
       </main>

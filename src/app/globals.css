@@ -4,6 +4,35 @@
   color-scheme: light;
   --background: #f8fafc;
   --foreground: #0f172a;
+  --site-ink: #0f172a;
+  --site-body: #334155;
+  --site-soft: #334155;
+  --site-muted: #475569;
+  --site-accent: #0e7490;
+  --site-accent-hover: #0e7490;
+  /* Links need darker cyan on the gradient's pale slate end. */
+  --site-link-contrast: #155e75;
+  --site-link-contrast-hover: #155e75;
+  --site-axis: #0e7490;
+  --site-axis-hover: #155e75;
+  --site-surface: #fff;
+  --site-card: #fff;
+  --site-project-card: #fff;
+  --site-hover: #e2e8f0;
+  --site-placeholder-icon: #e2e8f0;
+  --site-border: #cbd5e1;
+  --site-border-strong: #cbd5e1;
+  --site-border-hover: #94a3b8;
+  --site-profile: #cbd5e1;
+  --site-timeline-ring: #cbd5e1;
+  --site-download: #15803d;
+  --site-download-hover: #166534;
+  --site-nav-background: linear-gradient(to top, #e2e8f0ee, #f8fafc, #fff);
+  --site-heading-gradient: linear-gradient(90deg, #0f172a, #475569, #0f172a);
+  --site-heading-shadow: none;
+  --site-nav-name-shadow: none;
+  --site-profile-background: var(--page-background);
+
   --page-background: linear-gradient(135deg, #fff, #f8fafc, #e2e8f0);
 }
 
@@ -11,12 +40,63 @@
   color-scheme: dark;
   --background: #000;
   --foreground: #fff;
+  --site-ink: #fff;
+  --site-body: var(--color-gray-200);
+  --site-soft: var(--color-gray-300);
+  --site-muted: var(--color-gray-400);
+  --site-accent: var(--color-cyan-400);
+  --site-accent-hover: var(--color-cyan-300);
+  --site-link-contrast: var(--site-accent);
+  --site-link-contrast-hover: var(--site-accent-hover);
+  --site-axis: var(--color-cyan-500);
+  --site-axis-hover: var(--color-cyan-600);
+  --site-surface: var(--color-gray-800);
+  --site-card: color-mix(in srgb, var(--color-gray-800) 30%, transparent);
+  --site-project-card: color-mix(in srgb, var(--color-gray-800) 50%, transparent);
+  --site-hover: var(--color-gray-700);
+  --site-placeholder-icon: var(--color-gray-600);
+  --site-border: var(--color-gray-700);
+  --site-border-strong: var(--color-gray-600);
+  --site-border-hover: var(--color-gray-500);
+  --site-profile: var(--color-gray-800);
+  --site-timeline-ring: var(--color-gray-900);
+  --site-download: var(--color-green-600);
+  --site-download-hover: var(--color-green-700);
+  --site-nav-background: linear-gradient(to top, color-mix(in srgb, #1e293b 80%, transparent), #111827, #000);
+  --site-heading-gradient: linear-gradient(90deg, #fff, #b3b3b3, #fff);
+  --site-heading-shadow: drop-shadow(0 2px 8px #000a);
+  --site-nav-name-shadow: drop-shadow(var(--drop-shadow-lg));
+  --site-profile-background: linear-gradient(to bottom right, var(--color-gray-900), #000);
+
   --page-background: linear-gradient(to bottom right, #000, var(--color-gray-900), var(--color-gray-800));
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-site-ink: var(--site-ink);
+  --color-site-body: var(--site-body);
+  --color-site-soft: var(--site-soft);
+  --color-site-muted: var(--site-muted);
+  --color-site-accent: var(--site-accent);
+  --color-site-accent-hover: var(--site-accent-hover);
+  --color-site-link-contrast: var(--site-link-contrast);
+  --color-site-link-contrast-hover: var(--site-link-contrast-hover);
+  --color-site-axis: var(--site-axis);
+  --color-site-axis-hover: var(--site-axis-hover);
+  --color-site-surface: var(--site-surface);
+  --color-site-card: var(--site-card);
+  --color-site-project-card: var(--site-project-card);
+  --color-site-hover: var(--site-hover);
+  --color-site-placeholder-icon: var(--site-placeholder-icon);
+  --color-site-border: var(--site-border);
+  --color-site-border-strong: var(--site-border-strong);
+  --color-site-border-hover: var(--site-border-hover);
+  --color-site-profile: var(--site-profile);
+  --color-site-timeline-ring: var(--site-timeline-ring);
+  --color-site-download: var(--site-download);
+  --color-site-download-hover: var(--site-download-hover);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -26,6 +106,34 @@
     color-scheme: dark;
     --background: #000;
     --foreground: #fff;
+    --site-ink: #fff;
+    --site-body: var(--color-gray-200);
+    --site-soft: var(--color-gray-300);
+    --site-muted: var(--color-gray-400);
+    --site-accent: var(--color-cyan-400);
+    --site-accent-hover: var(--color-cyan-300);
+    --site-link-contrast: var(--site-accent);
+    --site-link-contrast-hover: var(--site-accent-hover);
+    --site-axis: var(--color-cyan-500);
+    --site-axis-hover: var(--color-cyan-600);
+    --site-surface: var(--color-gray-800);
+    --site-card: color-mix(in srgb, var(--color-gray-800) 30%, transparent);
+    --site-project-card: color-mix(in srgb, var(--color-gray-800) 50%, transparent);
+    --site-hover: var(--color-gray-700);
+    --site-placeholder-icon: var(--color-gray-600);
+    --site-border: var(--color-gray-700);
+    --site-border-strong: var(--color-gray-600);
+    --site-border-hover: var(--color-gray-500);
+    --site-profile: var(--color-gray-800);
+    --site-timeline-ring: var(--color-gray-900);
+    --site-download: var(--color-green-600);
+    --site-download-hover: var(--color-green-700);
+    --site-nav-background: linear-gradient(to top, color-mix(in srgb, #1e293b 80%, transparent), #111827, #000);
+    --site-heading-gradient: linear-gradient(90deg, #fff, #b3b3b3, #fff);
+    --site-heading-shadow: drop-shadow(0 2px 8px #000a);
+    --site-nav-name-shadow: drop-shadow(var(--drop-shadow-lg));
+    --site-profile-background: linear-gradient(to bottom right, var(--color-gray-900), #000);
+
     --page-background: linear-gradient(to bottom right, #000, var(--color-gray-900), var(--color-gray-800));
   }
 }
@@ -37,6 +145,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.site-page,
 .site-loading {
   background: var(--page-background);
 }
@@ -47,10 +156,10 @@ body {
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  border: 1px solid #4b5563;
+  border: 1px solid var(--site-border-strong);
   border-radius: 999px;
-  color: #fff;
-  background: #1f2937;
+  color: var(--site-ink);
+  background: var(--site-surface);
   cursor: pointer;
 }
 
@@ -61,7 +170,7 @@ body {
 }
 
 .site-theme-toggle:hover {
-  background: #374151;
+  background: var(--site-hover);
 }
 
 .site-theme-mobile {
@@ -72,20 +181,6 @@ body {
   gap: 12px;
   justify-content: flex-start;
   padding: 0 12px;
-}
-
-:root[data-theme="light"] .site-theme-toggle {
-  color: #0f172a;
-  background: #fff;
-  border-color: #cbd5e1;
-}
-
-:root[data-theme="light"] .site-theme-toggle:hover {
-  background: #e2e8f0;
-}
-
-:root[data-theme="light"] .site-theme-toggle:focus-visible {
-  outline-color: #0e7490;
 }
 
 @media (min-width: 768px) and (max-width: 1151px) {
@@ -118,8 +213,9 @@ body {
 }
 
 .site-nav :focus-visible,
+.site-page :focus-visible,
 .not-found-home:focus-visible {
-  outline: 2px solid #22d3ee;
+  outline: 2px solid var(--site-accent);
   outline-offset: 4px;
 }
 
@@ -129,8 +225,8 @@ body {
   padding: 64px 24px;
   display: grid;
   place-items: center;
-  color: #fff;
-  background: linear-gradient(to bottom right, #000, #111827, #1f2937);
+  color: var(--site-ink);
+  background: var(--page-background);
 }
 
 .not-found-message {
@@ -140,7 +236,7 @@ body {
 }
 
 .not-found-code {
-  color: #22d3ee;
+  color: var(--site-accent);
   font-size: 24px;
   font-weight: 500;
   margin: 0 0 16px;
@@ -157,7 +253,7 @@ body {
 .not-found-description {
   font-size: 18px;
   line-height: 1.65;
-  color: #d1d5db;
+  color: var(--site-soft);
   margin: 0 0 32px;
 }
 
@@ -166,19 +262,20 @@ body {
   align-items: center;
   min-height: 44px;
   padding: 10px 20px;
-  border: 1px solid #4b5563;
+  border: 1px solid var(--site-border-strong);
   border-radius: 8px;
-  color: #22d3ee;
+  color: var(--site-accent);
   text-decoration: none;
   font-weight: 500;
   font-size: 16px;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .not-found-home:hover,
 .not-found-home:focus-visible {
-  background: #1f2937;
-  border-color: #22d3ee;
+  color: var(--site-link-contrast);
+  background: var(--site-hover);
+  border-color: var(--site-accent);
 }
 
 @media (max-width: 767px) {
@@ -205,6 +302,156 @@ body {
   .not-found-home {
     transition: none;
   }
+}
+
+
+.site-page {
+  color: var(--site-ink);
+}
+
+.site-nav-background {
+  background: var(--site-nav-background);
+}
+
+.site-nav-name-shadow {
+  filter: var(--site-nav-name-shadow);
+}
+
+.site-profile-background {
+  background: var(--site-profile-background);
+}
+
+/* Keep placeholder copy readable without dimming its text and controls. */
+.site-placeholder {
+  opacity: 1;
+}
+
+.project-tag {
+  color: var(--tag-foreground);
+  background: var(--tag-background);
+}
+
+.project-tag[data-tone="neutral"] {
+  --tag-foreground: #334155;
+  --tag-background: #e2e8f0;
+}
+
+.project-tag[data-tone="blue"] {
+  --tag-foreground: #1e40af;
+  --tag-background: #dbeafe;
+}
+
+.project-tag[data-tone="cyan"] {
+  --tag-foreground: #155e75;
+  --tag-background: #cffafe;
+}
+
+.project-tag[data-tone="indigo"] {
+  --tag-foreground: #3730a3;
+  --tag-background: #e0e7ff;
+}
+
+.project-tag[data-tone="green"] {
+  --tag-foreground: #166534;
+  --tag-background: #dcfce7;
+}
+
+.project-tag[data-tone="yellow"] {
+  --tag-foreground: #854d0e;
+  --tag-background: #fef9c3;
+}
+
+.project-tag[data-tone="purple"] {
+  --tag-foreground: #6b21a8;
+  --tag-background: #f3e8ff;
+}
+
+.project-tag[data-tone="orange"] {
+  --tag-foreground: #9a3412;
+  --tag-background: #ffedd5;
+}
+
+:root[data-theme="dark"] .project-tag[data-tone="neutral"] {
+  --tag-foreground: var(--color-gray-300);
+  --tag-background: color-mix(in srgb, var(--color-gray-600) 20%, transparent);
+}
+
+:root[data-theme="dark"] .project-tag[data-tone="blue"] {
+  --tag-foreground: var(--color-blue-300);
+  --tag-background: color-mix(in srgb, var(--color-blue-600) 20%, transparent);
+}
+
+:root[data-theme="dark"] .project-tag[data-tone="cyan"] {
+  --tag-foreground: var(--color-cyan-300);
+  --tag-background: color-mix(in srgb, var(--color-cyan-600) 20%, transparent);
+}
+
+:root[data-theme="dark"] .project-tag[data-tone="indigo"] {
+  --tag-foreground: var(--color-indigo-300);
+  --tag-background: color-mix(in srgb, var(--color-indigo-600) 20%, transparent);
+}
+
+:root[data-theme="dark"] .project-tag[data-tone="green"] {
+  --tag-foreground: var(--color-green-300);
+  --tag-background: color-mix(in srgb, var(--color-green-600) 20%, transparent);
+}
+
+:root[data-theme="dark"] .project-tag[data-tone="yellow"] {
+  --tag-foreground: var(--color-yellow-300);
+  --tag-background: color-mix(in srgb, var(--color-yellow-600) 20%, transparent);
+}
+
+:root[data-theme="dark"] .project-tag[data-tone="purple"] {
+  --tag-foreground: var(--color-purple-300);
+  --tag-background: color-mix(in srgb, var(--color-purple-600) 20%, transparent);
+}
+
+:root[data-theme="dark"] .project-tag[data-tone="orange"] {
+  --tag-foreground: var(--color-orange-300);
+  --tag-background: color-mix(in srgb, var(--color-orange-600) 20%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+
+:root:not([data-theme]) .project-tag[data-tone="neutral"] {
+  --tag-foreground: var(--color-gray-300);
+  --tag-background: color-mix(in srgb, var(--color-gray-600) 20%, transparent);
+}
+
+:root:not([data-theme]) .project-tag[data-tone="blue"] {
+  --tag-foreground: var(--color-blue-300);
+  --tag-background: color-mix(in srgb, var(--color-blue-600) 20%, transparent);
+}
+
+:root:not([data-theme]) .project-tag[data-tone="cyan"] {
+  --tag-foreground: var(--color-cyan-300);
+  --tag-background: color-mix(in srgb, var(--color-cyan-600) 20%, transparent);
+}
+
+:root:not([data-theme]) .project-tag[data-tone="indigo"] {
+  --tag-foreground: var(--color-indigo-300);
+  --tag-background: color-mix(in srgb, var(--color-indigo-600) 20%, transparent);
+}
+
+:root:not([data-theme]) .project-tag[data-tone="green"] {
+  --tag-foreground: var(--color-green-300);
+  --tag-background: color-mix(in srgb, var(--color-green-600) 20%, transparent);
+}
+
+:root:not([data-theme]) .project-tag[data-tone="yellow"] {
+  --tag-foreground: var(--color-yellow-300);
+  --tag-background: color-mix(in srgb, var(--color-yellow-600) 20%, transparent);
+}
+
+:root:not([data-theme]) .project-tag[data-tone="purple"] {
+  --tag-foreground: var(--color-purple-300);
+  --tag-background: color-mix(in srgb, var(--color-purple-600) 20%, transparent);
+}
+
+:root:not([data-theme]) .project-tag[data-tone="orange"] {
+  --tag-foreground: var(--color-orange-300);
+  --tag-background: color-mix(in srgb, var(--color-orange-600) 20%, transparent);
+}
 }
 
 /* Blog. Plain CSS under the blog's own class names. Colours are the site's

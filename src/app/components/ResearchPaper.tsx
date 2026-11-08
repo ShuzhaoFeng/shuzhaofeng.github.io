@@ -172,7 +172,7 @@ export default function ResearchPaper({
   }, [isExpanded]);
 
   return (
-    <div className="bg-gray-800/30 rounded-lg p-6 border border-gray-600 hover:border-gray-500 transition-colors">
+    <div className="bg-site-card rounded-lg p-6 border border-site-border-strong hover:border-site-border-hover transition-colors">
       {/* Header with Image and Title */}
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         <div className="flex-shrink-0">
@@ -181,26 +181,26 @@ export default function ResearchPaper({
             alt={imageAlt}
             width={192}
             height={128}
-            className="w-full md:w-48 h-32 md:h-32 object-contain rounded-lg border border-gray-600 bg-white p-2"
+            className="w-full md:w-48 h-32 md:h-32 object-contain rounded-lg border border-site-border-strong bg-white p-2"
           />
         </div>
         <div className="flex-grow">
-          <h3 className="text-xl font-semibold text-white mb-2 leading-tight">
+          <h3 className="text-xl font-semibold text-site-ink mb-2 leading-tight">
             {title}
           </h3>
           {authors && (
-            <p className="text-gray-300 text-sm mb-1">
+            <p className="text-site-soft text-sm mb-1">
               <span className="font-medium">{t("research.authors")}</span>{" "}
               {authors}
             </p>
           )}
           {venue && (
-            <p className="text-gray-300 text-sm mb-1">
+            <p className="text-site-soft text-sm mb-1">
               <span className="font-medium">{t("research.venue")}</span> {venue}
             </p>
           )}
           {year && (
-            <p className="text-gray-300 text-sm mb-1">
+            <p className="text-site-soft text-sm mb-1">
               <span className="font-medium">{t("research.year")}</span> {year}
             </p>
           )}
@@ -209,10 +209,10 @@ export default function ResearchPaper({
 
       {/* Abstract */}
       <div className="mb-4">
-        <h4 className="text-lg font-medium text-gray-200 mb-2">
+        <h4 className="text-lg font-medium text-site-body mb-2">
           {t("research.abstractHeading")}
         </h4>
-        <div className="text-gray-300 leading-relaxed">
+        <div className="text-site-soft leading-relaxed">
           {/* The keys remount the text and the label on each toggle, so each
               new one fades up from partly visible (abstract-swap). */}
           <div
@@ -228,7 +228,7 @@ export default function ResearchPaper({
           </div>
           <button
             onClick={toggleAbstract}
-            className="mt-2 text-cyan-400 hover:text-cyan-300 text-sm font-medium transition-colors cursor-pointer"
+            className="mt-2 text-site-accent hover:text-site-accent-hover text-sm font-medium transition-colors cursor-pointer"
           >
             <span
               key={isExpanded ? "less" : "more"}
@@ -262,7 +262,7 @@ export default function ResearchPaper({
           <button
             onClick={handlePdfDownload}
             disabled={isDownloadingPdf}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-[background-color,opacity]"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-site-download hover:bg-site-download-hover disabled:opacity-50 disabled:hover:bg-site-download text-white text-sm font-medium rounded-lg transition-[background-color,opacity]"
           >
             <Download className="w-4 h-4" aria-hidden="true" />
             {t("research.downloadPdf")}
