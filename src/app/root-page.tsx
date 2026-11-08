@@ -373,7 +373,7 @@ export default function RootPage({ hasPosts }: { hasPosts: boolean }) {
 
   if (!isLoaded) {
     return (
-      <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800" />
+      <main className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center site-loading" />
     );
   }
 

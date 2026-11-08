@@ -29,7 +29,11 @@ i18n.use(initReactI18next).init({
 // Save language changes to localStorage
 i18n.on("languageChanged", (lng) => {
   if (typeof window !== "undefined") {
-    localStorage.setItem("i18nextLng", lng);
+    try {
+      localStorage.setItem("i18nextLng", lng);
+    } catch {
+      // Keep language restoration usable when browser settings cannot be saved.
+    }
   }
 });
 

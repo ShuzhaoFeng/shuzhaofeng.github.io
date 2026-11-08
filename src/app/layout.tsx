@@ -4,6 +4,8 @@ import "./globals.css";
 import NavBar from "./components/NavBar";
 import ActivityWidget from "./components/ActivityWidget";
 import I18nProvider from "./i18n-provider";
+import ThemeProvider from "./theme-provider";
+import { themeInitializationScript } from "./theme";
 import { sharedMetadata } from "./site-metadata";
 import { getAllPosts } from "./blog/posts";
 
@@ -31,15 +33,20 @@ export default function RootLayout({
   const hasPosts = postNames.length > 0;
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitializationScript }} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <I18nProvider postNames={postNames}>
-          <NavBar hasPosts={hasPosts} />
-          {children}
-          <ActivityWidget />
-        </I18nProvider>
+        <ThemeProvider>
+          <I18nProvider postNames={postNames}>
+            <NavBar hasPosts={hasPosts} />
+            {children}
+            <ActivityWidget />
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -36,7 +36,12 @@ export default function I18nProvider({
 
   useEffect(() => {
     // Load saved language from localStorage before rendering
-    const savedLanguage = localStorage.getItem("i18nextLng");
+    let savedLanguage: string | null = null;
+    try {
+      savedLanguage = localStorage.getItem("i18nextLng");
+    } catch {
+      // A blocked settings store must not prevent the page from rendering.
+    }
     if (savedLanguage && savedLanguage !== i18n.language) {
       i18n.changeLanguage(savedLanguage).then(() => {
         setIsLoaded(true);
@@ -97,7 +102,7 @@ export default function I18nProvider({
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800" />
+      <div className="min-h-screen site-loading" />
     );
   }
 
