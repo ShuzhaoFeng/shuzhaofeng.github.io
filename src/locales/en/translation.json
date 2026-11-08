@@ -12,6 +12,8 @@
   "nav.research": "Research",
   "nav.projects": "Projects",
   "nav.blog": "Blog",
+  "nav.switchToLight": "Switch to light mode",
+  "nav.switchToDark": "Switch to dark mode",
   "nav.name": "Shuzhao Feng",
   "journey.toBeContinued": "To be continued...",
   "journey.noLongerOperational": "no longer operational",

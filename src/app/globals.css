@@ -41,6 +41,82 @@ body {
   background: var(--page-background);
 }
 
+.site-theme-toggle {
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: 1px solid #4b5563;
+  border-radius: 999px;
+  color: #fff;
+  background: #1f2937;
+  cursor: pointer;
+}
+
+.site-theme-toggle svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.site-theme-toggle:hover {
+  background: #374151;
+}
+
+.site-theme-mobile {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  border-radius: 8px;
+  gap: 12px;
+  justify-content: flex-start;
+  padding: 0 12px;
+}
+
+:root[data-theme="light"] .site-theme-toggle {
+  color: #0f172a;
+  background: #fff;
+  border-color: #cbd5e1;
+}
+
+:root[data-theme="light"] .site-theme-toggle:hover {
+  background: #e2e8f0;
+}
+
+:root[data-theme="light"] .site-theme-toggle:focus-visible {
+  outline-color: #0e7490;
+}
+
+@media (min-width: 768px) and (max-width: 1151px) {
+  .site-nav-row {
+    gap: 8px;
+  }
+
+  .site-nav-name {
+    font-size: 16px;
+    margin-right: 0;
+  }
+
+  .site-nav-row > ul {
+    gap: 12px;
+    font-size: 14px;
+  }
+
+  .site-nav-social svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .site-nav-language {
+    margin-left: 0;
+  }
+
+  .site-nav-language > button {
+    width: 112px;
+  }
+}
+
 .site-nav :focus-visible,
 .not-found-home:focus-visible {
   outline: 2px solid #22d3ee;

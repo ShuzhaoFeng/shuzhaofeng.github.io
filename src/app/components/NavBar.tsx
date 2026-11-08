@@ -2,9 +2,10 @@
 import { useState, useRef, useEffect, type MouseEvent as ReactMouseEvent } from "react";
 import { flushSync } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { Check, ChevronDown, Globe, Mail, Menu, X } from "lucide-react";
+import { Check, ChevronDown, Globe, Mail, Menu, Moon, Sun, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTheme } from "../theme-provider";
 import {
   isSectionId,
   readSectionMemory,
@@ -143,6 +144,7 @@ function blogPageOf(pathname: string): "list" | "post" | null {
 }
 
 export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
+  const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
   const isMainPage = pathname === "/";
   // Blog chosen on `/`: the item is current at once, as a chosen section's
@@ -164,6 +166,8 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
   const [easeLabels, setEaseLabels] = useState(false);
 
   const { t, i18n } = useTranslation();
+  const themeActionLabel = t(theme === "dark" ? "nav.switchToLight" : "nav.switchToDark");
+  const ThemeIcon = theme === "dark" ? Sun : Moon;
   const [isLangOpen, setIsLangOpen] = useState(false);
   const langRef = useRef<HTMLDivElement | null>(null);
 
@@ -269,14 +273,13 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
     <nav className="site-nav w-full sticky top-0 z-50 shadow-md">
       <div className="bg-gradient-to-t from-[#1e293b]/80 via-[#111827] to-black w-full">
         <div className="max-w-6xl mx-auto px-2 sm:px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-4 md:gap-8 w-full">
+          <div className="site-nav-row flex items-center gap-2 sm:gap-4 md:gap-8 w-full">
             <div className="site-nav-name text-base sm:text-xl font-bold tracking-tight text-white drop-shadow-lg mr-2 sm:mr-6 min-w-max">
               {t("nav.name")}
             </div>
 
-            {/* Desktop Navigation. The row does not wrap, so between `md` and
-                `lg` the items sit 14 px apart, which offsets the width the
-                Blog item adds. From `lg` the 32 px gaps return. */}
+            {/* Compact desktop spacing in globals.css leaves room for Blog
+                and the theme control at the 768px breakpoint. */}
             <ul className="hidden md:flex gap-3.5 lg:gap-8 text-base font-medium flex-1">
               {navLinks.map(({ page, label }) => (
                 <li key={page} className="min-w-max">
@@ -329,6 +332,17 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
               </button>
             </div>
 
+            <button
+              type="button"
+              onClick={toggleTheme}
+              disabled={theme === null}
+              aria-label={themeActionLabel}
+              title={themeActionLabel}
+              className="site-theme-toggle hidden md:inline-flex"
+            >
+              <ThemeIcon aria-hidden="true" />
+            </button>
+
             {/* Social Icons */}
             <div className="site-nav-social flex items-center justify-end min-w-max gap-1">
               <a
@@ -373,7 +387,7 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
             </div>
 
             {/* Language dropdown - far right with spacing */}
-            <div ref={langRef} className="ml-2 sm:ml-4 relative">
+            <div ref={langRef} className="site-nav-language ml-2 sm:ml-4 relative">
               <button
                 onClick={() => setIsLangOpen(!isLangOpen)}
                 aria-haspopup="true"
@@ -484,6 +498,15 @@ export default function NavBar({ hasPosts }: { hasPosts: boolean }) {
                   />
                 </div>
               )}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                disabled={theme === null}
+                className="site-theme-toggle site-theme-mobile"
+              >
+                <ThemeIcon aria-hidden="true" />
+                <span>{themeActionLabel}</span>
+              </button>
             </div>
           </div>
         </div>
